@@ -113,8 +113,8 @@ fn main() {
     //region: cmdline parameters
     //TODO: is this a clear case for shadowing? The same value in different types
     //default ip and port
-    let df_local_ip = local_ip_get().expect("cannot get local ip");
-    //let df_local_ip = "127.0.0.22";
+    //let df_local_ip = local_ip_get().expect("cannot get local ip");
+    let df_local_ip = "127.0.0.22";
     let df_local_port = 80;
     //string representation of defaults
     let prm_ip = df_local_ip.to_string();
