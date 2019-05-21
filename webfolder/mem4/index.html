@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+  <title>mem4</title>
+  <link rel="stylesheet" href="css/mem4.css">
+</head>
+
+<body>
+  <div id="div_for_virtual_dom">
+  </div>
+  <script type="module">
+    import init from "./pkg/mem4.js";
+    init("./pkg/mem4_bg.wasm");
+   </script>
+</body>
+
+</html>
