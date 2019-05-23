@@ -64,8 +64,8 @@ pub enum WsMessage {
     AcceptPlay {
         ///ws client instance unique id. To not listen the echo to yourself.
         my_ws_uid: usize,
-        ///player1 is the initiator of the game.
-        player1_ws_uid: usize,
+        ///json of vector of players
+        players: String,
     },
     /// player1 initialize the game data ans sends it to all players
     /// I will send json string to not confuse the server with vectors

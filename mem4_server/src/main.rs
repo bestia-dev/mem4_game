@@ -312,40 +312,30 @@ fn user_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
                 Err(_disconnected) => {}
             }
         }
-        WsMessage::WantToPlay { .. }
-        | WsMessage::ResponseWsUid { .. }
-        | WsMessage::ResponseSpellingJson { .. }
-        | WsMessage::AcceptPlay { .. }
-        | WsMessage::PlayerClick { .. }
-        | WsMessage::GameDataInit { .. }
-        | WsMessage::PlayerChange { .. } => broadcast(users, ws_uid_of_message, &new_msg),
-        WsMessage::EndGame { .. } => send_to_other_players(users, ws_uid_of_message, &new_msg),
+        WsMessage::WantToPlay { .. } => broadcast(users, ws_uid_of_message, &new_msg),
+        WsMessage::ResponseWsUid { .. } => info!("ResponseWsUid: {}", ""),
+        WsMessage::ResponseSpellingJson { .. } => info!("ResponseSpellingJson: {}", ""),
+        WsMessage::AcceptPlay { players, .. }
+        | WsMessage::PlayerClick { players, .. }
+        | WsMessage::GameDataInit { players, .. }
+        | WsMessage::PlayerChange { players, .. }
+        | WsMessage::EndGame { players, .. } => {
+            send_to_other_players(users, ws_uid_of_message, &new_msg, &players)
+        }
     }
 }
 
 ///New message from this user send to all other players except sender.
-fn send_to_other_players(users: &Users, ws_uid_of_message: usize, new_msg: &str) {
+fn send_to_other_players(
+    users: &Users,
+    ws_uid_of_message: usize,
+    new_msg: &str,
+    string_players: &str,
+) {
     //info!("send_to_other_players: {}", new_msg);
 
-    //serde_json knows: 1. map (key+value pair) and 2. array
-    let json_map: serde_json::Map<String, serde_json::Value> =
-        serde_json::from_str(new_msg).expect("error serde_json::from_str(new_msg)");
-    //info!("js_players: {}", v);
-    let tuple = json_map
-        .iter()
-        .next()
-        .expect("error json_map.iter().next()");
-
-    let msg_type = tuple.1;
-    info!("object: {}", msg_type);
-
-    let js_players = msg_type.get("players").expect("error object.get(players)");
-    info!("js_players: {}", js_players);
-
-    let string_players = js_players.to_string();
-    info!("string_players: {}", string_players);
     let players: Vec<Player> =
-        serde_json::from_str(&string_players).expect("error serde_json::from_str(string_players)");
+        serde_json::from_str(string_players).expect("error serde_json::from_str(string_players)");
 
     for (&uid, tx) in users.lock().expect("error users.lock()").iter() {
         let mut is_player;

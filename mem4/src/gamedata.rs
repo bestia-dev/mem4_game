@@ -96,24 +96,35 @@ impl GameData {
             .as_ref()
             .expect("self.spelling.as_ref()")
             .name
-            .len();
+            .len()
+            - 1;
         let players_count = self.players.len();
         let cards_count = 16 * players_count;
         let random_count = cards_count / 2;
-        //the random numbers don't need to be unique.
-        //If there is a lot of players we could run out of unique numbers.
+        //if the number of cards is bigger than the images, i choose all the images.
+        //for the rest I use random.
+        let multiple: usize = random_count / spelling_count;
+        let rest = random_count - (multiple * spelling_count);
         //region: find random numbers between 1 and spelling_count
         //vec_of_random_numbers is 0 based
         let mut vec_of_random_numbers = Vec::new();
         let mut rng = SmallRng::from_entropy();
         let mut i = 0;
-        while i < random_count {
+        while i < rest {
             //gen_range is lower inclusive, upper exclusive 26 + 1
             let num: usize = rng.gen_range(1, spelling_count);
-            //push a pair of the same number
-            vec_of_random_numbers.push(num);
-            vec_of_random_numbers.push(num);
-            i += 1;
+            if !vec_of_random_numbers.contains(&num) {
+                //push a pair of the same number
+                vec_of_random_numbers.push(num);
+                vec_of_random_numbers.push(num);
+                i += 1;
+            }
+        }
+        for _m in 1..=multiple {
+            for i in 1..spelling_count {
+                vec_of_random_numbers.push(i);
+                vec_of_random_numbers.push(i);
+            }
         }
         //endregion
 

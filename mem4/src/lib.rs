@@ -848,7 +848,8 @@ root_rendering_component.game_data.game_state=GameState::Accepted;
                             .send_with_str(
                                 &serde_json::to_string(&WsMessage::AcceptPlay {
                                     my_ws_uid: root_rendering_component.game_data.my_ws_uid,
-                                    player1_ws_uid: root_rendering_component.game_data.players[0].ws_uid,
+                                    players: serde_json::to_string(&root_rendering_component.game_data.players)
+                                    .expect("serde_json::to_string(&game_data.players)"),
                                 })
                                 .expect("error sending test"),
                             )
@@ -891,16 +892,17 @@ root_rendering_component.game_data.game_state=GameState::Accepted;
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             //this game_data mutable reference is dropped on the end of the function
-                            //clippy is wrong about dropping the mut. I need it.
-                            let game_data = &root_rendering_component.game_data;
                             //region: send WsMessage over websocket
-                            game_data
+                            root_rendering_component
+                                .game_data
                                 .ws
                                 .send_with_str(
                                     &serde_json::to_string(&WsMessage::PlayerChange {
-                                        my_ws_uid: game_data.my_ws_uid,
-                                        players: serde_json::to_string(&game_data.players)
-                                            .expect("serde_json::to_string(&game_data.players)"),
+                                        my_ws_uid: root_rendering_component.game_data.my_ws_uid,
+                                        players: serde_json::to_string(
+                                            &root_rendering_component.game_data.players,
+                                        )
+                                        .expect("serde_json::to_string(&root_rendering_component.game_data.players)"),
                                     })
                                     .expect("error sending PlayerChange"),
                                 )
