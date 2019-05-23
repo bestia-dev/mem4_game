@@ -23,7 +23,7 @@ impl PlayersAndScores {
     pub const fn new() -> Self {
         PlayersAndScores {
             my_points: 0,
-            my_player_number: 0,
+            my_player_number: 1,
             player_turn: 0,
         }
     }
@@ -32,7 +32,10 @@ impl PlayersAndScores {
     pub fn update_intern_cache(&mut self, game_data: &GameData) -> bool {
         let mut is_invalidated;
         is_invalidated = false;
-        if self.my_points != game_data.player_points[game_data.my_player_number - 1] {
+        if game_data.my_player_number > 0
+            && game_data.player_points.len() >= game_data.my_player_number
+            && self.my_points != game_data.player_points[game_data.my_player_number - 1]
+        {
             self.my_points = game_data.player_points[game_data.my_player_number - 1];
             is_invalidated = true;
         }

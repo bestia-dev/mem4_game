@@ -47,7 +47,7 @@ mod gamedata;
 mod playersandscores;
 mod rulesanddescription;
 mod websocketcommunication;
-use crate::gamedata::{ CardStatusCardFace, GameData, GameState};
+use crate::gamedata::{CardStatusCardFace, GameData, GameState};
 use crate::playersandscores::PlayersAndScores;
 use crate::rulesanddescription::RulesAndDescription;
 use crate::websocketcommunication::setup_ws_connection;
@@ -292,11 +292,12 @@ impl RootRenderingComponent {
     }
     ///fn on change for both click and we msg.
     fn take_turn(&mut self) {
-        self.game_data.player_turn = if self.game_data.player_turn == 1 {
-            2
-        } else {
-            1
-        };
+        self.game_data.player_turn =
+            if self.game_data.player_turn + 1 < self.game_data.players_ws_uid.len() {
+                self.game_data.player_turn + 1
+            } else {
+                1
+            };
 
         //click on Change button closes first and second card
         let x1 = self.game_data.card_index_of_first_click;
@@ -317,9 +318,10 @@ impl RootRenderingComponent {
         self.check_invalidate_for_all_components();
     }
     ///prepares the game data
-    fn game_data_init(&mut self){
+    fn game_data_init(&mut self) {
         self.game_data.prepare_random_data();
-        self.game_data.game_state=GameState::Play;
+        self.game_data.game_state = GameState::Play;
+        self.game_data.player_turn = 1;
     }
     ///reset the data to replay the game
     fn reset(&mut self) {
@@ -329,11 +331,9 @@ impl RootRenderingComponent {
         self.game_data.card_index_of_second_click = 0;
         self.game_data.count_all_clicks = 0;
         self.game_data.players_ws_uid.clear();
-        self.game_data.players_ws_uid.push(0);
         self.game_data.game_state = GameState::Start;
         self.game_data.content_folder_name = "alphabet".to_string();
         self.game_data.player_points.clear();
-        self.game_data.player_points.push(0);
         self.game_data.my_player_number = 0;
         self.game_data.player_turn = 0;
         self.game_data.spelling = None;
@@ -352,35 +352,43 @@ impl RootRenderingComponent {
         console::log_1(&"rcv wanttoplay".into());
         self.reset();
         self.game_data.game_state = GameState::Asked;
-        self.game_data.players_ws_uid.clear();
-        self.game_data.players_ws_uid.push(my_ws_uid);
+        self.game_data.players_ws_uid.push(my_ws_uid); //the first player is the initiator
+        self.game_data.player_points.push(0);
+        self.game_data.my_player_number = 2; //temporary number
+        self.game_data.players_ws_uid.push(self.game_data.my_ws_uid);
+        self.game_data.player_points.push(0);
         self.game_data.content_folder_name = content_folder_name;
     }
     ///msg accept play
     fn on_accept_play(&mut self, my_ws_uid: usize) {
-        if self.game_data.my_player_number == 1 && ! self.game_data.players_ws_uid.contains(&my_ws_uid) {
-    self.game_data.players_ws_uid.push(my_ws_uid);
-    self.game_data.player_points.push(0);
-    self.check_invalidate_for_all_components();
-}
+        if self.game_data.my_player_number == 1
+            && !self.game_data.players_ws_uid.contains(&my_ws_uid)
+        {
+            self.game_data.players_ws_uid.push(my_ws_uid);
+            self.game_data.player_points.push(0);
+            self.check_invalidate_for_all_components();
+        }
     }
     ///on game data init
-    fn on_game_data_init(&mut self,
-    card_grid_data:&str,
-    spelling:&str,
-    players_ws_uid:&str,){
-        self.game_data.vec_cards = serde_json::from_str(card_grid_data).expect(
-            "error serde_json::from_str(card_grid_data)",
-        );
-                            
-        self.game_data.spelling = serde_json::from_str(spelling).expect(
-            "error serde_json::from_str(spelling)",
-        );
+    fn on_game_data_init(&mut self, card_grid_data: &str, spelling: &str, players_ws_uid: &str) {
+        self.game_data.game_state = GameState::Play;
+        self.game_data.player_turn = 1;
+        self.game_data.vec_cards = serde_json::from_str(card_grid_data)
+            .expect("error serde_json::from_str(card_grid_data)");
 
-        self.game_data.players_ws_uid = serde_json::from_str(players_ws_uid).expect(
-            "error serde_json::from_str(players_ws_uid)",
-        );
-        self.game_data.game_state=GameState::Play;
+        self.game_data.spelling =
+            serde_json::from_str(spelling).expect("error serde_json::from_str(spelling)");
+
+        self.game_data.players_ws_uid = serde_json::from_str(players_ws_uid)
+            .expect("error serde_json::from_str(players_ws_uid)");
+        self.game_data.game_state = GameState::Play;
+        //find my player number
+        for index in 0..self.game_data.players_ws_uid.len() {
+            if self.game_data.players_ws_uid[index] == self.game_data.my_ws_uid {
+                self.game_data.my_player_number = index + 1;
+            }
+        }
+        self.check_invalidate_for_all_components();
     }
     ///msg end game
     fn on_end_game(&mut self) {
@@ -500,14 +508,7 @@ impl Render for RootRenderingComponent {
                                 root.unwrap_mut::<RootRenderingComponent>();
                             //this game_data mutable reference is dropped on the end of the function
                             let mut game_data = &mut root_rendering_component.game_data;
-                            //the click on grid is allowed only when is the turn of this player
-                            if (game_data.game_state.as_ref() == GameState::Play.as_ref()
-                                && game_data.player_turn == 1
-                                && game_data.my_player_number == 1)
-                                || (game_data.game_state.as_ref() == GameState::Play.as_ref()
-                                    && game_data.player_turn == 2
-                                    && game_data.my_player_number == 2)
-                            {
+                            if game_data.game_state.as_ref() == GameState::Play.as_ref() {
                                 // If the event's target is our image...
                                 let img = match event
                                     .target()
@@ -554,8 +555,7 @@ impl Render for RootRenderingComponent {
                                         .send_with_str(
                                             &serde_json::to_string(&WsMessage::PlayerClick {
                                                 my_ws_uid: game_data.my_ws_uid,
-                                                players_ws_uid: 
- serde_json::to_string(&game_data.players_ws_uid)
+                                                players_ws_uid: serde_json::to_string(&game_data.players_ws_uid)
                 .expect("serde_json::to_string(&game_data.players_ws_uid)"),
                                                 card_index: this_click_card_index,
                                                 count_click_inside_one_turn: game_data
@@ -693,7 +693,10 @@ bumpalo::format!(in bump, "{}",
                             //region: send WsMessage over websocket
                             root_rendering_component.game_data.my_player_number = 1;
                             root_rendering_component.game_data.players_ws_uid.clear();
-                            root_rendering_component.game_data.players_ws_uid.push(root_rendering_component.game_data.my_ws_uid);
+                            root_rendering_component
+                                .game_data
+                                .players_ws_uid
+                                .push(root_rendering_component.game_data.my_ws_uid);
                             root_rendering_component.game_data.game_state = GameState::Asking;
                             root_rendering_component.game_data.content_folder_name =
                                 folder_name.clone();
@@ -771,7 +774,7 @@ bumpalo::format!(in bump, "{}",
                 .attr("id", "ws_elem")
                 .attr("style", "color:red;")
                 .children([text(
-                    bumpalo::format!(in bump, "Players accepted: {} Start Game?", root_rendering_component.game_data.players_ws_uid.len()-1).into_bump_str(),
+                    bumpalo::format!(in bump, "Players accepted: {}. Start Game?", root_rendering_component.game_data.players_ws_uid.len()-1).into_bump_str(),
                 )])
                  .on("click", move |root, vdom, _event| {
                             let root_rendering_component =
@@ -784,16 +787,12 @@ bumpalo::format!(in bump, "{}",
                                 .ws
                                 .send_with_str(
                                     &serde_json::to_string(&WsMessage::GameDataInit {
-card_grid_data: 
-			serde_json::to_string(&root_rendering_component.game_data.vec_cards)
+card_grid_data: serde_json::to_string(&root_rendering_component.game_data.vec_cards)
                 .expect("serde_json::to_string(&self.game_data.vec_cards)"),
-players_ws_uid: 
-			serde_json::to_string(&root_rendering_component.game_data.players_ws_uid)
+players_ws_uid: serde_json::to_string(&root_rendering_component.game_data.players_ws_uid)
                 .expect("serde_json::to_string(&self.game_data.players_ws_uid)"),
-spelling: 
-			serde_json::to_string(&root_rendering_component.game_data.spelling)
-                .expect("serde_json::to_string(&self.game_data.spelling)"),				
-                                        
+spelling: serde_json::to_string(&root_rendering_component.game_data.spelling)
+                .expect("serde_json::to_string(&self.game_data.spelling)"),
                                     })
                                     .expect("error sending WantToPlay"),
                                 )
@@ -816,7 +815,7 @@ spelling:
                             .into_bump_str(),
                     )])
                     .finish()
-                    } else if let GameState::Asked = root_rendering_component.game_data.game_state {
+            } else if let GameState::Asked = root_rendering_component.game_data.game_state {
                 // 2S Click here to Accept play!
                 console::log_1(&"GameState::Asked".into());
                 //return Click here to Accept play
@@ -852,12 +851,24 @@ root_rendering_component.game_data.game_state=GameState::Accepted;
                 .count_click_inside_one_turn
                 >= 2
             {
+                console::log_1(&JsValue::from_str(&format!(
+                    "my_player_number {}",
+                    &root_rendering_component.game_data.my_player_number
+                )));
+                console::log_1(&JsValue::from_str(&format!(
+                    "player_turn {}",
+                    &root_rendering_component.game_data.player_turn
+                )));
+
                 if root_rendering_component.game_data.my_player_number
-                    == root_rendering_component.game_data.player_turn
+                    == (if root_rendering_component.game_data.player_turn + 1
+                        < root_rendering_component.game_data.players_ws_uid.len()
+                    {
+                        root_rendering_component.game_data.player_turn + 1
+                    } else {
+                        1
+                    })
                 {
-                    //return wait for the other player
-                    div_wait_for_other_player(bump)
-                } else {
                     //return Click here to take your turn
                     h3(bump)
                         .attr("id", "ws_elem")
@@ -878,9 +889,10 @@ root_rendering_component.game_data.game_state=GameState::Accepted;
                                 .send_with_str(
                                     &serde_json::to_string(&WsMessage::PlayerChange {
                                         my_ws_uid: game_data.my_ws_uid,
-players_ws_uid: 
- serde_json::to_string(&game_data.players_ws_uid)
-                .expect("serde_json::to_string(&game_data.players_ws_uid)"),
+                                        players_ws_uid: serde_json::to_string(
+                                            &game_data.players_ws_uid,
+                                        )
+                                        .expect("serde_json::to_string(&game_data.players_ws_uid)"),
                                     })
                                     .expect("error sending PlayerChange"),
                                 )
@@ -891,6 +903,9 @@ players_ws_uid:
                             vdom.schedule_render();
                         })
                         .finish()
+                } else {
+                    //return wait for the other player
+                    div_wait_for_other_player(bump)
                 }
             } else if root_rendering_component
                 .game_data

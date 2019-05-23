@@ -179,7 +179,7 @@ impl GameData {
             game_state: GameState::Start,
             content_folder_name: "alphabet".to_string(),
             player_points,
-            my_player_number: 0,
+            my_player_number: 1,
             player_turn: 0,
             content_folders: vec![
                 String::from("alphabet"),

@@ -69,11 +69,11 @@ pub enum WsMessage {
     },
     /// player1 initialize the game data ans sends it to all players
     /// I will send json string to not confuse the server with vectors
-    GameDataInit{
+    GameDataInit {
         ///act is the action to take on the receiver
         card_grid_data: String,
-        spelling:String,
-        players_ws_uid:String,
+        spelling: String,
+        players_ws_uid: String,
     },
     ///player click
     PlayerClick {

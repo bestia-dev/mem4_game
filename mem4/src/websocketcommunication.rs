@@ -141,7 +141,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
 
-                            if let GameState::EndGame | GameState::Start | GameState::Asked =
+                            if let GameState::Accepted =
                                 root_rendering_component.game_data.game_state
                             {
                                 root_rendering_component.on_game_data_init(
