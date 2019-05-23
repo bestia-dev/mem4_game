@@ -11,6 +11,7 @@ script = [
 # It must be copied from the mem4_server.exe output.
     "start chrome http://127.0.0.22:80", 
     "start chrome http://127.0.0.22:80", 
+    "start chrome http://127.0.0.22:80", 
     "cd webfolder",
     "mem4_server.exe"
 ]

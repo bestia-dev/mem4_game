@@ -114,11 +114,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
                     .map_err(|_| ()),
                 );
             }
-            WsMessage::AcceptPlay {
-                my_ws_uid,
-                card_grid_data,
-                ..
-            } => {
+            WsMessage::AcceptPlay { my_ws_uid, .. } => {
                 wasm_bindgen_futures::spawn_local(
                     weak.with_component({
                         let v2 = weak.clone();
@@ -126,15 +122,41 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
                             console::log_1(&"rcv AcceptPlay".into());
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
-                            root_rendering_component.on_accept_play(my_ws_uid, &card_grid_data);
+                            root_rendering_component.on_accept_play(my_ws_uid);
                             v2.schedule_render();
                         }
                     })
                     .map_err(|_| ()),
                 );
             }
+            WsMessage::GameDataInit {
+                card_grid_data,
+                spelling,
+                players_ws_uid,
+            } => {
+                wasm_bindgen_futures::spawn_local(
+                    weak.with_component({
+                        let v2 = weak.clone();
+                        move |root| {
+                            let root_rendering_component =
+                                root.unwrap_mut::<RootRenderingComponent>();
+
+                            if let GameState::EndGame | GameState::Start | GameState::Asked =
+                                root_rendering_component.game_data.game_state
+                            {
+                                root_rendering_component.on_game_data_init(
+                                    &card_grid_data,
+                                    &spelling,
+                                    &players_ws_uid,
+                                );
+                                v2.schedule_render();
+                            }
+                        }
+                    })
+                    .map_err(|_| ()),
+                );
+            }
             WsMessage::PlayerClick {
-                my_ws_uid,
                 card_index,
                 count_click_inside_one_turn,
                 ..
@@ -146,18 +168,16 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
                         move |root| {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
-                            console::log_1(&"other_ws_uid".into());
-                            if my_ws_uid == root_rendering_component.game_data.other_ws_uid {
-                                root_rendering_component
-                                    .on_player_click(count_click_inside_one_turn, card_index);
-                                v2.schedule_render();
-                            }
+                            console::log_1(&"players_ws_uid".into());
+                            root_rendering_component
+                                .on_player_click(count_click_inside_one_turn, card_index);
+                            v2.schedule_render();
                         }
                     })
                     .map_err(|_| ()),
                 );
             }
-            WsMessage::PlayerChange { my_ws_uid, .. } => {
+            WsMessage::PlayerChange { .. } => {
                 wasm_bindgen_futures::spawn_local(
                     weak.with_component({
                         let v2 = weak.clone();
@@ -165,10 +185,8 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             console::log_1(&"PlayerChange".into());
-                            if my_ws_uid == root_rendering_component.game_data.other_ws_uid {
-                                root_rendering_component.on_player_change();
-                                v2.schedule_render();
-                            }
+                            root_rendering_component.on_player_change();
+                            v2.schedule_render();
                         }
                     })
                     .map_err(|_| ()),

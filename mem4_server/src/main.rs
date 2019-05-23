@@ -52,7 +52,6 @@ use futures::{Future, Stream};
 use mem4_common::WsMessage;
 use regex::Regex;
 use std::collections::HashMap;
-use std::convert::TryFrom;
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
@@ -256,8 +255,7 @@ fn user_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
     let new_msg = msg.to_string();
     //info!("msg: {}", new_msg);
 
-    //There are different messages coming from wasm
-    //ConnectionTest returns a message YourWebSocketUid
+    //There are different messages coming from the mem4 wasm app
     //WantToPlay must be broadcasted to all users
     //RequestSpelling must return a message ResponseSpellingJson to the same user
     //all others must be forwarded to exactly the other player.
@@ -314,24 +312,26 @@ fn user_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
                 Err(_disconnected) => {}
             }
         }
-        WsMessage::WantToPlay { .. } => broadcast(users, ws_uid_of_message, &new_msg),
-        mem4_common::WsMessage::ResponseWsUid { .. }
-        | mem4_common::WsMessage::ResponseSpellingJson { .. }
-        | mem4_common::WsMessage::AcceptPlay { .. }
-        | mem4_common::WsMessage::PlayerClick { .. }
-        | mem4_common::WsMessage::EndGame { .. }
-        | mem4_common::WsMessage::PlayerChange { .. } => send_to_other_player(users, &new_msg),
+        WsMessage::WantToPlay { .. }
+        | WsMessage::ResponseWsUid { .. }
+        | WsMessage::ResponseSpellingJson { .. }
+        | WsMessage::AcceptPlay { .. }
+        | WsMessage::PlayerClick { .. }
+        | WsMessage::GameDataInit { .. }
+        | WsMessage::PlayerChange { .. } => broadcast(users, ws_uid_of_message, &new_msg),
+        WsMessage::EndGame { .. } => send_to_other_players(users, ws_uid_of_message, &new_msg),
     }
 }
-///New message from this user send only to the other player.
-fn send_to_other_player(users: &Users, new_msg: &str) {
-    //info!("send_to_other_player: {}", new_msg);
-    //the other user is in the other_ws_uid field
+
+///New message from this user send to all other players.
+fn send_to_other_players(users: &Users, ws_uid_of_message: usize, new_msg: &str) {
+    //info!("send_to_other_players: {}", new_msg);
+    //the other user is in the players_ws_uid field
 
     //serde_json knows: 1. map (key+value pair) and 2. array
     let json_map: serde_json::Map<String, serde_json::Value> =
         serde_json::from_str(new_msg).expect("error serde_json::from_str(new_msg)");
-    //info!("js_other_ws_uid: {}", v);
+    //info!("js_players_ws_uid: {}", v);
     let tuple = json_map
         .iter()
         .next()
@@ -340,27 +340,30 @@ fn send_to_other_player(users: &Users, new_msg: &str) {
     let object = tuple.1;
     info!("object: {}", object);
 
-    let js_other_ws_uid = object
-        .get("other_ws_uid")
-        .expect("error object.get(other_ws_uid)");
-    info!("js_other_ws_uid: {}", js_other_ws_uid);
+    let js_players_ws_uid = object
+        .get("players_ws_uid")
+        .expect("error object.get(players_ws_uid)");
+    info!("js_players_ws_uid: {}", js_players_ws_uid);
 
-    let i64_other_ws_uid = js_other_ws_uid.as_i64().expect("js_other_ws_uid.as_i64()");
-    info!("i64_other_ws_uid: {}", i64_other_ws_uid);
-    let other_ws_uid =
-        usize::try_from(i64_other_ws_uid).expect("usize::try_from(i64_other_ws_uid)");
+    let string_players_ws_uid = js_players_ws_uid.to_string();
+    info!("string_players_ws_uid: {}", string_players_ws_uid);
+    let players_ws_uid: Vec<usize> = serde_json::from_str(&string_players_ws_uid)
+        .expect("error serde_json::from_str(string_players_ws_uid)");
 
-    match users
-        .lock()
-        .expect("error users.lock()")
-        .get(&other_ws_uid)
-        .unwrap()
-        .unbounded_send(Message::text(String::from(new_msg)))
-    {
-        Ok(()) => (),
-        Err(_disconnected) => {}
+    for (&uid, tx) in users.lock().expect("error users.lock()").iter() {
+        if ws_uid_of_message != uid && players_ws_uid.contains(&uid) {
+            match tx.unbounded_send(Message::text(String::from(new_msg))) {
+                Ok(()) => (),
+                Err(_disconnected) => {
+                    // The tx is disconnected, our `user_disconnected` code
+                    // should be happening in another task, nothing more to
+                    // do here.
+                }
+            }
+        }
     }
 }
+
 ///broadcast is the simplest
 fn broadcast(users: &Users, ws_uid_of_message: usize, new_msg: &str) {
     // New message from this user, send it to everyone else (except same uid)...

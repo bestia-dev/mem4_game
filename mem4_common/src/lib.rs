@@ -43,12 +43,12 @@ pub enum WsMessage {
         ///anything
         dummy: String,
     },
-    ///Request websocket Uid
+    ///Request websocket Uid - first message to WebSocket server
     RequestWsUid {
         ///anything
         test: String,
     },
-    ///response for ConnectionTest
+    ///response from WebSocket server for first message
     ResponseWsUid {
         ///websocket Uid
         your_ws_uid: usize,
@@ -64,17 +64,23 @@ pub enum WsMessage {
     AcceptPlay {
         ///ws client instance unique id. To not listen the echo to yourself.
         my_ws_uid: usize,
-        ///other player unique id. Used by the WebSocket server.
-        other_ws_uid: usize,
+        ///player1 is the initiator of the game.
+        player1_ws_uid: usize,
+    },
+    /// player1 initialize the game data ans sends it to all players
+    /// I will send json string to not confuse the server with vectors
+    GameDataInit{
         ///act is the action to take on the receiver
         card_grid_data: String,
+        spelling:String,
+        players_ws_uid:String,
     },
     ///player click
     PlayerClick {
         ///ws client instance unique id. To not listen the echo to yourself.
         my_ws_uid: usize,
         ///other player unique id. Used by the WebSocket server.
-        other_ws_uid: usize,
+        players_ws_uid: String,
         ///card_index
         card_index: usize,
         ///count click inside one turn
@@ -85,14 +91,14 @@ pub enum WsMessage {
         ///ws client instance unique id. To not listen the echo to yourself.
         my_ws_uid: usize,
         ///other player unique id. Used by the WebSocket server.
-        other_ws_uid: usize,
+        players_ws_uid: String,
     },
     ///end game
     EndGame {
         ///ws client instance unique id. To not listen the echo to yourself.
         my_ws_uid: usize,
         ///other player unique id. Used by the WebSocket server.
-        other_ws_uid: usize,
+        players_ws_uid: String,
     },
     ///Request the spelling from the WebSocket server
     RequestSpelling {

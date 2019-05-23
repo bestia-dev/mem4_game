@@ -25,6 +25,8 @@ pub enum GameState {
     Asking,
     ///Player2 is asked WantToPlay
     Asked,
+    ///Accepted
+    Accepted,
     ///play (the turn is in RootRenderingComponent.player_turn)
     Play,
     ///end game
@@ -55,10 +57,6 @@ pub struct Card {
 pub struct GameData {
     ///vector of cards
     pub vec_cards: Vec<Card>,
-    //First turn: Player1 clicks 2 times and opens 2 cards.
-    //If cards match, Player1 receives one point and countinues: 2 click for 2 cards.
-    //If not match: Player2 clicks the Change button to close opened cards.
-    //Then starts the Player2 turn.
     ///count click inside one turn
     pub count_click_inside_one_turn: usize,
     ///card index of first click
@@ -71,20 +69,18 @@ pub struct GameData {
     pub ws: WebSocket,
     ///my ws client instance unique id. To not listen the echo to yourself.
     pub my_ws_uid: usize,
-    ///other ws client instance unique id. To listen only to one accepted other player.
-    pub other_ws_uid: usize,
+    ///all ws client instance unique id.
+    pub players_ws_uid: Vec<usize>,
     ///game state: Start,Asking,Asked,Player1,Player2
     pub game_state: GameState,
     ///content folder name
     pub content_folder_name: String,
     ///What player am I
-    pub this_machine_player_number: usize,
-    ///whose turn is now:  player 1 or 2
+    pub my_player_number: usize,
+    ///whose turn is now:  player 1,2,3,...
     pub player_turn: usize,
     ///player1 points
-    pub player1_points: usize,
-    ///player2 points
-    pub player2_points: usize,
+    pub player_points: Vec<usize>,
     ///content folders vector
     pub content_folders: Vec<String>,
     ///spellings
@@ -93,23 +89,29 @@ pub struct GameData {
 impl GameData {
     ///prepare new random data
     pub fn prepare_random_data(&mut self) {
-        //region: find 8 distinct random numbers between 1 and 26 for the alphabet cards
+        let spelling_count = self
+            .spelling
+            .as_ref()
+            .expect("self.spelling.as_ref()")
+            .name
+            .len();
+        let players_count = self.players_ws_uid.len();
+        let cards_count = 16 * players_count;
+        let random_count = cards_count / 2;
+        //the random numbers don't need to be unique.
+        //If there is a lot of players we could run out of unique numbers.
+        //region: find random numbers between 1 and spelling_count
         //vec_of_random_numbers is 0 based
         let mut vec_of_random_numbers = Vec::new();
         let mut rng = SmallRng::from_entropy();
         let mut i = 0;
-        while i < 8 {
+        while i < random_count {
             //gen_range is lower inclusive, upper exclusive 26 + 1
-            let num: usize = rng.gen_range(1, 27);
-            if vec_of_random_numbers.contains(&num) {
-                //do nothing if the random number is repeated
-                //debug!("random duplicate {} in {:?}", num, vec_of_random_numbers);
-            } else {
-                //push a pair of the same number
-                vec_of_random_numbers.push(num);
-                vec_of_random_numbers.push(num);
-                i += 1;
-            }
+            let num: usize = rng.gen_range(1, spelling_count);
+            //push a pair of the same number
+            vec_of_random_numbers.push(num);
+            vec_of_random_numbers.push(num);
+            i += 1;
         }
         //endregion
 
@@ -129,7 +131,7 @@ impl GameData {
         };
         vec_cards.push(new_card);
 
-        //create the 16 card and push to the vector
+        //create cards and push to the vector
         for (index, random_number) in vec_of_random_numbers.iter().enumerate() {
             let new_card = Card {
                 status: CardStatusCardFace::Down,
@@ -160,6 +162,10 @@ impl GameData {
     }
     ///constructor of game data
     pub fn new(ws: WebSocket, my_ws_uid: usize) -> Self {
+        let mut players_ws_uid = Vec::new();
+        players_ws_uid.push(0);
+        let mut player_points = Vec::new();
+        player_points.push(0);
         //return from constructor
         GameData {
             vec_cards: Self::prepare_for_empty(),
@@ -169,12 +175,11 @@ impl GameData {
             count_all_clicks: 0,
             ws,
             my_ws_uid,
-            other_ws_uid: 0, //zero means not accepted yet
+            players_ws_uid,
             game_state: GameState::Start,
             content_folder_name: "alphabet".to_string(),
-            player1_points: 0,
-            player2_points: 0,
-            this_machine_player_number: 0, //unknown until WantToPlay+Accept
+            player_points,
+            my_player_number: 0,
             player_turn: 0,
             content_folders: vec![
                 String::from("alphabet"),

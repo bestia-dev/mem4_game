@@ -12,21 +12,18 @@ use dodrio::{Node, Render};
 pub struct PlayersAndScores {
     ///whose turn is now:  player 1 or 2
     player_turn: usize,
-    ///player1 points
-    player1_points: usize,
-    ///player2 points
-    player2_points: usize,
+    ///my points
+    my_points: usize,
     ///What player am I
-    this_machine_player_number: usize,
+    my_player_number: usize,
 }
 
 impl PlayersAndScores {
     ///constructor
     pub const fn new() -> Self {
         PlayersAndScores {
-            player1_points: 0,
-            player2_points: 0,
-            this_machine_player_number: 0, //unknown until WantToPlay+Accept
+            my_points: 0,
+            my_player_number: 0,
             player_turn: 0,
         }
     }
@@ -35,17 +32,12 @@ impl PlayersAndScores {
     pub fn update_intern_cache(&mut self, game_data: &GameData) -> bool {
         let mut is_invalidated;
         is_invalidated = false;
-        if self.player1_points != game_data.player1_points {
-            self.player1_points = game_data.player1_points;
+        if self.my_points != game_data.player_points[game_data.my_player_number - 1] {
+            self.my_points = game_data.player_points[game_data.my_player_number - 1];
             is_invalidated = true;
         }
-        if self.player2_points != game_data.player2_points {
-            self.player2_points = game_data.player2_points;
-            is_invalidated = true;
-        }
-
-        if self.this_machine_player_number != game_data.this_machine_player_number {
-            self.this_machine_player_number = game_data.this_machine_player_number;
+        if self.my_player_number != game_data.my_player_number {
+            self.my_player_number = game_data.my_player_number;
             is_invalidated = true;
         }
         if self.player_turn != game_data.player_turn {
@@ -58,8 +50,8 @@ impl PlayersAndScores {
 
 impl Render for PlayersAndScores {
     ///This rendering will be rendered and then cached . It will not be rerendered untill invalidation.
-    ///It is ivalidate, when the points change.
-    ///html element to with scores for 2 players
+    ///It is invalidate, when the points change.
+    ///html element with 1 score for this players
     fn render<'a, 'bump>(&'a self, bump: &'bump Bump) -> Node<'bump>
     where
         'a: 'bump,
@@ -72,43 +64,20 @@ impl Render for PlayersAndScores {
                 bumpalo::format!(in bump, "grid-template-columns: auto auto auto;{}","")
                     .into_bump_str(),
             )
-            .children([
-                div(bump)
-                    .attr("class", "grid_item")
-                    .attr(
-                        "style",
-                        bumpalo::format!(in bump,"text-align: left;color:{};text-decoration:{}",
-                            if self.player_turn==1 {"green"} else {"red"},
-                            if self.this_machine_player_number==1 {"underline"} else {"none"}
-                        )
-                        .into_bump_str(),
+            .children([div(bump)
+                .attr("class", "grid_item")
+                .attr(
+                    "style",
+                    bumpalo::format!(in bump,"text-align: left;color:{};",
+                        if self.player_turn==self.my_player_number {"green"} else {"red"}
                     )
-                    .children([text(
-                        bumpalo::format!(in bump, "player1: {}",self.player1_points)
-                            .into_bump_str(),
-                    )])
-                    .finish(),
-                div(bump)
-                    .attr("class", "grid_item")
-                    .attr("style", "text-align: center;")
-                    .children([text("")])
-                    .finish(),
-                div(bump)
-                    .attr("class", "grid_item")
-                    .attr(
-                        "style",
-                        bumpalo::format!(in bump,"text-align: right;color:{};text-decoration:{}",
-                            if self.player_turn==2 {"green"} else {"red"},
-                            if self.this_machine_player_number==2 {"underline"} else {"none"}
-                        )
+                    .into_bump_str(),
+                )
+                .children([text(
+                    bumpalo::format!(in bump, "player{}: {}",self.my_player_number, self.my_points)
                         .into_bump_str(),
-                    )
-                    .children([text(
-                        bumpalo::format!(in bump, "player2: {}",self.player2_points)
-                            .into_bump_str(),
-                    )])
-                    .finish(),
-            ])
+                )])
+                .finish()])
             .finish()
     }
 }
