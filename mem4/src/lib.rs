@@ -73,7 +73,7 @@ use mem4_common::{Player, WsMessage};
 use rand::rngs::SmallRng;
 use rand::FromEntropy;
 use rand::Rng;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::prelude::{wasm_bindgen, JsValue, UnwrapThrowExt};
 use wasm_bindgen::JsCast;
 use web_sys::{console, WebSocket};
 //endregion
@@ -350,11 +350,11 @@ impl RootRenderingComponent {
             ws_uid: my_ws_uid,
             points: 0,
         }); //the first player is the initiator
-        self.game_data.my_player_number = 2; //temporary number
         self.game_data.players.push(Player {
             ws_uid: self.game_data.my_ws_uid,
             points: 0,
         });
+        self.game_data.my_player_number = 2; //temporary number
         self.game_data.content_folder_name = content_folder_name;
     }
     ///msg accept play

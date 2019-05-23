@@ -12,24 +12,26 @@ use dodrio::{Node, Render};
 ///The special character \ at the end of the line in code means that it is NOT the end of the line for the string.
 ///The escape sequence \n means end of line also. For doublequote simply \" .
 const GAME_RULES:& str = "This game is for many players. More players - more fun.  
-All the players must have this webpage simultaneously opened in the smartphone's browser to allow communication.  
-All the smartphones must be on the table so all players can see them and touch them.  
-The first player clicks on 'Invite for play?' and broadcasts the message over WebSocket.  
-He can choose different types of play: alphabet, animal,...  
-Other players then see on the screen 'Click here to Accept play!', click it and send the message back to Player1.  
-Player1 then starts the game. The game data is initialized and sent over to other players.  
-Every smartphone has a grid of 4x4 cards. The sum of all cards is then the actual card grid.  
-The cards are in pairs. It means that there are random numbers as 1/2 of the card number.  
-The game starts with the cards face down.  
+It is fun to play only on smartphones. It works in all modern browsers.  
+All the players must open this web app to allow communication.  
+Put all the smartphones on the table near each other, so all players can see them and touch \
+them. It should look like a board game at this point.  
+The first player clicks on 'Invite for play?'.  
+He can choose different types of game visuals: alphabet, animal,...  
+Other players then see on the screen 'Click here to Accept play!'.  
+Player1 sees how many players have accepted. Then he starts the game.  
 On the screen under the grid are clear signals which player plays and which waits.  
-Player1 flips over two cards with two clicks. The cards are accompanied by sounds and text on the screen.  
-If the cards do not match, the other player clicks on 'Click here to Take your turn' and both cards are flipped back face down. Then it is his turn and he clicks to flip over his two cards.  
-If the cards match, they are left face up permanently and the player receives a point. He continues to play, he opens the next two cards.  
+Player1 flips over two cards with two clicks. This cards can be on any smartphone. \
+The cards are accompanied by sounds and text on the screen.  
+If the cards do not match, the other player clicks on 'Click here to Take your turn' and both cards \
+are flipped back face down. Then it is his turn and he clicks to flip over his two cards.  
+If the cards match, they are left face up permanently and the player receives a point. He continues \
+to play, he opens the next two cards.  
 The game is over when all the cards are permanently face up.  
 Click on \"Play again?\" to start the game over.  ";
 
 ///game description
-const GAME_DESCRIPTION:& str = "Learning to use Rust Wasm/WebAssembly with Dodrio Virtual Dom and WebSockets communication - forth iteration.";
+const GAME_DESCRIPTION:& str = "Learning to use Rust Wasm/WebAssembly with Dodrio Virtual Dom and WebSockets communication - fourth iteration.";
 
 ///Render Component: The static parts can be cached easily.
 pub struct RulesAndDescription {}

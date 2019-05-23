@@ -4,6 +4,8 @@ use crate::gamedata::GameData;
 use dodrio::builder::*;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Node, Render};
+use wasm_bindgen::prelude::*;
+use web_sys::console;
 
 ///Render Component: player score
 ///Its private fields are a cache copy from `game_data` fields.
@@ -30,9 +32,15 @@ impl PlayersAndScores {
     ///copies the data from game data to internal cache
     /// internal fiels are used to render component
     pub fn update_intern_cache(&mut self, game_data: &GameData) -> bool {
+        console::log_1(&JsValue::from_str(&format!(
+            "update_intern_cache  my_player_number {}",
+            &game_data.my_player_number
+        )));
+
         let mut is_invalidated;
         is_invalidated = false;
         if game_data.my_player_number > 0
+            && !game_data.players.is_empty()
             && game_data.players.len() >= game_data.my_player_number - 1
             && self.my_points != game_data.players[game_data.my_player_number - 1].points
         {
