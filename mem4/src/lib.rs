@@ -293,7 +293,7 @@ impl RootRenderingComponent {
     ///fn on change for both click and we msg.
     fn take_turn(&mut self) {
         self.game_data.player_turn =
-            if self.game_data.player_turn + 1 < self.game_data.players_ws_uid.len() {
+            if self.game_data.player_turn < self.game_data.players_ws_uid.len() {
                 self.game_data.player_turn + 1
             } else {
                 1
@@ -861,7 +861,7 @@ root_rendering_component.game_data.game_state=GameState::Accepted;
                 )));
 
                 if root_rendering_component.game_data.my_player_number
-                    == (if root_rendering_component.game_data.player_turn + 1
+                    == (if root_rendering_component.game_data.player_turn
                         < root_rendering_component.game_data.players_ws_uid.len()
                     {
                         root_rendering_component.game_data.player_turn + 1
