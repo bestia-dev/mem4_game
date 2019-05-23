@@ -772,6 +772,7 @@ bumpalo::format!(in bump, "{}",
                     .on("click", move |root, vdom, _event| {
                         let root_rendering_component = root.unwrap_mut::<RootRenderingComponent>();
                         root_rendering_component.reset();
+                        root_rendering_component.game_data.game_state = GameState::Start;
                         vdom.schedule_render();
                     })
                     .finish()
