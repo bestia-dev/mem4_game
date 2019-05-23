@@ -132,7 +132,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
             WsMessage::GameDataInit {
                 card_grid_data,
                 spelling,
-                players_ws_uid,
+                players,
             } => {
                 wasm_bindgen_futures::spawn_local(
                     weak.with_component({
@@ -147,7 +147,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
                                 root_rendering_component.on_game_data_init(
                                     &card_grid_data,
                                     &spelling,
-                                    &players_ws_uid,
+                                    &players,
                                 );
                                 v2.schedule_render();
                             }
@@ -168,7 +168,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
                         move |root| {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
-                            console::log_1(&"players_ws_uid".into());
+                            console::log_1(&"players".into());
                             root_rendering_component
                                 .on_player_click(count_click_inside_one_turn, card_index);
                             v2.schedule_render();

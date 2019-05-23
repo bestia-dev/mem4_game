@@ -24,7 +24,7 @@
     //clippy::use_self,
     //Cannot add #[inline] to the start function with #[wasm_bindgen(start)]
     //because then wasm-pack build --target no-modules returns an error: export `run` not found 
-    //clippy::missing_inline_in_public_items
+    clippy::missing_inline_in_public_items
 )]
 //endregion
 
@@ -72,15 +72,17 @@ pub enum WsMessage {
     GameDataInit {
         ///act is the action to take on the receiver
         card_grid_data: String,
+        ///json of spelling
         spelling: String,
-        players_ws_uid: String,
+        ///json of vector of players
+        players: String,
     },
     ///player click
     PlayerClick {
-        ///ws client instance unique id. To not listen the echo to yourself.
+        ///this identifies the smartphone, but not the player-in-turn
         my_ws_uid: usize,
-        ///other player unique id. Used by the WebSocket server.
-        players_ws_uid: String,
+        ///all players
+        players: String,
         ///card_index
         card_index: usize,
         ///count click inside one turn
@@ -90,15 +92,15 @@ pub enum WsMessage {
     PlayerChange {
         ///ws client instance unique id. To not listen the echo to yourself.
         my_ws_uid: usize,
-        ///other player unique id. Used by the WebSocket server.
-        players_ws_uid: String,
+        ///all players
+        players: String,
     },
     ///end game
     EndGame {
         ///ws client instance unique id. To not listen the echo to yourself.
         my_ws_uid: usize,
-        ///other player unique id. Used by the WebSocket server.
-        players_ws_uid: String,
+        ///all players
+        players: String,
     },
     ///Request the spelling from the WebSocket server
     RequestSpelling {
@@ -110,5 +112,14 @@ pub enum WsMessage {
         ///the spelling from the server
         json: String,
     },
+}
+
+///data for one player
+#[derive(Serialize, Deserialize)]
+pub struct Player {
+    ///ws_uid
+    pub ws_uid: usize,
+    ///field for src attribute for HTML element imagea and filename of card image
+    pub points: usize,
 }
 //endregion

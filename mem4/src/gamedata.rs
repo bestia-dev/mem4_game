@@ -1,5 +1,8 @@
 //! game data
 
+extern crate mem4_common;
+
+use mem4_common::Player;
 use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
 use rand::FromEntropy;
@@ -53,6 +56,7 @@ pub struct Card {
     ///field for id attribute for HTML element image contains the card index
     pub card_index_and_id: usize,
 }
+
 ///game data
 pub struct GameData {
     ///vector of cards
@@ -69,8 +73,8 @@ pub struct GameData {
     pub ws: WebSocket,
     ///my ws client instance unique id. To not listen the echo to yourself.
     pub my_ws_uid: usize,
-    ///all ws client instance unique id.
-    pub players_ws_uid: Vec<usize>,
+    ///players
+    pub players: Vec<Player>,
     ///game state: Start,Asking,Asked,Player1,Player2
     pub game_state: GameState,
     ///content folder name
@@ -79,8 +83,6 @@ pub struct GameData {
     pub my_player_number: usize,
     ///whose turn is now:  player 1,2,3,...
     pub player_turn: usize,
-    ///player1 points
-    pub player_points: Vec<usize>,
     ///content folders vector
     pub content_folders: Vec<String>,
     ///spellings
@@ -95,7 +97,7 @@ impl GameData {
             .expect("self.spelling.as_ref()")
             .name
             .len();
-        let players_count = self.players_ws_uid.len();
+        let players_count = self.players.len();
         let cards_count = 16 * players_count;
         let random_count = cards_count / 2;
         //the random numbers don't need to be unique.
@@ -147,10 +149,10 @@ impl GameData {
     }
     ///asociated function: before Accept, there are not random numbers, just default cards.
     pub fn prepare_for_empty() -> Vec<Card> {
-        //prepare 16 empty cards. The random is calculated only on AcceptPlay.
+        //prepare 32 empty cards. The random is calculated only on AcceptPlay.
         let mut vec_cards = Vec::new();
         //I must prepare the 0 index, but then I don't use it ever.
-        for i in 0..=16 {
+        for i in 0..=32 {
             let new_card = Card {
                 status: CardStatusCardFace::Down,
                 card_number_and_img_src: 1,
@@ -162,10 +164,11 @@ impl GameData {
     }
     ///constructor of game data
     pub fn new(ws: WebSocket, my_ws_uid: usize) -> Self {
-        let mut players_ws_uid = Vec::new();
-        players_ws_uid.push(0);
-        let mut player_points = Vec::new();
-        player_points.push(0);
+        let mut players = Vec::new();
+        players.push(Player {
+            ws_uid: 0,
+            points: 0,
+        });
         //return from constructor
         GameData {
             vec_cards: Self::prepare_for_empty(),
@@ -175,10 +178,9 @@ impl GameData {
             count_all_clicks: 0,
             ws,
             my_ws_uid,
-            players_ws_uid,
+            players,
             game_state: GameState::Start,
             content_folder_name: "alphabet".to_string(),
-            player_points,
             my_player_number: 1,
             player_turn: 0,
             content_folders: vec![

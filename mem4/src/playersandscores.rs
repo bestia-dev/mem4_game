@@ -33,10 +33,10 @@ impl PlayersAndScores {
         let mut is_invalidated;
         is_invalidated = false;
         if game_data.my_player_number > 0
-            && game_data.player_points.len() >= game_data.my_player_number
-            && self.my_points != game_data.player_points[game_data.my_player_number - 1]
+            && game_data.players.len() >= game_data.my_player_number - 1
+            && self.my_points != game_data.players[game_data.my_player_number - 1].points
         {
-            self.my_points = game_data.player_points[game_data.my_player_number - 1];
+            self.my_points = game_data.players[game_data.my_player_number - 1].points;
             is_invalidated = true;
         }
         if self.my_player_number != game_data.my_player_number {
@@ -71,7 +71,7 @@ impl Render for PlayersAndScores {
                 .attr("class", "grid_item")
                 .attr(
                     "style",
-                    bumpalo::format!(in bump,"text-align: left;color:{};",
+                    bumpalo::format!(in bump,"text-align: center;color:{};",
                         if self.player_turn==self.my_player_number {"green"} else {"red"}
                     )
                     .into_bump_str(),

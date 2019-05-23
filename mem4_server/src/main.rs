@@ -49,7 +49,7 @@ use clap::{App, Arg};
 use env_logger::Env;
 use futures::sync::mpsc;
 use futures::{Future, Stream};
-use mem4_common::WsMessage;
+use mem4_common::{Player, WsMessage};
 use regex::Regex;
 use std::collections::HashMap;
 use std::env;
@@ -323,35 +323,39 @@ fn user_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
     }
 }
 
-///New message from this user send to all other players.
+///New message from this user send to all other players except sender.
 fn send_to_other_players(users: &Users, ws_uid_of_message: usize, new_msg: &str) {
     //info!("send_to_other_players: {}", new_msg);
-    //the other user is in the players_ws_uid field
 
     //serde_json knows: 1. map (key+value pair) and 2. array
     let json_map: serde_json::Map<String, serde_json::Value> =
         serde_json::from_str(new_msg).expect("error serde_json::from_str(new_msg)");
-    //info!("js_players_ws_uid: {}", v);
+    //info!("js_players: {}", v);
     let tuple = json_map
         .iter()
         .next()
         .expect("error json_map.iter().next()");
 
-    let object = tuple.1;
-    info!("object: {}", object);
+    let msg_type = tuple.1;
+    info!("object: {}", msg_type);
 
-    let js_players_ws_uid = object
-        .get("players_ws_uid")
-        .expect("error object.get(players_ws_uid)");
-    info!("js_players_ws_uid: {}", js_players_ws_uid);
+    let js_players = msg_type.get("players").expect("error object.get(players)");
+    info!("js_players: {}", js_players);
 
-    let string_players_ws_uid = js_players_ws_uid.to_string();
-    info!("string_players_ws_uid: {}", string_players_ws_uid);
-    let players_ws_uid: Vec<usize> = serde_json::from_str(&string_players_ws_uid)
-        .expect("error serde_json::from_str(string_players_ws_uid)");
+    let string_players = js_players.to_string();
+    info!("string_players: {}", string_players);
+    let players: Vec<Player> =
+        serde_json::from_str(&string_players).expect("error serde_json::from_str(string_players)");
 
     for (&uid, tx) in users.lock().expect("error users.lock()").iter() {
-        if ws_uid_of_message != uid && players_ws_uid.contains(&uid) {
+        let mut is_player;
+        is_player = false;
+        for pl in &players {
+            if pl.ws_uid == uid {
+                is_player = true;
+            }
+        }
+        if ws_uid_of_message != uid && is_player {
             match tx.unbounded_send(Message::text(String::from(new_msg))) {
                 Ok(()) => (),
                 Err(_disconnected) => {
