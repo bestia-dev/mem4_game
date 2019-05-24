@@ -28,7 +28,7 @@ are flipped back face down. Then it is his turn and he clicks to flip over his t
 If the cards match, they are left face up permanently and the player receives a point. He continues \
 to play, he opens the next two cards.  
 The game is over when all the cards are permanently face up.  
-Click on \"Play again?\" to start the game over.  ";
+Click on \"Play again?\" to re-start the game.  ";
 
 ///game description
 const GAME_DESCRIPTION:& str = "Learning to use Rust Wasm/WebAssembly with Dodrio Virtual Dom and WebSockets communication - fourth iteration.";

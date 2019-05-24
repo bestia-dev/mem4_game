@@ -70,11 +70,7 @@ impl Render for PlayersAndScores {
         //return
         div(bump)
             .attr("class", "grid_container_players")
-            .attr(
-                "style",
-                bumpalo::format!(in bump, "grid-template-columns: auto auto auto;{}","")
-                    .into_bump_str(),
-            )
+            .attr("style", "grid-template-columns: auto;")
             .children([div(bump)
                 .attr("class", "grid_item")
                 .attr(
