@@ -37,8 +37,6 @@
     //because then wasm-pack build --target web returns an error: export `run` not found 
     clippy::missing_inline_in_public_items,
     clippy::integer_arithmetic,
-    //indexing may panic
-    clippy::indexing_slicing
 )]
 //endregion
 
@@ -245,7 +243,11 @@ impl RootRenderingComponent {
                         .card_number_and_img_src
                 {
                     //give points
-                    self.game_data.players[self.game_data.player_turn - 1].points += 1;
+                    self.game_data
+                        .players
+                        .get_mut(self.game_data.player_turn - 1)
+                        .expect("self.game_data.players.get_mu(self.game_data.player_turn - 1)")
+                        .points += 1;
 
                     // the two cards matches. make them permanent FaceUp
                     let x1 = self.game_data.card_index_of_first_click;
@@ -383,7 +385,14 @@ impl RootRenderingComponent {
         self.game_data.game_state = GameState::Play;
         //find my player number
         for index in 0..self.game_data.players.len() {
-            if self.game_data.players[index].ws_uid == self.game_data.my_ws_uid {
+            if self
+                .game_data
+                .players
+                .get_mut(index)
+                .expect("self.game_data.players.get_mut(index)")
+                .ws_uid
+                == self.game_data.my_ws_uid
+            {
                 self.game_data.my_player_number = index + 1;
             }
         }

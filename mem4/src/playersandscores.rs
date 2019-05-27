@@ -42,9 +42,18 @@ impl PlayersAndScores {
         if game_data.my_player_number > 0
             && !game_data.players.is_empty()
             && game_data.players.len() >= game_data.my_player_number - 1
-            && self.my_points != game_data.players[game_data.my_player_number - 1].points
+            && self.my_points
+                != game_data
+                    .players
+                    .get(game_data.my_player_number - 1)
+                    .expect("game_data.players.get(game_data.my_player_number - 1)")
+                    .points
         {
-            self.my_points = game_data.players[game_data.my_player_number - 1].points;
+            self.my_points = game_data
+                .players
+                .get(game_data.my_player_number - 1)
+                .expect("game_data.players.get(game_data.my_player_number - 1)")
+                .points;
             is_invalidated = true;
         }
         if self.my_player_number != game_data.my_player_number {
