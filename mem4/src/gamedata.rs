@@ -109,16 +109,21 @@ impl GameData {
         //vec_of_random_numbers is 0 based
         let mut vec_of_random_numbers = Vec::new();
         let mut rng = SmallRng::from_entropy();
+        vec_of_random_numbers.clear();
         for _i in 1..=rest {
-            //0 is a non-value here
-            let mut num: usize = 0;
-            while num == 0 || vec_of_random_numbers.contains(&num) {
+            //how to avoid duplicates
+            let mut num: usize;
+            // a do-while is written as a  loop-break
+            loop {
                 //gen_range is lower inclusive, upper exclusive 26 + 1
                 num = rng.gen_range(1, spelling_count_minus_one + 1);
-                //push a pair of the same number
-                vec_of_random_numbers.push(num);
-                vec_of_random_numbers.push(num);
+                if !vec_of_random_numbers.contains(&num) {
+                    break;
+                }
             }
+            //push a pair of the same number
+            vec_of_random_numbers.push(num);
+            vec_of_random_numbers.push(num);
         }
         for _m in 1..=multiple {
             for i in 1..=spelling_count_minus_one {
