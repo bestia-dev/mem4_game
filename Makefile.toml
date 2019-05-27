@@ -1,12 +1,16 @@
 [tasks.init]
 disabled = true
 
-#I tried with windows-alias here, but it didn't work.
+#DOes it work on linux and windows??
 
 [tasks.end]
+linux_alias = "linux_end"
+windows_alias = "windows_end"
+
+[tasks.windows_end]
 script = [
-    "xcopy c:\\Users\\Luciano\\RustProjects\\mem4_game\\mem4\\pkg\\*.* c:\\Users\\Luciano\\RustProjects\\mem4_game\\webfolder\\mem4\\pkg\\ /y ",
-    "xcopy c:\\Users\\Luciano\\RustProjects\\mem4_game\\target\\debug\\mem4_server.exe c:\\Users\\Luciano\\RustProjects\\mem4_game\\webfolder\\ /y ",
+    "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\mem4\\pkg\\*.* c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\mem4\\pkg\\ /y ",
+    "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\target\\debug\\mem4_server.exe c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\ /y ",
 # I cannot script the exact IP here.  
 # It must be copied from the mem4_server.exe output.
     "start chrome http://127.0.0.22:80", 
@@ -14,4 +18,10 @@ script = [
     "start chrome http://127.0.0.22:80", 
     "cd webfolder",
     "mem4_server.exe"
+]
+
+[tasks.linux_end]
+script = [
+    "\\cp ~/rustprojects/mem4_game/mem4/pkg/* -rf ~/rustprojects/mem4_game/webfolder/mem4/pkg",
+    "\\cp ~/rustprojects/mem4_game/target/debug/mem4_server -rf ~/rustprojects/mem4_game/webfolder"
 ]
