@@ -789,7 +789,6 @@ bumpalo::format!(in bump, "{}",
         where
             'a: 'bump,
         {
-            use dodrio::builder::{h3, text};
             if let GameState::Start = root_rendering_component.game_data.game_state {
                 // 1S Ask Player2 to play!
                 console::log_1(&"GameState::Start".into());

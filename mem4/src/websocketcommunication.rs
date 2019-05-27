@@ -12,14 +12,16 @@ use web_sys::{console, WebSocket};
 ///setup websocket connection
 pub fn setup_ws_connection(location_href: &str) -> WebSocket {
     //web-sys has websocket for Rust exactly like javascript has¸
-    console::log_1(&"location_href".into());
-    console::log_1(&wasm_bindgen::JsValue::from_str(location_href));
     //location_href comes in this format  http://localhost:4000/
     let mut loc_href = location_href.replace("http://", "ws://");
     //Only for debugging in the development environment
     //let mut loc_href = String::from("ws://192.168.1.57:80/");
     loc_href.push_str("mem4ws/");
-    console::log_1(&wasm_bindgen::JsValue::from_str(&loc_href));
+    console::log_1(&JsValue::from_str(&format!(
+        "location_href {}  loc_href {}",
+        location_href, loc_href,
+    )));
+
     //same server address and port as http server
     let ws = unwrap!(WebSocket::new(&loc_href), "WebSocket failed to connect.");
 
@@ -28,7 +30,7 @@ pub fn setup_ws_connection(location_href: &str) -> WebSocket {
     //It looks that the first send is in some way a handshake and is part of the connection
     //it will be execute onopen as a closure
     let open_handler = Box::new(move || {
-        console::log_1(&"Connection opened, sending 'test' to server".into());
+        console::log_1(&"Connection opened, sending RequestWsUid to server".into());
         unwrap!(
             ws_c.send_with_str(
                 &serde_json::to_string(&WsMessage::RequestWsUid {
