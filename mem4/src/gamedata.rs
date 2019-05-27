@@ -8,6 +8,8 @@ use rand::seq::SliceRandom;
 use rand::FromEntropy;
 use rand::Rng;
 use strum_macros::AsRefStr;
+use wasm_bindgen::prelude::*;
+use web_sys::console;
 use web_sys::WebSocket;
 
 ///Aviation Spelling
@@ -91,10 +93,7 @@ pub struct GameData {
 impl GameData {
     ///prepare new random data
     pub fn prepare_random_data(&mut self) {
-        let spelling_count = self
-            .spelling
-            .as_ref()
-            .expect("self.spelling.as_ref()")
+        let spelling_count_minus_one = unwrap!(self.spelling.as_ref(), "self.spelling.as_ref()")
             .name
             .len()
             - 1;
@@ -103,29 +102,34 @@ impl GameData {
         let random_count = cards_count / 2;
         //if the number of cards is bigger than the images, i choose all the images.
         //for the rest I use random.
-        let multiple: usize = random_count / spelling_count;
-        let rest = random_count - (multiple * spelling_count);
+        //integer division rounds toward zero
+        let multiple: usize = random_count / spelling_count_minus_one;
+        let rest = random_count - (multiple * spelling_count_minus_one);
         //region: find random numbers between 1 and spelling_count
         //vec_of_random_numbers is 0 based
         let mut vec_of_random_numbers = Vec::new();
         let mut rng = SmallRng::from_entropy();
-        let mut i = 0;
-        while i < rest {
+        for _i in 1..=rest {
             //gen_range is lower inclusive, upper exclusive 26 + 1
-            let num: usize = rng.gen_range(1, spelling_count);
+            let num: usize = rng.gen_range(1, spelling_count_minus_one + 1);
             if !vec_of_random_numbers.contains(&num) {
                 //push a pair of the same number
                 vec_of_random_numbers.push(num);
                 vec_of_random_numbers.push(num);
-                i += 1;
             }
         }
         for _m in 1..=multiple {
-            for i in 1..spelling_count {
+            for i in 1..=spelling_count_minus_one {
                 vec_of_random_numbers.push(i);
                 vec_of_random_numbers.push(i);
             }
         }
+        console::log_1(&JsValue::from_str(&format!(
+            "spelling_count {}  rest {}   vec.len {}",
+            spelling_count_minus_one,
+            rest,
+            vec_of_random_numbers.len()
+        )));
         //endregion
 
         //region: shuffle the numbers
@@ -151,7 +155,7 @@ impl GameData {
                 //dereference random number from iterator
                 card_number_and_img_src: *random_number,
                 //card base index will be 1. 0 is reserved for FaceDown.
-                card_index_and_id: index.checked_add(1).expect("usize overflow"),
+                card_index_and_id: unwrap!(index.checked_add(1), "usize overflow"),
             };
             vec_cards.push(new_card);
         }

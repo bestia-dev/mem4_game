@@ -16,6 +16,7 @@ crate-type = ["cdylib"]
 [features]
 
 [dependencies]
+unwrap = "1.2.1"
 mem4_common = { path = "../mem4_common" }
 dodrio = "0.1.0"
 wasm-bindgen = { version = "0.2.43", features = ["serde-serialize"] }

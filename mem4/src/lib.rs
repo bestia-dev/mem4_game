@@ -74,6 +74,8 @@ use rand::Rng;
 use wasm_bindgen::prelude::{wasm_bindgen, JsValue, UnwrapThrowExt};
 use wasm_bindgen::JsCast;
 use web_sys::{console, WebSocket};
+#[macro_use]
+extern crate unwrap;
 //endregion
 
 //region: enum, structs, const,...
@@ -102,18 +104,19 @@ pub fn run() -> Result<(), JsValue> {
     console_error_panic_hook::set_once();
 
     // Get the document's container to render the virtual dom component.
-    let window = web_sys::window().expect("error: web_sys::window");
-    let document = window.document().expect("error: window.document");
-    let div_for_virtual_dom = document
-        .get_element_by_id("div_for_virtual_dom")
-        .expect("No #div_for_virtual_dom");
+    let window = unwrap!(web_sys::window(), "error: web_sys::window");
+    let document = unwrap!(window.document(), "error: window.document");
+    let div_for_virtual_dom = unwrap!(
+        document.get_element_by_id("div_for_virtual_dom"),
+        "No #div_for_virtual_dom"
+    );
 
     let mut rng = SmallRng::from_entropy();
     //gen_range is lower inclusive, upper exclusive 26 + 1
     let my_ws_uid: usize = rng.gen_range(1, 9999);
 
     //find out URL
-    let location_href = window.location().href().expect("href not known");
+    let location_href = unwrap!(window.location().href(), "href not known");
 
     //websocket connection
     let ws = setup_ws_connection(location_href.as_str());
@@ -151,7 +154,7 @@ fn text_with_br_newline<'a>(txt: &'a str, bump: &'a Bump) -> Vec<Node<'a>> {
 }
 /// Get the top-level window's session storage.
 pub fn session_storage() -> web_sys::Storage {
-    let window = web_sys::window().expect("error: web_sys::window");
+    let window = unwrap!(web_sys::window(), "error: web_sys::window");
     window.session_storage().unwrap_throw().unwrap_throw()
 }
 //endregion
@@ -196,72 +199,54 @@ impl RootRenderingComponent {
         if self.game_data.count_click_inside_one_turn == 1
             || self.game_data.count_click_inside_one_turn == 2
         {
-            //region: audio play
-            //prepare the audio element with src filename of mp3
-            let audio_element = web_sys::HtmlAudioElement::new_with_src(
-                format!(
-                    "content/{}/sound/mem_sound_{:02}.mp3",
-                    self.game_data.content_folder_name,
-                    self.game_data
-                        .vec_cards
-                        .get(this_click_card_index)
-                        .expect("error this_click_card_index")
-                        .card_number_and_img_src
-                )
-                .as_str(),
-            );
-
-            //play() return a Promise in JSValue. That is too hard for me to deal with now.
-            audio_element
-                .expect("Error: HtmlAudioElement new.")
-                .play()
-                .expect("Error: HtmlAudioElement.play() ");
-            //endregion
-
             //flip the card up
-            self.game_data
-                .vec_cards
-                .get_mut(this_click_card_index)
-                .expect("error this_click_card_index")
-                .status = CardStatusCardFace::UpTemporary;
+            unwrap!(
+                self.game_data.vec_cards.get_mut(this_click_card_index),
+                "error this_click_card_index"
+            )
+            .status = CardStatusCardFace::UpTemporary;
 
             if self.game_data.count_click_inside_one_turn == 2 {
                 //if is the second click, flip the card and then check for card match
 
                 //if the cards match, player get one point and continues another turn
-                if self
-                    .game_data
-                    .vec_cards
-                    .get(self.game_data.card_index_of_first_click)
-                    .expect("error game_data.card_index_of_first_click")
-                    .card_number_and_img_src
-                    == self
-                        .game_data
+                if unwrap!(
+                    self.game_data
                         .vec_cards
-                        .get(self.game_data.card_index_of_second_click)
-                        .expect("error game_data.card_index_of_second_click")
-                        .card_number_and_img_src
+                        .get(self.game_data.card_index_of_first_click),
+                    "error game_data.card_index_of_first_click"
+                )
+                .card_number_and_img_src
+                    == unwrap!(
+                        self.game_data
+                            .vec_cards
+                            .get(self.game_data.card_index_of_second_click),
+                        "error game_data.card_index_of_second_click"
+                    )
+                    .card_number_and_img_src
                 {
                     //give points
-                    self.game_data
-                        .players
-                        .get_mut(self.game_data.player_turn - 1)
-                        .expect("self.game_data.players.get_mu(self.game_data.player_turn - 1)")
-                        .points += 1;
+                    unwrap!(
+                        self.game_data
+                            .players
+                            .get_mut(self.game_data.player_turn - 1),
+                        "self.game_data.players.get_mu(self.game_data.player_turn - 1)"
+                    )
+                    .points += 1;
 
                     // the two cards matches. make them permanent FaceUp
                     let x1 = self.game_data.card_index_of_first_click;
                     let x2 = self.game_data.card_index_of_second_click;
-                    self.game_data
-                        .vec_cards
-                        .get_mut(x1)
-                        .expect("error game_data.card_index_of_first_click")
-                        .status = CardStatusCardFace::UpPermanently;
-                    self.game_data
-                        .vec_cards
-                        .get_mut(x2)
-                        .expect("error game_data.card_index_of_second_click")
-                        .status = CardStatusCardFace::UpPermanently;
+                    unwrap!(
+                        self.game_data.vec_cards.get_mut(x1),
+                        "error game_data.card_index_of_first_click"
+                    )
+                    .status = CardStatusCardFace::UpPermanently;
+                    unwrap!(
+                        self.game_data.vec_cards.get_mut(x2),
+                        "error game_data.card_index_of_second_click"
+                    )
+                    .status = CardStatusCardFace::UpPermanently;
                     self.game_data.count_click_inside_one_turn = 0;
                     //if the sum of points is number of card/2, the game is over
                     let mut point_sum = 0;
@@ -271,17 +256,19 @@ impl RootRenderingComponent {
                     if self.game_data.vec_cards.len() / 2 == point_sum {
                         self.game_data.game_state = GameState::EndGame;
                         //send message
-                        self.game_data
-                            .ws
-                            .send_with_str(
+                        unwrap!(
+                            self.game_data.ws.send_with_str(
                                 &serde_json::to_string(&WsMessage::EndGame {
                                     my_ws_uid: self.game_data.my_ws_uid,
-                                    players: serde_json::to_string(&self.game_data.players)
-                                        .expect("serde_json::to_string(&self.game_data.players)"),
+                                    players: unwrap!(
+                                        serde_json::to_string(&self.game_data.players),
+                                        "serde_json::to_string(&self.game_data.players)"
+                                    ),
                                 })
                                 .expect("error sending EndGame"),
-                            )
-                            .expect("Failed to send EndGame");
+                            ),
+                            "Failed to send EndGame"
+                        );
                     }
                 }
             }
@@ -299,16 +286,16 @@ impl RootRenderingComponent {
         //click on Change button closes first and second card
         let x1 = self.game_data.card_index_of_first_click;
         let x2 = self.game_data.card_index_of_second_click;
-        self.game_data
-            .vec_cards
-            .get_mut(x1)
-            .expect("error game_data.card_index_of_first_click ")
-            .status = CardStatusCardFace::Down;
-        self.game_data
-            .vec_cards
-            .get_mut(x2)
-            .expect("error game_data.card_index_of_second_click")
-            .status = CardStatusCardFace::Down;
+        unwrap!(
+            self.game_data.vec_cards.get_mut(x1),
+            "error game_data.card_index_of_first_click "
+        )
+        .status = CardStatusCardFace::Down;
+        unwrap!(
+            self.game_data.vec_cards.get_mut(x2),
+            "error game_data.card_index_of_second_click"
+        )
+        .status = CardStatusCardFace::Down;
         self.game_data.card_index_of_first_click = 0;
         self.game_data.card_index_of_second_click = 0;
         self.game_data.count_click_inside_one_turn = 0;
@@ -373,24 +360,29 @@ impl RootRenderingComponent {
     fn on_game_data_init(&mut self, card_grid_data: &str, spelling: &str, players: &str) {
         self.game_data.game_state = GameState::Play;
         self.game_data.player_turn = 1;
-        self.game_data.vec_cards = serde_json::from_str(card_grid_data)
-            .expect("error serde_json::from_str(card_grid_data)");
+        self.game_data.vec_cards = unwrap!(
+            serde_json::from_str(card_grid_data),
+            "error serde_json::from_str(card_grid_data)"
+        );
 
-        self.game_data.spelling =
-            serde_json::from_str(spelling).expect("error serde_json::from_str(spelling)");
+        self.game_data.spelling = unwrap!(
+            serde_json::from_str(spelling),
+            "error serde_json::from_str(spelling)"
+        );
 
-        self.game_data.players =
-            serde_json::from_str(players).expect("error serde_json::from_str(players)");
+        self.game_data.players = unwrap!(
+            serde_json::from_str(players),
+            "error serde_json::from_str(players)"
+        );
 
         self.game_data.game_state = GameState::Play;
         //find my player number
         for index in 0..self.game_data.players.len() {
-            if self
-                .game_data
-                .players
-                .get_mut(index)
-                .expect("self.game_data.players.get_mut(index)")
-                .ws_uid
+            if unwrap!(
+                self.game_data.players.get_mut(index),
+                "self.game_data.players.get_mut(index)"
+            )
+            .ws_uid
                 == self.game_data.my_ws_uid
             {
                 self.game_data.my_player_number = index + 1;
@@ -404,7 +396,8 @@ impl RootRenderingComponent {
     }
     ///msg response spelling json
     fn on_response_spelling_json(&mut self, json: &str) {
-        self.game_data.spelling = serde_json::from_str(json).expect(
+        self.game_data.spelling = unwrap!(
+            serde_json::from_str(json),
             "error root_rendering_component.game_data.spelling = serde_json::from_str(&json)",
         );
     }
@@ -473,7 +466,12 @@ impl Render for RootRenderingComponent {
             for x in start_index..=end_index {
                 let index: usize = x;
                 //region: prepare variables and closures for inserting into vdom
-                let img_src = match game_data.vec_cards.get(index).expect("error index").status {
+                let img_src = match unwrap!(
+                    game_data.vec_cards.get(index),
+                    "match game_data.vec_cards.get(index) {} startindex {} endindex {} vec_card.len {}",index,start_index, end_index,game_data.vec_cards.len()
+                )
+                .status
+                {
                     CardStatusCardFace::Down => bumpalo::format!(in bump, "content/{}/{}",
                                                 game_data.content_folder_name,
                                                 SRC_FOR_CARD_FACE_DOWN)
@@ -481,10 +479,10 @@ impl Render for RootRenderingComponent {
                     CardStatusCardFace::UpTemporary | CardStatusCardFace::UpPermanently => {
                         bumpalo::format!(in bump, "content/{}/img/mem_image_{:02}.png",
                         game_data.content_folder_name,
-                                game_data
+                                unwrap!(game_data
                                     .vec_cards
                                     .get(index)
-                                    .expect("error index")
+                                    ,"error index")
                                     .card_number_and_img_src
                         )
                         .into_bump_str()
@@ -492,7 +490,7 @@ impl Render for RootRenderingComponent {
                 };
 
                 let img_id =
-                    bumpalo::format!(in bump, "img{:02}",game_data.vec_cards.get(index).expect("error index").card_index_and_id)
+                    bumpalo::format!(in bump, "img{:02}",unwrap!(game_data.vec_cards.get(index),"game_data.vec_cards.get(index)").card_index_and_id)
                         .into_bump_str();
 
                 let opacity = if img_src
@@ -536,17 +534,17 @@ impl Render for RootRenderingComponent {
                                 };
 
                                 //id attribute of image html element is prefixed with img ex. "img12"
-                                let this_click_card_index =
-                                    (img.id().get(3..).expect("error slicing"))
-                                        .parse::<usize>()
-                                        .expect("error parse img id to usize");
+                                let this_click_card_index = unwrap!(
+                                    (unwrap!(img.id().get(3..), "error slicing")).parse::<usize>(),
+                                    "error parse img id to usize"
+                                );
 
                                 //click is usefull only od facedown cards
-                                if let CardStatusCardFace::Down = game_data
-                                    .vec_cards
-                                    .get(this_click_card_index)
-                                    .expect("error this_click_card_index")
-                                    .status
+                                if let CardStatusCardFace::Down = unwrap!(
+                                    game_data.vec_cards.get(this_click_card_index),
+                                    "error this_click_card_index"
+                                )
+                                .status
                                 {
                                     //the begining of the turn is count_click_inside_one_turn=0
                                     //on click imediately increase that. So first click is 1 and second click is 2.
@@ -566,23 +564,51 @@ impl Render for RootRenderingComponent {
                                     }
 
                                     //region: send WsMessage over websocket
-                                    game_data
-                                        .ws
-                                        .send_with_str(
+                                    unwrap!(
+                                        game_data.ws.send_with_str(
                                             &serde_json::to_string(&WsMessage::PlayerClick {
                                                 my_ws_uid: game_data.my_ws_uid,
-                                                players: serde_json::to_string(&game_data.players)
-                                                    .expect(
-                                                        "serde_json::to_string(&game_data.players)",
-                                                    ),
+                                                players: unwrap!(
+                                                    serde_json::to_string(&game_data.players),
+                                                    "serde_json::to_string(&game_data.players)",
+                                                ),
                                                 card_index: this_click_card_index,
                                                 count_click_inside_one_turn: game_data
                                                     .count_click_inside_one_turn,
                                             })
                                             .expect("error sending PlayerClick"),
-                                        )
-                                        .expect("Failed to send PlayerClick");
+                                        ),
+                                        "Failed to send PlayerClick"
+                                    );
                                     //endregion
+
+                                    //region: audio play
+                                    if game_data.count_click_inside_one_turn == 1
+                                        || game_data.count_click_inside_one_turn == 2
+                                    {
+                                        //prepare the audio element with src filename of mp3
+                                        let audio_element = web_sys::HtmlAudioElement::new_with_src(
+                                            format!(
+                                                "content/{}/sound/mem_sound_{:02}.mp3",
+                                                game_data.content_folder_name,
+                                                unwrap!(
+                                                    game_data.vec_cards.get(this_click_card_index),
+                                                    "error this_click_card_index"
+                                                )
+                                                .card_number_and_img_src
+                                            )
+                                            .as_str(),
+                                        );
+
+                                        //play() return a Promise in JSValue. That is too hard for me to deal with now.
+                                        unwrap!(
+                                            unwrap!(audio_element, "Error: HtmlAudioElement new.")
+                                                .play(),
+                                            "Error: HtmlAudioElement.play() "
+                                        );
+                                    }
+                                    //endregion
+
                                     root_rendering_component.card_on_click();
                                 }
                                 // Finally, re-render the component on the next animation frame.
@@ -611,16 +637,18 @@ impl Render for RootRenderingComponent {
                 //if the two opened card match use green else use red color
                 let color; //haha variable does not need to be mutable. Great !
 
-                if game_data
-                    .vec_cards
-                    .get(game_data.card_index_of_first_click)
-                    .expect("error index")
+                if unwrap!(
+                    game_data.vec_cards.get(game_data.card_index_of_first_click),
+                    "error index"
+                )
+                .card_number_and_img_src
+                    == unwrap!(
+                        game_data
+                            .vec_cards
+                            .get(game_data.card_index_of_second_click),
+                        "error index"
+                    )
                     .card_number_and_img_src
-                    == game_data
-                        .vec_cards
-                        .get(game_data.card_index_of_second_click)
-                        .expect("error index")
-                        .card_number_and_img_src
                 {
                     color = "green";
                 } else if game_data.card_index_of_first_click == 0
@@ -646,9 +674,9 @@ impl Render for RootRenderingComponent {
                         .attr("style", "text-align: left;")
                         .children([text(
 bumpalo::format!(in bump, "{}",
- root_rendering_component.game_data.spelling.clone().expect("root_rendering_component.game_data.spelling.clone()")
- .name.get(game_data.vec_cards.get(game_data.card_index_of_first_click).expect("error index")
-                                .card_number_and_img_src).expect("error index")
+ unwrap!(unwrap!(root_rendering_component.game_data.spelling.clone(),"root_rendering_component.game_data.spelling.clone()")
+ .name.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_first_click),"game_data.vec_cards.get(game_data.card_index_of_first_click")
+                                .card_number_and_img_src),".card_number_and_img_src")
 )
                         .into_bump_str(),
                         )])
@@ -658,10 +686,10 @@ bumpalo::format!(in bump, "{}",
                         .attr("style", "text-align: right;")
                         .children([text(
                             bumpalo::format!(in bump, "{}",
-                            root_rendering_component.game_data.spelling.clone().expect("root_rendering_component.game_data.spelling.clone()")
-                            .name.get(game_data.vec_cards.get(game_data.card_index_of_second_click)
-                            .expect("error index")
-                                .card_number_and_img_src).expect("error index")
+                            unwrap!(unwrap!(root_rendering_component.game_data.spelling.clone(),"root_rendering_component.game_data.spelling.clone()")
+                            .name.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_second_click)
+                            ,"game_data.card_index_of_second_click)")
+                                .card_number_and_img_src),".card_number_and_img_src)")
                                 )
                         .into_bump_str(),
                         )])
@@ -720,10 +748,8 @@ bumpalo::format!(in bump, "{}",
                                 folder_name.clone();
 
                             //send request to Websocket server for spellings (async over websocket messages)
-                            root_rendering_component
-                                .game_data
-                                .ws
-                                .send_with_str(
+                            unwrap!(
+                                root_rendering_component.game_data.ws.send_with_str(
                                     &serde_json::to_string(&WsMessage::RequestSpelling {
                                         filename: format!(
                                             "content/{}/text.json",
@@ -731,20 +757,20 @@ bumpalo::format!(in bump, "{}",
                                         ),
                                     })
                                     .expect("error sending RequestSpelling"),
-                                )
-                                .expect("Failed to send RequestSpelling");
+                                ),
+                                "Failed to send RequestSpelling"
+                            );
 
-                            root_rendering_component
-                                .game_data
-                                .ws
-                                .send_with_str(
+                            unwrap!(
+                                root_rendering_component.game_data.ws.send_with_str(
                                     &serde_json::to_string(&WsMessage::WantToPlay {
                                         my_ws_uid: root_rendering_component.game_data.my_ws_uid,
                                         content_folder_name: folder_name.clone(),
                                     })
                                     .expect("error sending WantToPlay"),
-                                )
-                                .expect("Failed to send WantToPlay");
+                                ),
+                                "Failed to send WantToPlay"
+                            );
 
                             //endregion
                             vdom.schedule_render();
@@ -801,21 +827,21 @@ bumpalo::format!(in bump, "{}",
                             //region: send WsMessage over websocket
                             root_rendering_component.game_data_init();
 
-                            root_rendering_component
+                            unwrap!(root_rendering_component
                                 .game_data
                                 .ws
                                 .send_with_str(
                                     &serde_json::to_string(&WsMessage::GameDataInit {
-card_grid_data: serde_json::to_string(&root_rendering_component.game_data.vec_cards)
-                .expect("serde_json::to_string(&self.game_data.vec_cards)"),
-players: serde_json::to_string(&root_rendering_component.game_data.players)
-                .expect("serde_json::to_string(&self.game_data.players)"),
-spelling: serde_json::to_string(&root_rendering_component.game_data.spelling)
-                .expect("serde_json::to_string(&self.game_data.spelling)"),
+card_grid_data: unwrap!(serde_json::to_string(&root_rendering_component.game_data.vec_cards)
+                ,"serde_json::to_string(&self.game_data.vec_cards)"),
+players: unwrap!(serde_json::to_string(&root_rendering_component.game_data.players)
+                ,"serde_json::to_string(&self.game_data.players)"),
+spelling: unwrap!(serde_json::to_string(&root_rendering_component.game_data.spelling)
+                ,"serde_json::to_string(&self.game_data.spelling)"),
                                     })
                                     .expect("error sending WantToPlay"),
                                 )
-                                .expect("Failed to send WantToPlay");
+                                ,"Failed to send WantToPlay");
 
                             //endregion
                             vdom.schedule_render();
@@ -851,18 +877,18 @@ spelling: serde_json::to_string(&root_rendering_component.game_data.spelling)
                             root.unwrap_mut::<RootRenderingComponent>();
 root_rendering_component.game_data.game_state=GameState::Accepted;
 
-                        root_rendering_component
+                        unwrap!(root_rendering_component
                             .game_data
                             .ws
                             .send_with_str(
                                 &serde_json::to_string(&WsMessage::AcceptPlay {
                                     my_ws_uid: root_rendering_component.game_data.my_ws_uid,
-                                    players: serde_json::to_string(&root_rendering_component.game_data.players)
-                                    .expect("serde_json::to_string(&game_data.players)"),
+                                    players: unwrap!(serde_json::to_string(&root_rendering_component.game_data.players)
+                                    ,"serde_json::to_string(&game_data.players)"),
                                 })
                                 .expect("error sending test"),
                             )
-                            .expect("Failed to send");
+                            ,"Failed to send");
                         vdom.schedule_render();
                     })
                     .finish()
@@ -902,20 +928,20 @@ root_rendering_component.game_data.game_state=GameState::Accepted;
                                 root.unwrap_mut::<RootRenderingComponent>();
                             //this game_data mutable reference is dropped on the end of the function
                             //region: send WsMessage over websocket
-                            root_rendering_component
+                            unwrap!(root_rendering_component
                                 .game_data
                                 .ws
                                 .send_with_str(
                                     &serde_json::to_string(&WsMessage::PlayerChange {
                                         my_ws_uid: root_rendering_component.game_data.my_ws_uid,
-                                        players: serde_json::to_string(
+                                        players: unwrap!(serde_json::to_string(
                                             &root_rendering_component.game_data.players,
                                         )
-                                        .expect("serde_json::to_string(&root_rendering_component.game_data.players)"),
+                                        ,"serde_json::to_string(&root_rendering_component.game_data.players)"),
                                     })
                                     .expect("error sending PlayerChange"),
                                 )
-                                .expect("Failed to send PlayerChange");
+                                ,"Failed to send PlayerChange");
                             //endregion
                             root_rendering_component.take_turn();
                             // Finally, re-render the component on the next animation frame.

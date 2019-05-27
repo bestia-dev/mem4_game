@@ -21,7 +21,7 @@ pub fn setup_ws_connection(location_href: &str) -> WebSocket {
     loc_href.push_str("mem4ws/");
     console::log_1(&wasm_bindgen::JsValue::from_str(&loc_href));
     //same server address and port as http server
-    let ws = WebSocket::new(&loc_href).expect("WebSocket failed to connect.");
+    let ws = unwrap!(WebSocket::new(&loc_href), "WebSocket failed to connect.");
 
     //I don't know why is clone needed
     let ws_c = ws.clone();
@@ -29,13 +29,15 @@ pub fn setup_ws_connection(location_href: &str) -> WebSocket {
     //it will be execute onopen as a closure
     let open_handler = Box::new(move || {
         console::log_1(&"Connection opened, sending 'test' to server".into());
-        ws_c.send_with_str(
-            &serde_json::to_string(&WsMessage::RequestWsUid {
-                test: String::from("test"),
-            })
-            .expect("error sending test"),
-        )
-        .expect("Failed to send 'test' to server");
+        unwrap!(
+            ws_c.send_with_str(
+                &serde_json::to_string(&WsMessage::RequestWsUid {
+                    test: String::from("test"),
+                })
+                .expect("error sending test"),
+            ),
+            "Failed to send 'test' to server"
+        );
     });
 
     let cb_oh: Closure<Fn()> = Closure::wrap(open_handler);
@@ -58,8 +60,10 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
     //This is the only way I found to write to RootRenderingComponent fields.
     let weak = vdom.weak();
     let msg_recv_handler = Box::new(move |msg: JsValue| {
-        let data: JsValue =
-            Reflect::get(&msg, &"data".into()).expect("No 'data' field in websocket message!");
+        let data: JsValue = unwrap!(
+            Reflect::get(&msg, &"data".into()),
+            "No 'data' field in websocket message!"
+        );
 
         //serde_json can find out the variant of WsMessage
         //parse json and put data in the enum
