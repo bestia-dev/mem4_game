@@ -110,9 +110,11 @@ impl GameData {
         let mut vec_of_random_numbers = Vec::new();
         let mut rng = SmallRng::from_entropy();
         for _i in 1..=rest {
-            //gen_range is lower inclusive, upper exclusive 26 + 1
-            let num: usize = rng.gen_range(1, spelling_count_minus_one + 1);
-            if !vec_of_random_numbers.contains(&num) {
+            //0 is a non-value here
+            let mut num: usize = 0;
+            while num == 0 || vec_of_random_numbers.contains(&num) {
+                //gen_range is lower inclusive, upper exclusive 26 + 1
+                num = rng.gen_range(1, spelling_count_minus_one + 1);
                 //push a pair of the same number
                 vec_of_random_numbers.push(num);
                 vec_of_random_numbers.push(num);
