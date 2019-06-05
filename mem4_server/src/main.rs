@@ -110,15 +110,6 @@ fn main() {
     //endregion
 
     //region: cmdline parameters
-    //TODO: is this a clear case for shadowing? The same value in different types
-    //default ip and port
-    let df_local_ip = local_ip_get().expect("cannot get local ip");
-    //let df_local_ip = "127.0.0.22";
-    let df_local_port = 80;
-    //string representation of defaults
-    let prm_ip = df_local_ip.to_string();
-    let prm_port = df_local_port.to_string();
-
     let matches = App::new("mem4_server")
         .version("1.0.0")
         .author("Luciano Bestia")
@@ -126,22 +117,39 @@ fn main() {
         .arg(
             Arg::with_name("prm_ip")
                 .value_name("ip")
-                .default_value(&prm_ip)
+                .default_value("")
                 .help("ip address for listening"),
         )
         .arg(
             Arg::with_name("prm_port")
                 .value_name("port")
-                .default_value(&prm_port)
+                .default_value("")
                 .help("port for listening"),
         )
         .get_matches();
 
     //from string parameters to strong types
-    let fnl_prm_ip = matches.value_of("prm_ip").expect("error on prm_ip");
-    let fnl_prm_port = matches.value_of("prm_port").expect("error on prm_port");
+    let mut fnl_prm_ip = matches
+        .value_of("prm_ip")
+        .expect("error on prm_ip")
+        .to_lowercase();
+    let mut fnl_prm_port = matches
+        .value_of("prm_port")
+        .expect("error on prm_port")
+        .to_lowercase();
+
+    //if not cmd parameters, then use default local address
+    if fnl_prm_ip == "" {
+        let df_local_ip = local_ip_get().expect("cannot get local ip");
+        fnl_prm_ip.push_str(&df_local_ip.to_string());
+    }
+    if fnl_prm_port == "" {
+        let df_local_port = 80;
+        fnl_prm_port.push_str(&df_local_port.to_string());
+    }
+
     let local_ip = IpAddr::V4(fnl_prm_ip.parse::<Ipv4Addr>().expect("not an ip address"));
-    let local_port = u16::from_str_radix(fnl_prm_port, 10).expect("not a number");
+    let local_port = u16::from_str_radix(&fnl_prm_port, 10).expect("not a number");
     let local_addr = SocketAddr::new(local_ip, local_port);
 
     info!(
