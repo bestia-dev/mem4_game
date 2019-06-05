@@ -3,6 +3,9 @@ Things are changing fast. This is the situation on 2019-05-21. LucianoBestia
 Learning Rust Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication - part four.
 Read the `Last project`:  
 https://github.com/LucianoBestia/mem3_game  
+You can play the game here (hosted on google cloud platform):  
+http://34.87.17.103/mem4  
+  
 # Idea
 Playing the memory game alone is boring.  
 Playing it with one friend is better.  
