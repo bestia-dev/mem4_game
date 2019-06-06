@@ -208,7 +208,7 @@ impl GameData {
             content_folders: vec![
                 String::from("alphabet"),
                 String::from("animals"),
-                String::from("negative"),
+                String::from("playingcards"),
             ],
             spelling: None,
         }
