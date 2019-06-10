@@ -313,7 +313,6 @@ impl RootRenderingComponent {
         self.game_data.count_click_inside_one_turn = 0;
         self.game_data.card_index_of_first_click = 0;
         self.game_data.card_index_of_second_click = 0;
-        self.game_data.count_all_clicks = 0;
         self.game_data.players.clear();
         self.game_data.game_state = GameState::Start;
         self.game_data.content_folder_name = "alphabet".to_string();
@@ -554,11 +553,9 @@ impl Render for RootRenderingComponent {
                                     if game_data.count_click_inside_one_turn == 1 {
                                         game_data.card_index_of_first_click = this_click_card_index;
                                         game_data.card_index_of_second_click = 0;
-                                        game_data.count_all_clicks += 1;
                                     } else if game_data.count_click_inside_one_turn == 2 {
                                         game_data.card_index_of_second_click =
                                             this_click_card_index;
-                                        game_data.count_all_clicks += 1;
                                     } else {
                                         //nothing
                                     }
@@ -722,18 +719,20 @@ bumpalo::format!(in bump, "{}",
         {
             let mut vec_of_nodes = Vec::new();
             //I don't know how to solve the lifetime problems. So I just clone the small data.
-            let a = root_rendering_component.game_data.content_folders.clone();
-            for folder_name in a {
+            let ff = root_rendering_component.game_data.content_folders.clone();
+            for folder_name in ff {
                 vec_of_nodes.push(
                     h3(bump)
                         .attr("id", "ws_elem")
                         .attr("style", "color:green;")
-                        .children([text(
+                        .children([
+                            a(bump)
+                             .children([text(
                             //show Ask Player2 to Play!
                             bumpalo::format!(in bump, "{} for {} !", invite_string, folder_name)
                                 .into_bump_str(),
-                        )])
-                        .on("click", move |root, vdom, _event| {
+                            )])
+                            .on("click", move |root, vdom, _event| {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             //region: send WsMessage over websocket
@@ -774,7 +773,9 @@ bumpalo::format!(in bump, "{}",
 
                             //endregion
                             vdom.schedule_render();
-                        })
+                            })
+                        .finish(),
+                        ])
                         .finish(),
                 );
             }
@@ -796,7 +797,8 @@ bumpalo::format!(in bump, "{}",
                 ask_to_play(root_rendering_component, bump, "Invite")
             } else if let GameState::EndGame = root_rendering_component.game_data.game_state {
                 //end game ,Play again?
-                h3(bump)
+                a(bump)
+                    .attr("class", "m_container")
                     .attr("id", "ws_elem")
                     .attr("style", "color:green;")
                     .children([text(
@@ -817,10 +819,12 @@ bumpalo::format!(in bump, "{}",
                          h3(bump)
                 .attr("id", "ws_elem")
                 .attr("style", "color:red;")
-                .children([text(
-                    bumpalo::format!(in bump, "Players accepted: {}. Start Game?", root_rendering_component.game_data.players.len()-1).into_bump_str(),
-                )])
-                 .on("click", move |root, vdom, _event| {
+                .children([
+                    a(bump)
+                    .children([
+text(bumpalo::format!(in bump, "Players accepted: {}. Start Game?", root_rendering_component.game_data.players.len()-1).into_bump_str()),
+                    ])
+                    .on("click", move |root, vdom, _event| {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             //region: send WsMessage over websocket
@@ -845,7 +849,9 @@ spelling: unwrap!(serde_json::to_string(&root_rendering_component.game_data.spel
                             //endregion
                             vdom.schedule_render();
                         })
-                .finish(),
+                    .finish(),
+                ])
+               .finish(),
                         ask_to_play(root_rendering_component, bump, "Reinvite"),
                     ])
                     .finish()
@@ -854,10 +860,14 @@ spelling: unwrap!(serde_json::to_string(&root_rendering_component.game_data.spel
                 h3(bump)
                     .attr("id", "ws_elem")
                     .attr("style", "color:red;")
-                    .children([text(
-                        bumpalo::format!(in bump, "Game {} accepted.", root_rendering_component.game_data.content_folder_name)
-                            .into_bump_str(),
-                    )])
+                    .children([
+                        a(bump)
+                        .children([text(
+                            bumpalo::format!(in bump, "Game {} accepted.", root_rendering_component.game_data.content_folder_name)
+                                .into_bump_str(),
+                        )])
+                        .finish(),
+                    ])
                     .finish()
             } else if let GameState::Asked = root_rendering_component.game_data.game_state {
                 // 2S Click here to Accept play!
@@ -866,30 +876,34 @@ spelling: unwrap!(serde_json::to_string(&root_rendering_component.game_data.spel
                 h3(bump)
                     .attr("id", "ws_elem")
                     .attr("style", "color:green;")
-                    .children([text(
-                        //show Ask Player2 to Play!
-                        bumpalo::format!(in bump, "Click here to Accept {}!", root_rendering_component.game_data.content_folder_name)
-                            .into_bump_str(),
-                    )])
-                    .on("click", move |root, vdom, _event| {
-                        let root_rendering_component =
-                            root.unwrap_mut::<RootRenderingComponent>();
-root_rendering_component.game_data.game_state=GameState::Accepted;
+                    .children([
+                        a(bump)
+                        .children([text(
+                            //show Ask Player2 to Play!
+                            bumpalo::format!(in bump, "Click here to Accept {}!", root_rendering_component.game_data.content_folder_name)
+                                .into_bump_str(),
+                        )])
+                        .on("click", move |root, vdom, _event| {
+                            let root_rendering_component =
+                                root.unwrap_mut::<RootRenderingComponent>();
+    root_rendering_component.game_data.game_state=GameState::Accepted;
 
-                        unwrap!(root_rendering_component
-                            .game_data
-                            .ws
-                            .send_with_str(
-                                &serde_json::to_string(&WsMessage::AcceptPlay {
-                                    my_ws_uid: root_rendering_component.game_data.my_ws_uid,
-                                    players: unwrap!(serde_json::to_string(&root_rendering_component.game_data.players)
-                                    ,"serde_json::to_string(&game_data.players)"),
-                                })
-                                .expect("error sending test"),
-                            )
-                            ,"Failed to send");
-                        vdom.schedule_render();
-                    })
+                            unwrap!(root_rendering_component
+                                .game_data
+                                .ws
+                                .send_with_str(
+                                    &serde_json::to_string(&WsMessage::AcceptPlay {
+                                        my_ws_uid: root_rendering_component.game_data.my_ws_uid,
+                                        players: unwrap!(serde_json::to_string(&root_rendering_component.game_data.players)
+                                        ,"serde_json::to_string(&game_data.players)"),
+                                    })
+                                    .expect("error sending test"),
+                                )
+                                ,"Failed to send");
+                            vdom.schedule_render();
+                        })
+                        .finish()
+                    ])
                     .finish()
             } else if root_rendering_component
                 .game_data
@@ -918,34 +932,38 @@ root_rendering_component.game_data.game_state=GameState::Accepted;
                     h3(bump)
                         .attr("id", "ws_elem")
                         .attr("style", "color:green;")
-                        .children([text(
-                            bumpalo::format!(in bump, "Click here to take your turn !{}", "")
-                                .into_bump_str(),
-                        )])
-                        .on("click", move |root, vdom, _event| {
-                            let root_rendering_component =
-                                root.unwrap_mut::<RootRenderingComponent>();
-                            //this game_data mutable reference is dropped on the end of the function
-                            //region: send WsMessage over websocket
-                            unwrap!(root_rendering_component
-                                .game_data
-                                .ws
-                                .send_with_str(
-                                    &serde_json::to_string(&WsMessage::PlayerChange {
-                                        my_ws_uid: root_rendering_component.game_data.my_ws_uid,
-                                        players: unwrap!(serde_json::to_string(
-                                            &root_rendering_component.game_data.players,
-                                        )
-                                        ,"serde_json::to_string(&root_rendering_component.game_data.players)"),
-                                    })
-                                    .expect("error sending PlayerChange"),
-                                )
-                                ,"Failed to send PlayerChange");
-                            //endregion
-                            root_rendering_component.take_turn();
-                            // Finally, re-render the component on the next animation frame.
-                            vdom.schedule_render();
-                        })
+                        .children([
+                            a(bump)
+                            .children([text(
+                                bumpalo::format!(in bump, "Click here to take your turn !{}", "")
+                                    .into_bump_str(),
+                            )])
+                            .on("click", move |root, vdom, _event| {
+                                let root_rendering_component =
+                                    root.unwrap_mut::<RootRenderingComponent>();
+                                //this game_data mutable reference is dropped on the end of the function
+                                //region: send WsMessage over websocket
+                                unwrap!(root_rendering_component
+                                    .game_data
+                                    .ws
+                                    .send_with_str(
+                                        &serde_json::to_string(&WsMessage::PlayerChange {
+                                            my_ws_uid: root_rendering_component.game_data.my_ws_uid,
+                                            players: unwrap!(serde_json::to_string(
+                                                &root_rendering_component.game_data.players,
+                                            )
+                                            ,"serde_json::to_string(&root_rendering_component.game_data.players)"),
+                                        })
+                                        .expect("error sending PlayerChange"),
+                                    )
+                                    ,"Failed to send PlayerChange");
+                                //endregion
+                                root_rendering_component.take_turn();
+                                // Finally, re-render the component on the next animation frame.
+                                vdom.schedule_render();
+                            })                            
+                            .finish()
+                        ])
                         .finish()
                 } else {
                     //return wait for the other player
@@ -962,9 +980,13 @@ root_rendering_component.game_data.game_state=GameState::Accepted;
                     h3(bump)
                         .attr("id", "ws_elem")
                         .attr("style", "color:orange;")
-                        .children([text(
-                            bumpalo::format!(in bump, "Play !{}", "").into_bump_str(),
-                        )])
+                        .children([
+                            a(bump)
+                            .children([text(
+                                bumpalo::format!(in bump, "Play !{}", "").into_bump_str(),
+                            )])
+                            .finish()
+                        ])
                         .finish()
                 } else {
                     //return wait for the other player
@@ -975,10 +997,14 @@ root_rendering_component.game_data.game_state=GameState::Accepted;
                 //return
                 h3(bump)
                     .attr("id", "ws_elem")
-                    .children([text(
-                        bumpalo::format!(in bump, "gamestate: {} player {}", root_rendering_component.game_data.game_state.as_ref(),root_rendering_component.game_data.my_player_number)
-                            .into_bump_str(),
-                    )])
+                    .children([
+                            a(bump)
+                                .children([text(
+                                    bumpalo::format!(in bump, "gamestate: {} player {}", root_rendering_component.game_data.game_state.as_ref(),root_rendering_component.game_data.my_player_number)
+                                        .into_bump_str(),
+                                )])
+                            .finish()
+                        ])
                     .finish()
             }
         }
@@ -987,9 +1013,14 @@ root_rendering_component.game_data.game_state=GameState::Accepted;
             h3(bump)
                 .attr("id", "ws_elem")
                 .attr("style", "color:red;")
-                .children([text(
-                    bumpalo::format!(in bump, "Wait for the other player.{}", "").into_bump_str(),
-                )])
+                .children([
+                    a(bump)
+                    .children([
+                        text(
+                        bumpalo::format!(in bump, "Wait for the other player.{}", "").into_bump_str(),
+                    )])
+                    .finish()
+                ])
                 .finish()
         }
         //endregion
@@ -999,21 +1030,15 @@ root_rendering_component.game_data.game_state=GameState::Accepted;
         div(bump)
             .attr("class", "m_container")
             .children([
-                div_grid_header(self, bump),
                 //div for the css grid object defined in css with <img> inside
                 div(bump)
                     .attr("class", "grid_container")
                     .attr("style", "margin-left: auto;margin-right: auto;")
                     .children(div_grid_items(self, bump))
                     .finish(),
-                self.players_and_scores.render(bump),
                 div_game_status_and_player_actions(self, bump),
-                h5(bump)
-                    .children([text(
-                        bumpalo::format!(in bump, "Count of Clicks: {}", self.game_data.count_all_clicks)
-                            .into_bump_str(),
-                    )])
-                    .finish(),
+                div_grid_header(self, bump),
+                self.players_and_scores.render(bump),
                 self.cached_rules_and_description.render(bump),
             ])
             .finish()

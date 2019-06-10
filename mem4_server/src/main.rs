@@ -117,13 +117,13 @@ fn main() {
         .arg(
             Arg::with_name("prm_ip")
                 .value_name("ip")
-                .default_value("")
+                .default_value("0.0.0.0")
                 .help("ip address for listening"),
         )
         .arg(
             Arg::with_name("prm_port")
                 .value_name("port")
-                .default_value("")
+                .default_value("8084")
                 .help("port for listening"),
         )
         .get_matches();
@@ -139,6 +139,7 @@ fn main() {
         .to_lowercase();
 
     //if not cmd parameters, then use default local address
+    //let's try the new defaults that work good with docker 0.0.0.0:8084
     if fnl_prm_ip == "" {
         let df_local_ip = local_ip_get().expect("cannot get local ip");
         fnl_prm_ip.push_str(&df_local_ip.to_string());

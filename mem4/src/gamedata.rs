@@ -69,8 +69,6 @@ pub struct GameData {
     pub card_index_of_first_click: usize,
     ///card index of second click
     pub card_index_of_second_click: usize,
-    ///counts only clicks that flip the card. The third click is not counted.
-    pub count_all_clicks: usize,
     ///web socket. used it to send message onclick.
     pub ws: WebSocket,
     ///my ws client instance unique id. To not listen the echo to yourself.
@@ -197,7 +195,6 @@ impl GameData {
             count_click_inside_one_turn: 0,
             card_index_of_first_click: 0,
             card_index_of_second_click: 0,
-            count_all_clicks: 0,
             ws,
             my_ws_uid,
             players,

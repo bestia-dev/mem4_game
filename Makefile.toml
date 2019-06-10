@@ -1,13 +1,13 @@
 [tasks.init]
 disabled = true
 
-#DOes it work on linux and windows??
+#Does it work on linux and windows??
+
+#[tasks.end]
+#linux_alias = "linux_end"
+#windows_alias = "windows_end"
 
 [tasks.end]
-linux_alias = "linux_end"
-windows_alias = "windows_end"
-
-[tasks.windows_end]
 script = [
     "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\mem4\\pkg\\*.* c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\mem4\\pkg\\ /y ",
     "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\target\\debug\\mem4_server.exe c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\ /y ",
