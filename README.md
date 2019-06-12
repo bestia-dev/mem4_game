@@ -5,7 +5,8 @@ Read the `Last project`:
 https://github.com/LucianoBestia/mem3_game  
 You can play the game here (hosted on google cloud platform):  
 http://34.87.17.103/mem4  
-  
+For exercise I made a Docker image/container for mem4 on the google VM:  
+http://34.87.17.103/memdock4  
 # Idea
 Playing the memory game alone is boring.  
 Playing it with one friend is better.  
@@ -17,6 +18,9 @@ All the phones will have a 4x4 card grid. If we put 4 smartphones on the table i
 It can be played with as many friends as there are: 3,4,5,6,7,8,... More friends - more fun.  
 ## TODO:
 - better documentation. Do I really have to write very long doc-comments in the code ? It looks terrible. But it is useful when reading the code. Maybe I can hide it in a region block. Dodrio has beautiful docs. How did he do it?  
+- cargo release is a subcommand to increment the version and make a git tag
+- The size of the game should be the size of the screen. I don't need to use the css or JavaScript tricks. I have Rust with Virtual Dom. I can calculate exactly the size in Rust and render it perfectly 60 times per second. So I can make a Rust reactive size calculator now.
+-- typed html. Writing html with the dodrio builder is terrible. There is this typed html macro I could try to use.
 ## Changelog
 2019-05-24 completed a working version
-
+2019-06-06 google cloud platform, docker, DockerHub
