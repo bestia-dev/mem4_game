@@ -2,9 +2,10 @@
 //! is a static content. great for cache.
 
 use crate::text_with_br_newline;
-use dodrio::builder::*;
+use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Node, Render};
+use typed_html::dodrio;
 
 ///Text of game rules.
 ///Multiline string literal just works.
@@ -43,30 +44,26 @@ impl Render for RulesAndDescription {
     where
         'a: 'bump,
     {
-        div(bump)
-        .children([
-            h4(bump)
-            .children(text_with_br_newline(GAME_DESCRIPTION,bump))
-            .finish(),
-            h2(bump)
-            .children([text(
+        dodrio!(bump,
+        <div>
+            <h4>
+                {text_with_br_newline(GAME_DESCRIPTION,bump)}
+            </h4>
+            <h2>
+            {vec![text(
                 bumpalo::format!(in bump, "Memory game rules: {}", "").into_bump_str(),
-            )])
-            .finish(),
-            h4(bump)
-            .children(text_with_br_newline(GAME_RULES, bump))
-            .finish(),
-            h6(bump)
-            .children([
-                text(bumpalo::format!(in bump, "Learning Rust programming: {}", "").into_bump_str(),),
-                a(bump)
-                    .attr("href", "https://github.com/LucianoBestia/mem4_game")  
-                    .attr("target","_blank")              
-                    .children([text(bumpalo::format!(in bump, "https://github.com/LucianoBestia/mem4_game{}", "").into_bump_str(),)])
-                    .finish(),
-            ])
-                .finish(),
-        ])
-        .finish()
+            )]}
+            </h2>
+            <h4>
+                {text_with_br_newline(GAME_RULES, bump)}
+            </h4>
+            <h6>
+                {vec![text(bumpalo::format!(in bump, "Learning Rust programming: {}", "").into_bump_str(),)]}
+                <a href= "https://github.com/LucianoBestia/mem4_game" target="_blank">
+                    {vec![text(bumpalo::format!(in bump, "https://github.com/LucianoBestia/mem4_game{}", "").into_bump_str(),)]}
+                </a>
+            </h6>
+        </div>
+        )
     }
 }

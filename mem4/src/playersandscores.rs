@@ -1,9 +1,10 @@
 //! file and module for playersandscores
 use crate::gamedata::GameData;
 
-use dodrio::builder::*;
+use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Node, Render};
+use typed_html::dodrio;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 
@@ -76,24 +77,19 @@ impl Render for PlayersAndScores {
     where
         'a: 'bump,
     {
+        let style1 = bumpalo::format!(in bump,"text-align: center;color:{};",
+            if self.player_turn==self.my_player_number {"green"} else {"red"}
+        )
+        .into_bump_str();
+        let text1 = bumpalo::format!(in bump, "player{}: {}",self.my_player_number, self.my_points)
+            .into_bump_str();
         //return
-        div(bump)
-            .attr("class", "grid_container_players")
-            .attr("style", "grid-template-columns: auto;")
-            .children([div(bump)
-                .attr("class", "grid_item")
-                .attr(
-                    "style",
-                    bumpalo::format!(in bump,"text-align: center;color:{};",
-                        if self.player_turn==self.my_player_number {"green"} else {"red"}
-                    )
-                    .into_bump_str(),
-                )
-                .children([text(
-                    bumpalo::format!(in bump, "player{}: {}",self.my_player_number, self.my_points)
-                        .into_bump_str(),
-                )])
-                .finish()])
-            .finish()
+        dodrio!(bump,
+        <div class="grid_container_players" style= "grid-template-columns: auto;">
+            <div class= "grid_item" style={style1}>
+                {vec![text(text1)]}
+            </div>
+        </div>
+        )
     }
 }
