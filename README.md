@@ -24,10 +24,10 @@ Everything is done in compile time, so the runtime is nothing slower.
 ## TODO:
 - better documentation. Do I really have to write very long doc-comments in the code ? It looks terrible. But it is useful when reading the code. Maybe I can hide it in a region block. Dodrio has beautiful docs. How did he do it?  
 - cargo release is a subcommand to increment the version and make a git tag
-- The size of the game should be the size of the screen. I don't need to use the css or JavaScript tricks. I have Rust with Virtual Dom. I can calculate exactly the size in Rust and render it perfectly 60 times per second. So I can make a Rust reactive size calculator now.
 
 ## Changelog
 2019-05-24 completed a working version  
 2019-06-06 google cloud platform, docker, DockerHub  
 2019-06-13 typed html  
+2019-06-20 added Triestine, calculate grid size in rust  
   
