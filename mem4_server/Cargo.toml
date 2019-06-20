@@ -1,6 +1,6 @@
 [package]
 name = "mem4_server"
-version = "1.0.0" 
+version = "1.1.0" 
 description = "server for the game mem4 http + websocket on the same port"
 authors = ["Luciano Bestia"]
 license = "MIT"
