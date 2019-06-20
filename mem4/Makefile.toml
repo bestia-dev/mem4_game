@@ -3,15 +3,27 @@
 [config]
 skip_core_tasks = true
 
+#region: flows
 [tasks.default]
 dependencies = [
     "build",
     "post-build",
 ]
 
+[tasks.release]
+dependencies = [
+    "build-release",
+    "post-build",
+]
+#endregion
+
 [tasks.build]
 command = "wasm-pack"
 args = ["build", "--target", "web"]
+
+[tasks.build-release]
+command = "wasm-pack"
+args = ["build","--target", "web"]
 
 [tasks.post-build]
 linux_alias = "linux_post-build"

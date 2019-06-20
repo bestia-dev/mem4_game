@@ -1,4 +1,12 @@
 [config]
 skip_core_tasks = true
 
+#region: flows
+#somewhere exists a task with name "workspace", that cannot be overriden?
+
+[tasks.release]
+workspace = false
+command = "cargo"
+args = ["make","release"]
+#end region
 

@@ -1,11 +1,24 @@
+#https://github.com/sagiegurari/cargo-make/blob/master/src/lib/Makefile.stable.toml
+
 [config]
 skip_core_tasks = true
 
+#region: flows
 [tasks.default]
 dependencies = [
     "build",
 ]
 
+[tasks.release]
+dependencies = [
+    "build-release",
+]
+#endregion
+
 [tasks.build]
 command = "cargo"
 args = ["build"]
+
+[tasks.build-release]
+command = "cargo"
+args = ["build","--release"]
