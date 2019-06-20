@@ -1068,10 +1068,11 @@ impl Render for RootRenderingComponent {
             max_grid_width, max_grid_height
         )));
 
-        let style = format!("width:{}px; height:{}px;", max_grid_width, max_grid_height);
+        let xstyle = format!("width:{}px; height:{}px;", max_grid_width, max_grid_height);
+        let xstyle2 = format!("width:{}px;", max_grid_width + 2);
         dodrio!(bump,
-        <div class= "m_container">
-            <div class= "grid_container" style={style}>
+        <div class= "m_container" style={xstyle2}>
+            <div class= "grid_container" style={xstyle}>
                 {div_grid_items(self, bump)}
             </div>
             {vec![div_game_status_and_player_actions(self, bump)]}
