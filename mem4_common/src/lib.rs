@@ -58,7 +58,7 @@ pub enum WsMessage {
         ///ws client instance unique id. To not listen the echo to yourself.
         my_ws_uid: usize,
         ///content folder name
-        content_folder_name: String,
+        asked_folder_name: String,
     },
     /// accept play
     AcceptPlay {

@@ -18,7 +18,7 @@ All the players must open this web app to allow communication.
 Put all the smartphones on the table near each other, so all players can see them and touch \
 them. It should look like a board game at this point.  
 The first player clicks on 'Invite for play?'.  
-He can choose different types of game visuals: alphabet, animal, playing cards...  
+He can choose different types of game visuals: alphabet, animal, playing cards,...  
 Other players then see on the screen 'Click here to Accept play!'.  
 Player1 sees how many players have accepted. Then he starts the game.  
 On the screen under the grid are clear signals which player plays and which waits.  

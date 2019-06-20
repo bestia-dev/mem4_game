@@ -3,5 +3,7 @@
         "", "alpha", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel", "india",
         "juliet", "kilo", "lima", "mike", "november", "oscar", "papa", "quebec", "romeo", "sierra",
         "tango", "uniform", "victor", "whiskey", "xray", "yankee", "zulu"
-    ]
+    ],
+	"card_width": 116,
+    "card_height":116
 }

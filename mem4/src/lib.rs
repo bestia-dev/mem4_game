@@ -11,6 +11,7 @@
 //! read StructModel.md
 //endregion
 
+//needed for dodrio! macro (typed-html)
 #![recursion_limit = "512"]
 //region: Clippy
 #![warn(
@@ -63,6 +64,8 @@ extern crate serde_json;
 extern crate strum;
 extern crate strum_macros;
 extern crate web_sys;
+#[macro_use]
+extern crate unwrap;
 
 use dodrio::builder::*;
 use dodrio::bumpalo::{self, Bump};
@@ -73,10 +76,8 @@ use rand::FromEntropy;
 use rand::Rng;
 use typed_html::dodrio;
 use wasm_bindgen::prelude::{wasm_bindgen, JsValue, UnwrapThrowExt};
-use wasm_bindgen::JsCast;
+use wasm_bindgen::JsCast; //don't remove this. It is needed for dyn_into.
 use web_sys::{console, WebSocket};
-#[macro_use]
-extern crate unwrap;
 //endregion
 
 //region: enum, structs, const,...
@@ -143,6 +144,7 @@ pub fn run() -> Result<(), JsValue> {
 //endregion
 
 //region: Helper functions
+
 ///change the newline lines ending into <br> node
 fn text_with_br_newline<'a>(txt: &'a str, bump: &'a Bump) -> Vec<Node<'a>> {
     let mut vec_text_node = Vec::new();
@@ -304,6 +306,7 @@ impl RootRenderingComponent {
     }
     ///prepares the game data
     fn game_data_init(&mut self) {
+        self.game_data.content_folder_name = self.game_data.asked_folder_name.clone();
         self.game_data.prepare_random_data();
         self.game_data.game_state = GameState::Play;
         self.game_data.player_turn = 1;
@@ -317,6 +320,7 @@ impl RootRenderingComponent {
         self.game_data.players.clear();
         self.game_data.game_state = GameState::Start;
         self.game_data.content_folder_name = "alphabet".to_string();
+        self.game_data.asked_folder_name = "".to_string();
         self.game_data.my_player_number = 1;
         self.game_data.player_turn = 0;
         self.game_data.spelling = None;
@@ -331,7 +335,7 @@ impl RootRenderingComponent {
         self.game_data.my_ws_uid = your_ws_uid;
     }
     ///msg want to play
-    fn on_want_to_play(&mut self, my_ws_uid: usize, content_folder_name: String) {
+    fn on_want_to_play(&mut self, my_ws_uid: usize, asked_folder_name: String) {
         console::log_1(&"rcv wanttoplay".into());
         self.reset();
         self.game_data.game_state = GameState::Asked;
@@ -344,7 +348,7 @@ impl RootRenderingComponent {
             points: 0,
         });
         self.game_data.my_player_number = 2; //temporary number
-        self.game_data.content_folder_name = content_folder_name;
+        self.game_data.asked_folder_name = asked_folder_name;
     }
     ///msg accept play
     fn on_accept_play(&mut self, my_ws_uid: usize) {
@@ -358,6 +362,7 @@ impl RootRenderingComponent {
     }
     ///on game data init
     fn on_game_data_init(&mut self, card_grid_data: &str, spelling: &str, players: &str) {
+        self.game_data.content_folder_name = self.game_data.asked_folder_name.clone();
         self.game_data.game_state = GameState::Play;
         self.game_data.player_turn = 1;
         self.game_data.vec_cards = unwrap!(
@@ -444,6 +449,54 @@ impl Render for RootRenderingComponent {
         //`pub` not permitted there because it's implied
         //so I have to write functions outside of the impl block but inside my "module"
 
+        ///grid width
+        fn grid_width() -> usize {
+            //the size of  the visible part of the window
+            let window = unwrap!(web_sys::window(), "error: web_sys::window");
+
+            let jsvalue_inner_width = unwrap!(window.inner_width(), "window.inner_width");
+
+            let f64_inner_width = unwrap!(
+                jsvalue_inner_width.as_f64(),
+                "jsValue_inner_width.as_string()"
+            );
+            let usize_inner_width = f64_inner_width as usize;
+            //width min: 300px, max: 600 px in between width=visible width
+            //3 columnsdelimiter 5px wide
+            let grid_width: usize;
+            if usize_inner_width < 300 {
+                grid_width = 300;
+            } else if usize_inner_width > 600 {
+                grid_width = 600;
+            } else {
+                grid_width = usize_inner_width;
+            }
+            grid_width
+        }
+        ///grid height
+        fn grid_height() -> usize {
+            //the size of  the visible part of the window
+            let window = unwrap!(web_sys::window(), "error: web_sys::window");
+            let jsvalue_inner_height = unwrap!(window.inner_height(), "window.inner_height");
+
+            let f64_inner_height = unwrap!(
+                jsvalue_inner_height.as_f64(),
+                "jsValue_inner_height.as_f64()"
+            );
+            let usize_inner_height = f64_inner_height as usize;
+
+            //height minimum 300, max 1000, else 0.8*visible height
+            //3 row separetors 5px wide
+            let grid_height: usize;
+            if usize_inner_height < 300 {
+                grid_height = 300;
+            } else if usize_inner_height > 1000 {
+                grid_height = 1000;
+            } else {
+                grid_height = (0.8 * (usize_inner_height as f64)) as usize;
+            }
+            grid_height
+        }
         ///prepare a vector<Node> for the Virtual Dom for 'css grid' item with <img>
         ///the grid container needs only grid items. There is no need for rows and columns in 'css grid'.
         fn div_grid_items<'a, 'bump>(
@@ -454,6 +507,7 @@ impl Render for RootRenderingComponent {
             let game_data = &root_rendering_component.game_data;
 
             let mut vec_grid_item_bump = Vec::new();
+
             //4x4 is 16 cards. index goes from PlayerNUmber-1*16+1 to Player
             console::log_1(&JsValue::from_str(&format!(
                 "my_player_number {}",
@@ -719,7 +773,7 @@ impl Render for RootRenderingComponent {
                             points: 0,
                         });
                         root_rendering_component.game_data.game_state = GameState::Asking;
-                        root_rendering_component.game_data.content_folder_name =
+                        root_rendering_component.game_data.asked_folder_name =
                             folder_name.clone();
 
                         //send request to Websocket server for spellings (async over websocket messages)
@@ -728,7 +782,7 @@ impl Render for RootRenderingComponent {
                                 &serde_json::to_string(&WsMessage::RequestSpelling {
                                     filename: format!(
                                         "content/{}/text.json",
-                                        root_rendering_component.game_data.content_folder_name
+                                        root_rendering_component.game_data.asked_folder_name
                                     ),
                                 })
                                 .expect("error sending RequestSpelling"),
@@ -740,7 +794,7 @@ impl Render for RootRenderingComponent {
                             root_rendering_component.game_data.ws.send_with_str(
                                 &serde_json::to_string(&WsMessage::WantToPlay {
                                     my_ws_uid: root_rendering_component.game_data.my_ws_uid,
-                                    content_folder_name: folder_name.clone(),
+                                    asked_folder_name: folder_name.clone(),
                                 })
                                 .expect("error sending WantToPlay"),
                             ),
@@ -774,7 +828,7 @@ impl Render for RootRenderingComponent {
         where
             'a: 'bump,
         {
-            #![allow(clippy::cyclomatic_complexity)]
+            #![allow(clippy::cognitive_complexity)]
             if let GameState::Start = root_rendering_component.game_data.game_state {
                 // 1S Ask Player2 to play!
                 console::log_1(&"GameState::Start".into());
@@ -783,18 +837,20 @@ impl Render for RootRenderingComponent {
             } else if let GameState::EndGame = root_rendering_component.game_data.game_state {
                 //end game ,Play again?
                 dodrio!(bump,
-                <a class= "m_container" id= "ws_elem" style= "color:green;" onclick={
-                        move |root, vdom, _event| {
-                        let root_rendering_component = root.unwrap_mut::<RootRenderingComponent>();
-                        root_rendering_component.reset();
-                        root_rendering_component.game_data.game_state = GameState::Start;
-                        vdom.schedule_render();
-                    }}>
-                    {vec![text(
-                        //Play again?
-                        bumpalo::format!(in bump, "Play again{}?", "").into_bump_str(),
-                    )]}
-                </a>
+                <h3 class= "m_container" id= "ws_elem" style= "color:green;">
+                    <a onclick={
+                            move |root, vdom, _event| {
+                            let root_rendering_component = root.unwrap_mut::<RootRenderingComponent>();
+                            root_rendering_component.reset();
+                            root_rendering_component.game_data.game_state = GameState::Start;
+                            vdom.schedule_render();
+                        }}>
+                        {vec![text(
+                            //Play again?
+                            bumpalo::format!(in bump, "Play again{}?", "").into_bump_str(),
+                        )]}
+                    </a>
+                </h3>
                 )
             } else if let GameState::Asking = root_rendering_component.game_data.game_state {
                 //return wait for the other player
@@ -837,7 +893,7 @@ impl Render for RootRenderingComponent {
                 dodrio!(bump,
                 <h3 id= "ws_elem" style= "color:red;">
                     <a>
-                    {vec![text(bumpalo::format!(in bump, "Game {} accepted.", root_rendering_component.game_data.content_folder_name).into_bump_str(),)]}
+                    {vec![text(bumpalo::format!(in bump, "Game {} accepted.", root_rendering_component.game_data.asked_folder_name).into_bump_str(),)]}
                     </a>
                 </h3>
                 )
@@ -868,7 +924,7 @@ impl Render for RootRenderingComponent {
                         }}>
                         {vec![text(
                             //show Ask Player2 to Play!
-                            bumpalo::format!(in bump, "Click here to Accept {}!", root_rendering_component.game_data.content_folder_name)
+                            bumpalo::format!(in bump, "Click here to Accept {}!", root_rendering_component.game_data.asked_folder_name)
                                 .into_bump_str(),
                         )]}
                     </a>
@@ -945,7 +1001,7 @@ impl Render for RootRenderingComponent {
                 {
                     dodrio!(bump,
                     <h3 id= "ws_elem" style= "color:orange;">
-                        <a>
+                        <a onclick ={move |root, vdom, _event| {}}>
                         {vec![text(bumpalo::format!(in bump, "Play !{}", "").into_bump_str())]}
                         </a>
                     </h3>
@@ -979,9 +1035,43 @@ impl Render for RootRenderingComponent {
         //endregion
 
         //region: create the whole virtual dom. The verbose stuff is in private functions
+        //grid_container width and height
+        let mut max_grid_width = grid_width();
+        let mut max_grid_height = grid_height();
+        console::log_1(&JsValue::from_str(&format!(
+            "inner_width {} inner_height {}",
+            max_grid_width, max_grid_height
+        )));
+        //default if not choosen
+        let mut card_width = 115;
+        let mut card_height = 115;
+        match &self.game_data.spelling {
+            None => (),
+            Some(_x) => {
+                card_width = unwrap!(self.game_data.spelling.clone()).card_width;
+                card_height = unwrap!(self.game_data.spelling.clone()).card_height;
+            }
+        }
+        console::log_1(&JsValue::from_str(&format!(
+            "card_width {} card_height {}",
+            card_width, card_height
+        )));
+        //ratio between width and height must stay the same
+        let ratio = (card_height as f64) / (card_width as f64);
+        if (max_grid_width as f64) * ratio > (max_grid_height as f64) {
+            max_grid_width = ((max_grid_height as f64) / ratio) as usize;
+        } else {
+            max_grid_height = ((max_grid_width as f64) * ratio) as usize;
+        }
+        console::log_1(&JsValue::from_str(&format!(
+            "max_grid_width {} max_grid_height {}",
+            max_grid_width, max_grid_height
+        )));
+
+        let style = format!("width:{}px; height:{}px;", max_grid_width, max_grid_height);
         dodrio!(bump,
         <div class= "m_container">
-            <div class= "grid_container" style= "margin-left: auto;margin-right: auto;">
+            <div class= "grid_container" style={style}>
                 {div_grid_items(self, bump)}
             </div>
             {vec![div_game_status_and_player_actions(self, bump)]}

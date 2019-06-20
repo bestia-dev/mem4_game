@@ -19,6 +19,10 @@ use web_sys::WebSocket;
 pub struct Spelling {
     ///names of spelling
     pub name: Vec<String>,
+    ///card image width
+    pub card_width: usize,
+    ///card image height
+    pub card_height: usize,
 }
 
 ///the game can be in various states and that differentiate the UI and actions
@@ -79,6 +83,8 @@ pub struct GameData {
     pub game_state: GameState,
     ///content folder name
     pub content_folder_name: String,
+    ///want to play asks for a specific game
+    pub asked_folder_name: String,
     ///What player am I
     pub my_player_number: usize,
     ///whose turn is now:  player 1,2,3,...
@@ -200,12 +206,14 @@ impl GameData {
             players,
             game_state: GameState::Start,
             content_folder_name: "alphabet".to_string(),
+            asked_folder_name: "".to_string(),
             my_player_number: 1,
             player_turn: 0,
             content_folders: vec![
                 String::from("alphabet"),
                 String::from("animals"),
                 String::from("playingcards"),
+                String::from("triestine"),
             ],
             spelling: None,
         }

@@ -99,7 +99,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
 
             WsMessage::WantToPlay {
                 my_ws_uid,
-                content_folder_name,
+                asked_folder_name,
             } => {
                 wasm_bindgen_futures::spawn_local(
                     weak.with_component({
@@ -112,7 +112,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
                                 root_rendering_component.game_data.game_state
                             {
                                 root_rendering_component
-                                    .on_want_to_play(my_ws_uid, content_folder_name);
+                                    .on_want_to_play(my_ws_uid, asked_folder_name);
                                 v2.schedule_render();
                             }
                         }
