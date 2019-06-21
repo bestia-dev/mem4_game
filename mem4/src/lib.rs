@@ -506,20 +506,22 @@ impl Render for RootRenderingComponent {
             //this game_data mutable reference is dropped on the end of the function
             let game_data = &root_rendering_component.game_data;
 
-            let mut vec_grid_item_bump = Vec::new();
+            let mut vec_grid_item_bump: Vec<Node<'bump>> = Vec::new();
+            if let None = game_data.spelling {
 
-            //4x4 is 16 cards. index goes from PlayerNUmber-1*16+1 to Player
-            console::log_1(&JsValue::from_str(&format!(
-                "my_player_number {}",
-                &root_rendering_component.game_data.my_player_number
-            )));
+            } else {
+                //4x4 is 16 cards. index goes from PlayerNUmber-1*16+1 to Player
+                console::log_1(&JsValue::from_str(&format!(
+                    "my_player_number {}",
+                    &root_rendering_component.game_data.my_player_number
+                )));
 
-            let start_index = ((game_data.my_player_number - 1) * 16) + 1;
-            let end_index = game_data.my_player_number * 16;
-            for x in start_index..=end_index {
-                let index: usize = x;
-                //region: prepare variables and closures for inserting into vdom
-                let img_src = match unwrap!(
+                let start_index = ((game_data.my_player_number - 1) * 16) + 1;
+                let end_index = game_data.my_player_number * 16;
+                for x in start_index..=end_index {
+                    let index: usize = x;
+                    //region: prepare variables and closures for inserting into vdom
+                    let img_src = match unwrap!(
                     game_data.vec_cards.get(index),
                     "match game_data.vec_cards.get(index) {} startindex {} endindex {} vec_card.len {}",index,start_index, end_index,game_data.vec_cards.len()
                 )
@@ -542,131 +544,134 @@ impl Render for RootRenderingComponent {
                     }
                 };
 
-                let img_id =
+                    let img_id =
                     bumpalo::format!(in bump, "img{:02}",unwrap!(game_data.vec_cards.get(index),"game_data.vec_cards.get(index)").card_index_and_id)
                         .into_bump_str();
 
-                let opacity = if img_src
-                    == format!(
-                        "content/{}/{}",
-                        game_data.content_folder_name, SRC_FOR_CARD_FACE_DOWN
-                    ) {
-                    bumpalo::format!(in bump, "opacity:{}", 0.2).into_bump_str()
-                } else {
-                    bumpalo::format!(in bump, "opacity:{}", 1).into_bump_str()
-                };
-                //endregion
+                    let opacity = if img_src
+                        == format!(
+                            "content/{}/{}",
+                            game_data.content_folder_name, SRC_FOR_CARD_FACE_DOWN
+                        ) {
+                        bumpalo::format!(in bump, "opacity:{}", 0.2).into_bump_str()
+                    } else {
+                        bumpalo::format!(in bump, "opacity:{}", 1).into_bump_str()
+                    };
+                    //endregion
 
-                //creating 16 <div> in loop
-                let grid_item_bump = dodrio!(bump,
-                <div class= "grid_item">
-                    <img src={img_src} id={img_id} style={opacity} onclick={move |root, vdom, event| {
-                            //on click needs a code Closure in Rust. Dodrio and wasm-bindgen
-                            //generate the javascript code to call it properly.
-                            //we need our Struct RootRenderingComponent for Rust to write any data.
-                            //It comes in the parameter root.
-                            //All we can change is inside the struct RootRenderingComponent fields.
-                            //The method render will later use that for rendering the new html.
-                            let root_rendering_component =
-                                root.unwrap_mut::<RootRenderingComponent>();
-                            //this game_data mutable reference is dropped on the end of the function
-                            let mut game_data = &mut root_rendering_component.game_data;
-                            if game_data.game_state.as_ref() == GameState::Play.as_ref() {
-                                // If the event's target is our image...
-                                let img = match event
-                                    .target()
-                                    .and_then(|t| t.dyn_into::<web_sys::HtmlImageElement>().ok())
-                                {
-                                    None => return,
-                                    //?? Don't understand what this does. The original was written for Input element.
-                                    Some(input) => input,
-                                };
-
-                                //id attribute of image html element is prefixed with img ex. "img12"
-                                let this_click_card_index = unwrap!(
-                                    (unwrap!(img.id().get(3..), "error slicing")).parse::<usize>(),
-                                    "error parse img id to usize"
-                                );
-
-                                //click is usefull only od facedown cards
-                                if let CardStatusCardFace::Down = unwrap!(
-                                    game_data.vec_cards.get(this_click_card_index),
-                                    "error this_click_card_index"
-                                )
-                                .status
-                                {
-                                    //the begining of the turn is count_click_inside_one_turn=0
-                                    //on click imediately increase that. So first click is 1 and second click is 2.
-                                    //all other clicks on the grid are not usable.
-                                    game_data.count_click_inside_one_turn += 1;
-
-                                    if game_data.count_click_inside_one_turn == 1 {
-                                        game_data.card_index_of_first_click = this_click_card_index;
-                                        game_data.card_index_of_second_click = 0;
-                                    } else if game_data.count_click_inside_one_turn == 2 {
-                                        game_data.card_index_of_second_click =
-                                            this_click_card_index;
-                                    } else {
-                                        //nothing
-                                    }
-
-                                    //region: send WsMessage over websocket
-                                    unwrap!(
-                                        game_data.ws.send_with_str(
-                                            &serde_json::to_string(&WsMessage::PlayerClick {
-                                                my_ws_uid: game_data.my_ws_uid,
-                                                players: unwrap!(
-                                                    serde_json::to_string(&game_data.players),
-                                                    "serde_json::to_string(&game_data.players)",
-                                                ),
-                                                card_index: this_click_card_index,
-                                                count_click_inside_one_turn: game_data
-                                                    .count_click_inside_one_turn,
-                                            })
-                                            .expect("error sending PlayerClick"),
-                                        ),
-                                        "Failed to send PlayerClick"
-                                    );
-                                    //endregion
-
-                                    //region: audio play
-                                    if game_data.count_click_inside_one_turn == 1
-                                        || game_data.count_click_inside_one_turn == 2
+                    //creating 16 <div> in loop
+                    let grid_item_bump = dodrio!(bump,
+                    <div class= "grid_item">
+                        <img src={img_src} id={img_id} style={opacity} onclick={move |root, vdom, event| {
+                                //on click needs a code Closure in Rust. Dodrio and wasm-bindgen
+                                //generate the javascript code to call it properly.
+                                //we need our Struct RootRenderingComponent for Rust to write any data.
+                                //It comes in the parameter root.
+                                //All we can change is inside the struct RootRenderingComponent fields.
+                                //The method render will later use that for rendering the new html.
+                                let root_rendering_component =
+                                    root.unwrap_mut::<RootRenderingComponent>();
+                                //this game_data mutable reference is dropped on the end of the function
+                                let mut game_data = &mut root_rendering_component.game_data;
+                                if game_data.game_state.as_ref() == GameState::Play.as_ref() {
+                                    // If the event's target is our image...
+                                    let img = match event
+                                        .target()
+                                        .and_then(|t| t.dyn_into::<web_sys::HtmlImageElement>().ok())
                                     {
-                                        //prepare the audio element with src filename of mp3
-                                        let audio_element = web_sys::HtmlAudioElement::new_with_src(
-                                            format!(
-                                                "content/{}/sound/mem_sound_{:02}.mp3",
-                                                game_data.content_folder_name,
-                                                unwrap!(
-                                                    game_data.vec_cards.get(this_click_card_index),
-                                                    "error this_click_card_index"
-                                                )
-                                                .card_number_and_img_src
-                                            )
-                                            .as_str(),
-                                        );
+                                        None => return,
+                                        //?? Don't understand what this does. The original was written for Input element.
+                                        Some(input) => input,
+                                    };
 
-                                        //play() return a Promise in JSValue. That is too hard for me to deal with now.
+                                    //id attribute of image html element is prefixed with img ex. "img12"
+                                    let this_click_card_index = unwrap!(
+                                        (unwrap!(img.id().get(3..), "error slicing")).parse::<usize>(),
+                                        "error parse img id to usize"
+                                    );
+
+                                    //click is usefull only od facedown cards
+                                    if let CardStatusCardFace::Down = unwrap!(
+                                        game_data.vec_cards.get(this_click_card_index),
+                                        "error this_click_card_index"
+                                    )
+                                    .status
+                                    {
+                                        //the begining of the turn is count_click_inside_one_turn=0
+                                        //on click imediately increase that. So first click is 1 and second click is 2.
+                                        //all other clicks on the grid are not usable.
+                                        game_data.count_click_inside_one_turn += 1;
+
+                                        if game_data.count_click_inside_one_turn == 1 {
+                                            game_data.card_index_of_first_click = this_click_card_index;
+                                            game_data.card_index_of_second_click = 0;
+                                        } else if game_data.count_click_inside_one_turn == 2 {
+                                            game_data.card_index_of_second_click =
+                                                this_click_card_index;
+                                        } else {
+                                            //nothing
+                                        }
+
+                                        //region: send WsMessage over websocket
                                         unwrap!(
-                                            unwrap!(audio_element, "Error: HtmlAudioElement new.")
-                                                .play(),
-                                            "Error: HtmlAudioElement.play() "
+                                            game_data.ws.send_with_str(
+                                                &serde_json::to_string(&WsMessage::PlayerClick {
+                                                    my_ws_uid: game_data.my_ws_uid,
+                                                    players: unwrap!(
+                                                        serde_json::to_string(&game_data.players),
+                                                        "serde_json::to_string(&game_data.players)",
+                                                    ),
+                                                    card_index: this_click_card_index,
+                                                    count_click_inside_one_turn: game_data
+                                                        .count_click_inside_one_turn,
+                                                })
+                                                .expect("error sending PlayerClick"),
+                                            ),
+                                            "Failed to send PlayerClick"
                                         );
-                                    }
-                                    //endregion
+                                        //endregion
 
-                                    root_rendering_component.card_on_click();
+                                        //region: audio play
+                                        if game_data.count_click_inside_one_turn == 1
+                                            || game_data.count_click_inside_one_turn == 2
+                                        {
+                                            //prepare the audio element with src filename of mp3
+                                            let audio_element = web_sys::HtmlAudioElement::new_with_src(
+                                                format!(
+                                                    "content/{}/sound/mem_sound_{:02}.mp3",
+                                                    game_data.content_folder_name,
+                                                    unwrap!(
+                                                        game_data.vec_cards.get(this_click_card_index),
+                                                        "error this_click_card_index"
+                                                    )
+                                                    .card_number_and_img_src
+                                                )
+                                                .as_str(),
+                                            );
+
+                                            //play() return a Promise in JSValue. That is too hard for me to deal with now.
+                                            unwrap!(
+                                                unwrap!(audio_element, "Error: HtmlAudioElement new.")
+                                                    .play(),
+                                                "Error: HtmlAudioElement.play() "
+                                            );
+                                        }
+                                        //endregion
+
+                                        root_rendering_component.card_on_click();
+                                    }
+                                    // Finally, re-render the component on the next animation frame.
+                                    vdom.schedule_render();
                                 }
-                                // Finally, re-render the component on the next animation frame.
-                                vdom.schedule_render();
-                            }
-                        }}>
-                    </img>
-                </div>
-                );
-                vec_grid_item_bump.push(grid_item_bump);
+                            }}>
+                        </img>
+                    </div>
+                    );
+                    vec_grid_item_bump.push(grid_item_bump);
+                }
             }
+
+            //return
             vec_grid_item_bump
         }
 
@@ -709,30 +714,30 @@ impl Render for RootRenderingComponent {
                 {
                     //return
                     dodrio!(bump,
-                                        <div class= "grid_container_header" style={bumpalo::format!(in bump, "grid-template-columns: auto auto; color:{}",color).into_bump_str()}>
-                                            <div class= "grid_item" style= "text-align: left;">
-                                                {vec![text(
-                    bumpalo::format!(in bump, "{}",
-                     unwrap!(unwrap!(root_rendering_component.game_data.spelling.clone(),"root_rendering_component.game_data.spelling.clone()")
-                     .name.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_first_click),"game_data.vec_cards.get(game_data.card_index_of_first_click")
+                    <div class= "grid_container_header" style={bumpalo::format!(in bump, "grid-template-columns: auto auto; color:{}",color).into_bump_str()}>
+                        <div class= "grid_item" style= "text-align: left;">
+                            {vec![text(
+                            bumpalo::format!(in bump, "{}",
+                            unwrap!(unwrap!(root_rendering_component.game_data.spelling.clone(),"root_rendering_component.game_data.spelling.clone()")
+                            .name.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_first_click),"game_data.vec_cards.get(game_data.card_index_of_first_click")
                                                     .card_number_and_img_src),".card_number_and_img_src")
-                    )
-                                            .into_bump_str(),
-                                            )]}
-                                            </div>
-                                            <div class= "grid_item" style= "text-align: right;">
-                                                {vec![text(
-                                                bumpalo::format!(in bump, "{}",
-                                                unwrap!(unwrap!(root_rendering_component.game_data.spelling.clone(),"root_rendering_component.game_data.spelling.clone()")
-                                                .name.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_second_click)
-                                                ,"game_data.card_index_of_second_click)")
-                                                    .card_number_and_img_src),".card_number_and_img_src)")
                                                     )
-                                            .into_bump_str(),
-                                            )]}
-                                            </div>
-                                        </div>
-                                        )
+                            .into_bump_str(),
+                            )]}
+                            </div>
+                            <div class= "grid_item" style= "text-align: right;">
+                                {vec![text(
+                                bumpalo::format!(in bump, "{}",
+                                unwrap!(unwrap!(root_rendering_component.game_data.spelling.clone(),"root_rendering_component.game_data.spelling.clone()")
+                                .name.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_second_click)
+                                ,"game_data.card_index_of_second_click)")
+                                    .card_number_and_img_src),".card_number_and_img_src)")
+                                    )
+                            .into_bump_str(),
+                            )]}
+                            </div>
+                        </div>
+                        )
                 }
             } else {
                 {
@@ -761,8 +766,7 @@ impl Render for RootRenderingComponent {
             for folder_name in ff {
                 let folder_name_clone2 = folder_name.clone();
                 vec_of_nodes.push(dodrio!(bump,
-                <h3 id= "ws_elem" style= "color:green;">
-                    <a onclick={move |root, vdom, _event| {
+                <div class="div_clickable" onclick={move |root, vdom, _event| {
                         let root_rendering_component =
                             root.unwrap_mut::<RootRenderingComponent>();
                         //region: send WsMessage over websocket
@@ -804,13 +808,14 @@ impl Render for RootRenderingComponent {
                         //endregion
                         vdom.schedule_render();
                         }}>
+                <h3 id= "ws_elem" style= "color:green;">
                         {vec![text(
                         //show Ask Player2 to Play!
                         bumpalo::format!(in bump, "{} for {} !", invite_string, folder_name_clone2)
                             .into_bump_str(),
                         )]}
-                    </a>
                 </h3>
+                </div>
                 ));
             }
             dodrio!(bump,
@@ -837,27 +842,26 @@ impl Render for RootRenderingComponent {
             } else if let GameState::EndGame = root_rendering_component.game_data.game_state {
                 //end game ,Play again?
                 dodrio!(bump,
-                <h3 class= "m_container" id= "ws_elem" style= "color:green;">
-                    <a onclick={
+                <div class="div_clickable" onclick={
                             move |root, vdom, _event| {
                             let root_rendering_component = root.unwrap_mut::<RootRenderingComponent>();
                             root_rendering_component.reset();
                             root_rendering_component.game_data.game_state = GameState::Start;
                             vdom.schedule_render();
                         }}>
+                <h3 class= "m_container" id= "ws_elem" style= "color:green;">
                         {vec![text(
                             //Play again?
                             bumpalo::format!(in bump, "Play again{}?", "").into_bump_str(),
                         )]}
-                    </a>
                 </h3>
+                </div>
                 )
             } else if let GameState::Asking = root_rendering_component.game_data.game_state {
                 //return wait for the other player
                 dodrio!(bump,
-                                <div>
-                                    <h3 id="ws_elem" style= "color:red;">
-                                        <a onclick={move |root, vdom, _event| {
+                <div>
+                                <div class="div_clickable" onclick={move |root, vdom, _event| {
                                             let root_rendering_component =
                                                 root.unwrap_mut::<RootRenderingComponent>();
                                             //region: send WsMessage over websocket
@@ -882,9 +886,11 @@ impl Render for RootRenderingComponent {
                                             //endregion
                                             vdom.schedule_render();
                                         }}>
-                                            {vec![text(bumpalo::format!(in bump, "Players accepted: {}. Start Game?", root_rendering_component.game_data.players.len()-1).into_bump_str()),]}
-                                        </a>
-                                    </h3>
+                                        <h3 id="ws_elem" style= "color:red;">
+                                                {vec![text(bumpalo::format!(in bump, "Players accepted: {}. Start Game?", root_rendering_component.game_data.players.len()-1).into_bump_str()),]}
+                                        </h3>
+                                    </div>
+                                    //TODO: end want to play instead of reinvite.
                                     {vec![ask_to_play(root_rendering_component, bump, "Reinvite")]}
                                 </div>
                                 )
@@ -892,9 +898,7 @@ impl Render for RootRenderingComponent {
                 console::log_1(&"GameState::Accepted".into());
                 dodrio!(bump,
                 <h3 id= "ws_elem" style= "color:red;">
-                    <a>
                     {vec![text(bumpalo::format!(in bump, "Game {} accepted.", root_rendering_component.game_data.asked_folder_name).into_bump_str(),)]}
-                    </a>
                 </h3>
                 )
             } else if let GameState::Asked = root_rendering_component.game_data.game_state {
@@ -902,8 +906,7 @@ impl Render for RootRenderingComponent {
                 console::log_1(&"GameState::Asked".into());
                 //return Click here to Accept play
                 dodrio!(bump,
-                <h3 id= "ws_elem" style= "color:green;">
-                    <a onclick={move |root, vdom, _event| {
+                <div class="div_clickable" onclick={move |root, vdom, _event| {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             root_rendering_component.game_data.game_state=GameState::Accepted;
@@ -922,13 +925,14 @@ impl Render for RootRenderingComponent {
                                 ,"Failed to send");
                             vdom.schedule_render();
                         }}>
-                        {vec![text(
-                            //show Ask Player2 to Play!
-                            bumpalo::format!(in bump, "Click here to Accept {}!", root_rendering_component.game_data.asked_folder_name)
-                                .into_bump_str(),
-                        )]}
-                    </a>
-                </h3>
+                    <h3 id= "ws_elem" style= "color:green;">
+                            {vec![text(
+                                //show Ask Player2 to Play!
+                                bumpalo::format!(in bump, "Click here to Accept {}!", root_rendering_component.game_data.asked_folder_name)
+                                    .into_bump_str(),
+                            )]}
+                    </h3>
+                </div>
                 )
             } else if root_rendering_component
                 .game_data
@@ -955,8 +959,7 @@ impl Render for RootRenderingComponent {
                 {
                     //return Click here to take your turn
                     dodrio!(bump,
-                    <h3 id= "ws_elem" style= "color:green;">
-                        <a onclick={move |root, vdom, _event| {
+                    <div class="div_clickable" onclick={move |root, vdom, _event| {
                                 let root_rendering_component =
                                     root.unwrap_mut::<RootRenderingComponent>();
                                 //this game_data mutable reference is dropped on the end of the function
@@ -980,12 +983,13 @@ impl Render for RootRenderingComponent {
                                 // Finally, re-render the component on the next animation frame.
                                 vdom.schedule_render();
                             }}>
+                        <h3 id= "ws_elem" style= "color:green;">
                             {vec![text(
                                 bumpalo::format!(in bump, "Click here to take your turn !{}", "")
                                     .into_bump_str(),
                             )]}
-                        </a>
-                    </h3>
+                        </h3>
+                    </div>
                     )
                 } else {
                     //return wait for the other player
@@ -1000,11 +1004,11 @@ impl Render for RootRenderingComponent {
                     == root_rendering_component.game_data.player_turn
                 {
                     dodrio!(bump,
-                    <h3 id= "ws_elem" style= "color:orange;">
-                        <a onclick ={move |root, vdom, _event| {}}>
-                        {vec![text(bumpalo::format!(in bump, "Play !{}", "").into_bump_str())]}
-                        </a>
-                    </h3>
+                    <div class="div_clickable">
+                        <h3 id= "ws_elem" style= "color:orange;">
+                            {vec![text(bumpalo::format!(in bump, "Play !{}", "").into_bump_str())]}
+                        </h3>
+                    </div>
                     )
                 } else {
                     //return wait for the other player
@@ -1015,9 +1019,7 @@ impl Render for RootRenderingComponent {
                 //return
                 dodrio!(bump,
                 <h3 id= "ws_elem">
-                    <a>
                     {vec![text(bumpalo::format!(in bump, "gamestate: {} player {}", root_rendering_component.game_data.game_state.as_ref(),root_rendering_component.game_data.my_player_number).into_bump_str())]}
-                    </a>
                 </h3>
                 )
             }
@@ -1026,9 +1028,7 @@ impl Render for RootRenderingComponent {
         fn div_wait_for_other_player(bump: &Bump) -> Node {
             dodrio!(bump,
             <h3 id="ws_elem" style= "color:red;">
-                <a>
                 {vec![text(bumpalo::format!(in bump, "Wait for the other player.{}", "").into_bump_str())]}
-                </a>
             </h3>
             )
         }
@@ -1070,11 +1070,22 @@ impl Render for RootRenderingComponent {
 
         let xstyle = format!("width:{}px; height:{}px;", max_grid_width, max_grid_height);
         let xstyle2 = format!("width:{}px;", max_grid_width + 2);
+
+        let mut xgrid_container = dodrio!(bump,
+         <div class= "grid_container" >
+            </div>
+        );
+        if let GameState::Play | GameState::EndGame = self.game_data.game_state {
+            xgrid_container = dodrio!(bump,
+                <div class= "grid_container" style={xstyle}>
+                    {div_grid_items(self, bump)}
+                </div>
+            );
+        }
+
         dodrio!(bump,
         <div class= "m_container" style={xstyle2}>
-            <div class= "grid_container" style={xstyle}>
-                {div_grid_items(self, bump)}
-            </div>
+            {vec![xgrid_container]}
             {vec![div_game_status_and_player_actions(self, bump)]}
             {vec![div_grid_header(self, bump)]}
             {vec![self.players_and_scores.render(bump)]}
