@@ -1,6 +1,6 @@
 [package]
 name = "mem4"
-version = "1.1.0"
+version = "1.1.1"
 authors = ["Luciano Furlan <Luciano.Bestia@gmail.com>"]
 edition = "2018"
 description = "Learning Rust Wasm/WebAssembly with Virtual Dom Dodrio"
