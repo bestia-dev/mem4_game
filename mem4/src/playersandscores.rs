@@ -42,16 +42,20 @@ impl PlayersAndScores {
         is_invalidated = false;
         if game_data.my_player_number > 0
             && !game_data.players.is_empty()
-            && game_data.players.len() >= game_data.my_player_number - 1
+            && game_data.players.len() >= unwrap!(game_data.my_player_number.checked_sub(1))
             && self.my_points
                 != unwrap!(
-                    game_data.players.get(game_data.my_player_number - 1),
+                    game_data
+                        .players
+                        .get(unwrap!(game_data.my_player_number.checked_sub(1))),
                     "game_data.players.get(game_data.my_player_number - 1)"
                 )
                 .points
         {
             self.my_points = unwrap!(
-                game_data.players.get(game_data.my_player_number - 1),
+                game_data
+                    .players
+                    .get(unwrap!(game_data.my_player_number.checked_sub(1))),
                 "game_data.players.get(game_data.my_player_number - 1)"
             )
             .points;

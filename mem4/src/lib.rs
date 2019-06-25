@@ -28,17 +28,40 @@
 )]
 #![allow(
     //library from dependencies have this clippy warnings. Not my code.
+    //Why is this bad: It will be more difficult for users to discover the purpose of the crate, 
+    //and key information related to it.
     clippy::cargo_common_metadata,
+    //Why is this bad : This bloats the size of targets, and can lead to confusing error messages when 
+    //structs or traits are used interchangeably between different versions of a crate.
     clippy::multiple_crate_versions,
+    //Why is this bad : As the edition guide says, it is highly unlikely that you work with any possible 
+    //version of your dependency, and wildcard dependencies would cause unnecessary 
+    //breakage in the ecosystem.
     clippy::wildcard_dependencies,
     //Rust is more idiomatic without return statement
+    //Why is this bad : Actually omitting the return keyword is idiomatic Rust code. 
+    //Programmers coming from other languages might prefer the expressiveness of return. 
+    //It’s possible to miss the last returning statement because the only difference 
+    //is a missing ;. Especially in bigger code with multiple return paths having a 
+    //return keyword makes it easier to find the corresponding statements.
     clippy::implicit_return,
     //I have private function inside a function. Self does not work there.
+    //Why is this bad: Unnecessary repetition. Mixed use of Self and struct name feels inconsistent.
     clippy::use_self,
     //Cannot add #[inline] to the start function with #[wasm_bindgen(start)]
     //because then wasm-pack build --target web returns an error: export `run` not found 
+    //Why is this bad: In general, it is not. Functions can be inlined across crates when that’s profitable 
+    //as long as any form of LTO is used. When LTO is disabled, functions that are not #[inline] 
+    //cannot be inlined across crates. Certain types of crates might intend for most of the 
+    //methods in their public API to be able to be inlined across crates even when LTO is disabled. 
+    //For these types of crates, enabling this lint might make sense. It allows the crate to 
+    //require all exported methods to be #[inline] by default, and then opt out for specific 
+    //methods where this might not make sense.
     clippy::missing_inline_in_public_items,
-    clippy::integer_arithmetic,
+    //Why is this bad: This is only checked against overflow in debug builds. In some applications one wants explicitly checked, wrapping or saturating arithmetic.
+    //clippy::integer_arithmetic,
+    //Why is this bad: For some embedded systems or kernel development, it can be useful to rule out floating-point numbers.
+    clippy::float_arithmetic,
 )]
 //endregion
 
@@ -52,6 +75,7 @@ use crate::playersandscores::PlayersAndScores;
 use crate::rulesanddescription::RulesAndDescription;
 use crate::websocketcommunication::setup_ws_connection;
 use crate::websocketcommunication::setup_ws_msg_recv;
+use crate::websocketcommunication::setup_ws_onerror;
 
 //Strum is a set of macros and traits for working with enums and strings easier in Rust.
 extern crate console_error_panic_hook;
@@ -66,7 +90,9 @@ extern crate strum_macros;
 extern crate web_sys;
 #[macro_use]
 extern crate unwrap;
+extern crate conv;
 
+use conv::*;
 use dodrio::builder::*;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Cached, Node, Render};
@@ -135,6 +161,9 @@ pub fn run() -> Result<(), JsValue> {
 
     //websocket on receive message callback
     setup_ws_msg_recv(&ws, &vdom);
+
+    //websocket on error message callback
+    setup_ws_onerror(&ws, &vdom);
 
     // Run the component forever. Forget to drop the memory.
     vdom.forget();
@@ -232,7 +261,7 @@ impl RootRenderingComponent {
                     unwrap!(
                         self.game_data
                             .players
-                            .get_mut(self.game_data.player_turn - 1),
+                            .get_mut(unwrap!(self.game_data.player_turn.checked_sub(1))),
                         "self.game_data.players.get_mu(self.game_data.player_turn - 1)"
                     )
                     .points += 1;
@@ -256,7 +285,7 @@ impl RootRenderingComponent {
                     for x in &self.game_data.players {
                         point_sum += x.points;
                     }
-                    if self.game_data.vec_cards.len() / 2 == point_sum {
+                    if unwrap!(self.game_data.vec_cards.len().checked_div(2)) == point_sum {
                         self.game_data.game_state = GameState::EndGame;
                         //send message
                         unwrap!(
@@ -281,7 +310,7 @@ impl RootRenderingComponent {
     ///fn on change for both click and we msg.
     fn take_turn(&mut self) {
         self.game_data.player_turn = if self.game_data.player_turn < self.game_data.players.len() {
-            self.game_data.player_turn + 1
+            unwrap!(self.game_data.player_turn.checked_add(1))
         } else {
             1
         };
@@ -390,7 +419,7 @@ impl RootRenderingComponent {
             .ws_uid
                 == self.game_data.my_ws_uid
             {
-                self.game_data.my_player_number = index + 1;
+                self.game_data.my_player_number = unwrap!(index.checked_add(1));
             }
         }
         self.check_invalidate_for_all_components();
@@ -460,7 +489,7 @@ impl Render for RootRenderingComponent {
                 jsvalue_inner_width.as_f64(),
                 "jsValue_inner_width.as_string()"
             );
-            let usize_inner_width = f64_inner_width as usize;
+            let usize_inner_width: usize = unwrap!(f64_inner_width.approx());
             //width min: 300px, max: 600 px in between width=visible width
             //3 columnsdelimiter 5px wide
             let grid_width: usize;
@@ -483,7 +512,7 @@ impl Render for RootRenderingComponent {
                 jsvalue_inner_height.as_f64(),
                 "jsValue_inner_height.as_f64()"
             );
-            let usize_inner_height = f64_inner_height as usize;
+            let usize_inner_height: usize = unwrap!(f64_inner_height.approx());
 
             //height minimum 300, max 1000, else 0.8*visible height
             //3 row separetors 5px wide
@@ -493,7 +522,9 @@ impl Render for RootRenderingComponent {
             } else if usize_inner_height > 1000 {
                 grid_height = 1000;
             } else {
-                grid_height = (0.8 * (usize_inner_height as f64)) as usize;
+                grid_height =
+                    unwrap!((0.8 * (unwrap!(usize_inner_height.approx_as::<f64>())))
+                        .approx_as::<usize>());
             }
             grid_height
         }
@@ -507,17 +538,20 @@ impl Render for RootRenderingComponent {
             let game_data = &root_rendering_component.game_data;
 
             let mut vec_grid_item_bump: Vec<Node<'bump>> = Vec::new();
-            if let None = game_data.spelling {
-
-            } else {
+            if game_data.spelling.is_some() {
                 //4x4 is 16 cards. index goes from PlayerNUmber-1*16+1 to Player
                 console::log_1(&JsValue::from_str(&format!(
                     "my_player_number {}",
                     &root_rendering_component.game_data.my_player_number
                 )));
 
-                let start_index = ((game_data.my_player_number - 1) * 16) + 1;
-                let end_index = game_data.my_player_number * 16;
+                //((game_data.my_player_number - 1) * 16) + 1
+                let start_index = unwrap!(unwrap!((unwrap!(game_data
+                    .my_player_number
+                    .checked_sub(1)))
+                .checked_mul(16))
+                .checked_add(1));
+                let end_index = unwrap!(game_data.my_player_number.checked_mul(16));
                 for x in start_index..=end_index {
                     let index: usize = x;
                     //region: prepare variables and closures for inserting into vdom
@@ -952,7 +986,10 @@ impl Render for RootRenderingComponent {
                     == (if root_rendering_component.game_data.player_turn
                         < root_rendering_component.game_data.players.len()
                     {
-                        root_rendering_component.game_data.player_turn + 1
+                        unwrap!(root_rendering_component
+                            .game_data
+                            .player_turn
+                            .checked_add(1))
                     } else {
                         1
                     })
@@ -1035,63 +1072,86 @@ impl Render for RootRenderingComponent {
         //endregion
 
         //region: create the whole virtual dom. The verbose stuff is in private functions
-        //grid_container width and height
-        let mut max_grid_width = grid_width();
-        let mut max_grid_height = grid_height();
-        console::log_1(&JsValue::from_str(&format!(
-            "inner_width {} inner_height {}",
-            max_grid_width, max_grid_height
-        )));
-        //default if not choosen
-        let mut card_width = 115;
-        let mut card_height = 115;
-        match &self.game_data.spelling {
-            None => (),
-            Some(_x) => {
-                card_width = unwrap!(self.game_data.spelling.clone()).card_width;
-                card_height = unwrap!(self.game_data.spelling.clone()).card_height;
+
+        if self.game_data.error_text == "" {
+            //grid_container width and height
+            let mut max_grid_width = grid_width();
+            let mut max_grid_height = grid_height();
+            console::log_1(&JsValue::from_str(&format!(
+                "inner_width {} inner_height {}",
+                max_grid_width, max_grid_height
+            )));
+            //default if not choosen
+            let mut card_width = 115;
+            let mut card_height = 115;
+            match &self.game_data.spelling {
+                None => (),
+                Some(_x) => {
+                    card_width = unwrap!(self.game_data.spelling.clone()).card_width;
+                    card_height = unwrap!(self.game_data.spelling.clone()).card_height;
+                }
             }
-        }
-        console::log_1(&JsValue::from_str(&format!(
-            "card_width {} card_height {}",
-            card_width, card_height
-        )));
-        //ratio between width and height must stay the same
-        let ratio = (card_height as f64) / (card_width as f64);
-        if (max_grid_width as f64) * ratio > (max_grid_height as f64) {
-            max_grid_width = ((max_grid_height as f64) / ratio) as usize;
-        } else {
-            max_grid_height = ((max_grid_width as f64) * ratio) as usize;
-        }
-        console::log_1(&JsValue::from_str(&format!(
-            "max_grid_width {} max_grid_height {}",
-            max_grid_width, max_grid_height
-        )));
+            console::log_1(&JsValue::from_str(&format!(
+                "card_width {} card_height {}",
+                card_width, card_height
+            )));
+            //ratio between width and height must stay the same
+            let ratio =
+                unwrap!(card_height.approx_as::<f64>()) / unwrap!(card_width.approx_as::<f64>());
+            if unwrap!(max_grid_width.approx_as::<f64>()) * ratio
+                > unwrap!(max_grid_height.approx_as::<f64>())
+            {
+                max_grid_width = unwrap!(
+                    (unwrap!(max_grid_height.approx_as::<f64>()) / ratio).approx_as::<usize>()
+                );
+            } else {
+                max_grid_height = unwrap!(
+                    (unwrap!(max_grid_width.approx_as::<f64>()) * ratio).approx_as::<usize>()
+                );
+            }
+            console::log_1(&JsValue::from_str(&format!(
+                "max_grid_width {} max_grid_height {}",
+                max_grid_width, max_grid_height
+            )));
 
-        let xstyle = format!("width:{}px; height:{}px;", max_grid_width, max_grid_height);
-        let xstyle2 = format!("width:{}px;", max_grid_width + 2);
+            let xstyle = format!("width:{}px; height:{}px;", max_grid_width, max_grid_height);
+            let xstyle2 = format!("width:{}px;", unwrap!(max_grid_width.checked_add(2)));
 
-        let mut xgrid_container = dodrio!(bump,
-         <div class= "grid_container" >
-            </div>
-        );
-        if let GameState::Play | GameState::EndGame = self.game_data.game_state {
-            xgrid_container = dodrio!(bump,
-                <div class= "grid_container" style={xstyle}>
-                    {div_grid_items(self, bump)}
+            let mut xgrid_container = dodrio!(bump,
+            <div class= "grid_container" >
                 </div>
             );
-        }
+            if let GameState::Play | GameState::EndGame = self.game_data.game_state {
+                xgrid_container = dodrio!(bump,
+                    <div class= "grid_container" style={xstyle}>
+                        {div_grid_items(self, bump)}
+                    </div>
+                );
+            }
 
-        dodrio!(bump,
-        <div class= "m_container" style={xstyle2}>
-            {vec![xgrid_container]}
-            {vec![div_game_status_and_player_actions(self, bump)]}
-            {vec![div_grid_header(self, bump)]}
-            {vec![self.players_and_scores.render(bump)]}
-            {vec![self.cached_rules_and_description.render(bump)]}
-        </div>
-        )
+            dodrio!(bump,
+            <div class= "m_container" style={xstyle2}>
+                {vec![xgrid_container]}
+                {vec![div_game_status_and_player_actions(self, bump)]}
+                {vec![div_grid_header(self, bump)]}
+                {vec![self.players_and_scores.render(bump)]}
+                {vec![self.cached_rules_and_description.render(bump)]}
+            </div>
+            )
+        } else {
+            //render only the error text to the screen.
+            //because I want to debug the websocket lost connection
+            dodrio!(bump,
+                <div>
+                    <h1>
+                        {vec![text(
+                            bumpalo::format!(in bump, "error_text {} !", self.game_data.error_text)
+                                .into_bump_str(),
+                            )]}
+                    </h1>
+                </div>
+            )
+        }
         //endregion
     }
 }

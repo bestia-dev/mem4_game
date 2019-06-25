@@ -32,6 +32,7 @@ log = "0.4.6"
 strum = "0.15.0"
 strum_macros = "0.15.0"
 typed-html = {version="0.2.0", features = ["dodrio_macro"]}
+conv = "0.3.3"
 
 [dependencies.web-sys]
 version = "0.3.20"
@@ -41,6 +42,7 @@ features = [
   "CssStyleDeclaration",
   "Document",
   "Element",
+  "ErrorEvent",
   "Event",
   "EventListener",
   "EventTarget",

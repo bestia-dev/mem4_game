@@ -7,7 +7,7 @@ use js_sys::Reflect;
 use mem4_common::WsMessage;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use web_sys::{console, WebSocket};
+use web_sys::{console, ErrorEvent, WebSocket};
 
 ///setup websocket connection
 pub fn setup_ws_connection(location_href: &str) -> WebSocket {
@@ -235,4 +235,28 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
 
     //don't drop the eventlistener from memory
     cb_mrh.forget();
+}
+/// on error write it on the screen for debuggng
+pub fn setup_ws_onerror(ws: &WebSocket, vdom: &dodrio::Vdom) {
+    let weak = vdom.weak();
+    let onerror_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
+        let err_text = format!("error event {:?}", e);
+        console::log_1(&JsValue::from_str(&err_text));
+        {
+            wasm_bindgen_futures::spawn_local(
+                weak.with_component({
+                    let v2 = weak.clone();
+                    move |root| {
+                        console::log_1(&"error text".into());
+                        let root_rendering_component = root.unwrap_mut::<RootRenderingComponent>();
+                        root_rendering_component.game_data.error_text = err_text;
+                        v2.schedule_render();
+                    }
+                })
+                .map_err(|_| ()),
+            );
+        }
+    }) as Box<dyn FnMut(ErrorEvent)>);
+    ws.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
+    onerror_callback.forget();
 }

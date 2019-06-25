@@ -93,22 +93,27 @@ pub struct GameData {
     pub content_folders: Vec<String>,
     ///spellings
     pub spelling: Option<Spelling>,
+    ///error text
+    pub error_text: String,
 }
 impl GameData {
     ///prepare new random data
     pub fn prepare_random_data(&mut self) {
-        let spelling_count_minus_one = unwrap!(self.spelling.as_ref(), "self.spelling.as_ref()")
-            .name
-            .len()
-            - 1;
+        let spelling_count_minus_one =
+            unwrap!(unwrap!(self.spelling.as_ref(), "self.spelling.as_ref()")
+                .name
+                .len()
+                .checked_sub(1));
         let players_count = self.players.len();
-        let cards_count = 16 * players_count;
-        let random_count = cards_count / 2;
+        let cards_count = unwrap!(players_count.checked_mul(16));
+        let random_count = unwrap!(cards_count.checked_div(2));
         //if the number of cards is bigger than the images, i choose all the images.
         //for the rest I use random.
         //integer division rounds toward zero
-        let multiple: usize = random_count / spelling_count_minus_one;
-        let rest = random_count - (multiple * spelling_count_minus_one);
+        let multiple: usize = unwrap!(random_count.checked_div(spelling_count_minus_one));
+        let rest = unwrap!(
+            random_count.checked_sub(unwrap!(spelling_count_minus_one.checked_mul(multiple)))
+        );
         //region: find random numbers between 1 and spelling_count
         //vec_of_random_numbers is 0 based
         let mut vec_of_random_numbers = Vec::new();
@@ -120,7 +125,7 @@ impl GameData {
             // a do-while is written as a  loop-break
             loop {
                 //gen_range is lower inclusive, upper exclusive 26 + 1
-                num = rng.gen_range(1, spelling_count_minus_one + 1);
+                num = rng.gen_range(1, unwrap!(spelling_count_minus_one.checked_add(1)));
                 if !vec_of_random_numbers.contains(&num) {
                     break;
                 }
@@ -216,6 +221,7 @@ impl GameData {
                 String::from("triestine"),
             ],
             spelling: None,
+            error_text: "".to_string(),
         }
     }
 }

@@ -23,11 +23,15 @@ It has also a macro `dodrio!` created exclusively for the dodrio vdom.
 Everything is done in compile time, so the runtime is nothing slower.
 ## TODO:
 - better documentation. Do I really have to write very long doc-comments in the code ? It looks terrible. But it is useful when reading the code. Maybe I can hide it in a region block. Dodrio has beautiful docs. How did he do it?  
-- cargo release is a subcommand to increment the version and make a git tag
-
+- cargo release is a subcommand to increment the version and make a git tag  
+- websocket abruptly ends connection. Must implement reconnect  
+  
 ## Changelog
 2019-05-24 completed a working version  
 2019-06-06 google cloud platform, docker, DockerHub  
 2019-06-13 typed html  
 2019-06-20 added Triestine, calculate grid size in rust  
+2019-06-25 integer arithmetic unwrap!(x.checked_add(y)), checked_sub, checked_mul, checked_div
+floating f64 cast to usize and vice versa with x.approx_as::<f64>() from crate conv
+
   
