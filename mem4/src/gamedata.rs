@@ -96,6 +96,8 @@ pub struct GameData {
     pub error_text: String,
     ///href
     pub href: String,
+    /// is reconnect
+    pub is_reconnect: bool,
 }
 impl GameData {
     ///prepare new random data
@@ -224,6 +226,16 @@ impl GameData {
             spelling: None,
             error_text: "".to_string(),
             href: "".to_string(),
+            is_reconnect: false,
+        }
+    }
+    ///check only if state Start
+    pub fn is_state_start(&self) -> bool {
+        #[allow(clippy::wildcard_enum_match_arm)]
+        match self.game_state {
+            GameState::Start => true,
+            _ => false,
         }
     }
 }
+

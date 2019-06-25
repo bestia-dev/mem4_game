@@ -82,7 +82,6 @@ type Users = Arc<Mutex<HashMap<usize, mpsc::UnboundedSender<Message>>>>;
 ///main function of the binary
 fn main() {
     //region: ansi terminal color output (for log also)
-    //TODO: what is the difference between output and Log? When to use them?
     //only windows need this line
     enable_ansi_support();
     /*

@@ -5,13 +5,15 @@ use crate::RootRenderingComponent;
 use futures::Future;
 use js_sys::Reflect;
 use mem4_common::WsMessage;
-use std::{thread, time};
+use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{console, ErrorEvent, WebSocket};
 
-
+//the location_href is not consumed in this function and Clippy wants a reference instead a value
+//but I don't want references, because they have the lifetime problem.
+#[allow(clippy::needless_pass_by_value)]
 ///setup websocket connection
-pub fn setup_ws_connection(location_href: &str, old_ws_id: usize) -> WebSocket {
+pub fn setup_ws_connection(location_href: String, old_ws_id: usize) -> WebSocket {
     //web-sys has websocket for Rust exactly like javascript has¸
     //location_href comes in this format  http://localhost:4000/
     let mut loc_href = location_href.replace("http://", "ws://");
@@ -52,10 +54,12 @@ pub fn setup_ws_connection(location_href: &str, old_ws_id: usize) -> WebSocket {
     ws.set_onopen(Some(cb_oh.as_ref().unchecked_ref()));
     //don't drop the open_handler memory
     cb_oh.forget();
+
     ws
 }
+
 /// receive websocket msg callback. I don't understand this much. Too much future and promises.
-pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
+pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
     //Player1 on machine1 have a button Ask player to play! before he starts to play.
     //Click and it sends the WsMessage want_to_play. Player1 waits for the reply and cannot play.
     //Player2 on machine2 see the WsMessage and Accepts it.
@@ -65,7 +69,6 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
     //Machine2 receives the WsMessage and runs the same code as the player would click. The RootRenderingComponent is blocked.
     //The method with_component() needs a future (promise) It will be executed on the next vdom tick.
     //This is the only way I found to write to RootRenderingComponent fields.
-    let weak = vdom.weak();
     let msg_recv_handler = Box::new(move |msg: JsValue| {
         let data: JsValue = unwrap!(
             Reflect::get(&msg, &"data".into()),
@@ -92,7 +95,10 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
                 wasm_bindgen_futures::spawn_local(
                     weak.with_component({
                         move |root| {
-                            console::log_1(&"ResponseWsUid".into());
+                            console::log_1(&JsValue::from_str(&format!(
+                                "ResponseWsUid: {}  ",
+                                your_ws_uid
+                            )));
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             root_rendering_component.on_response_ws_uid(your_ws_uid);
@@ -242,8 +248,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
     cb_mrh.forget();
 }
 /// on error write it on the screen for debuggng
-pub fn setup_ws_onerror(ws: &WebSocket, vdom: &dodrio::Vdom) {
-    let weak = vdom.weak();
+pub fn setup_ws_onerror(ws: &WebSocket, weak: dodrio::VdomWeak) {
     let onerror_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
         let err_text = format!("error event {:?}", e);
         console::log_1(&JsValue::from_str(&err_text));
@@ -266,29 +271,19 @@ pub fn setup_ws_onerror(ws: &WebSocket, vdom: &dodrio::Vdom) {
     onerror_callback.forget();
 }
 /// on close websocket connection
-pub fn setup_ws_onclose(ws: &WebSocket, vdom: &dodrio::Vdom) {
-    let weak = vdom.weak();
+pub fn setup_ws_onclose(ws: &WebSocket, weak: dodrio::VdomWeak) {
     let onclose_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
-        let err_text = format!("error event {:?}", e);
+        let err_text = format!("ws_onclose {:?}", e);
         console::log_1(&JsValue::from_str(&err_text));
         {
             wasm_bindgen_futures::spawn_local(
                 weak.with_component({
                     let v2 = weak.clone();
                     move |root| {
-                        console::log_1(&"error text".into());
+                        console::log_1(&"spawn_local because of vdom".into());
                         let root_rendering_component = root.unwrap_mut::<RootRenderingComponent>();
-                        // try to reconnect 5 times every second
-                        //wait interval
-                        //TODO: Wasm can't sleep !!!
-                        let thousand_millis = time::Duration::from_millis(1000);
-                        thread::sleep(thousand_millis);
-                        setup_ws_connection(
-                            &root_rendering_component.game_data.href,
-                            root_rendering_component.game_data.my_ws_uid,
-                        );
-
-                        root_rendering_component.game_data.error_text = err_text;
+                        //I want to show a reconnect button to the user
+                        root_rendering_component.game_data.is_reconnect = true;
                         v2.schedule_render();
                     }
                 })

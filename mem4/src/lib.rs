@@ -73,11 +73,11 @@ mod websocketcommunication;
 use crate::gamedata::{CardStatusCardFace, GameData, GameState};
 use crate::playersandscores::PlayersAndScores;
 use crate::rulesanddescription::RulesAndDescription;
+
 use crate::websocketcommunication::setup_ws_connection;
 use crate::websocketcommunication::setup_ws_msg_recv;
-use crate::websocketcommunication::setup_ws_onerror;
 use crate::websocketcommunication::setup_ws_onclose;
-
+use crate::websocketcommunication::setup_ws_onerror;
 //Strum is a set of macros and traits for working with enums and strings easier in Rust.
 extern crate console_error_panic_hook;
 extern crate log;
@@ -102,7 +102,7 @@ use rand::rngs::SmallRng;
 use rand::FromEntropy;
 use rand::Rng;
 use typed_html::dodrio;
-use wasm_bindgen::prelude::{wasm_bindgen, JsValue, UnwrapThrowExt};
+use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast; //don't remove this. It is needed for dyn_into.
 use web_sys::{console, WebSocket};
 //endregion
@@ -146,10 +146,9 @@ pub fn run() -> Result<(), JsValue> {
 
     //find out URL
     let location_href = unwrap!(window.location().href(), "href not known");
-    
 
     //websocket connection
-    let ws = setup_ws_connection(location_href.as_str(),0);
+    let ws = setup_ws_connection(location_href.clone(), 0);
     //I don't know why is needed to clone the websocket connection
     let ws_c = ws.clone();
 
@@ -157,19 +156,12 @@ pub fn run() -> Result<(), JsValue> {
     //I added ws_c so that I can send messages on websocket
 
     let mut root_rendering_component = RootRenderingComponent::new(ws_c, my_ws_uid);
-    root_rendering_component.game_data.href=location_href;
+    root_rendering_component.game_data.href = location_href;
 
     // Mount the component to the `<div id="div_for_virtual_dom">`.
     let vdom = dodrio::Vdom::new(&div_for_virtual_dom, root_rendering_component);
 
-    //websocket on receive message callback
-    setup_ws_msg_recv(&ws, &vdom);
-
-    //websocket on error message callback
-    setup_ws_onerror(&ws, &vdom);
-
-    //websocket on close message callback
-    setup_ws_onclose(&ws, &vdom);
+    setup_all_ws_events(&ws, vdom.weak());
 
     // Run the component forever. Forget to drop the memory.
     vdom.forget();
@@ -177,6 +169,18 @@ pub fn run() -> Result<(), JsValue> {
     Ok(())
 }
 //endregion
+
+///setup all ws events
+pub fn setup_all_ws_events(ws: &WebSocket, weak: dodrio::VdomWeak) {
+    //websocket on receive message callback
+    setup_ws_msg_recv(ws, weak.clone());
+
+    //websocket on error message callback
+    setup_ws_onerror(ws, weak.clone());
+
+    //websocket on close message callback
+    setup_ws_onclose(ws, weak);
+}
 
 //region: Helper functions
 
@@ -873,8 +877,52 @@ impl Render for RootRenderingComponent {
         where
             'a: 'bump,
         {
+            //0	CONNECTING, 1	OPEN, 2	CLOSING, 3	CLOSED
             #![allow(clippy::cognitive_complexity)]
-            if let GameState::Start = root_rendering_component.game_data.game_state {
+            if !root_rendering_component.game_data.is_state_start()
+                && (root_rendering_component.game_data.is_reconnect
+                    || root_rendering_component.game_data.ws.ready_state() != 1)
+            {
+                //connection lost. Reconnect?
+                dodrio!(bump,
+                <div>
+                    <div class="div_clickable" onclick={
+                        move |root, vdom, _event| {
+                        let root_rendering_component = root.unwrap_mut::<RootRenderingComponent>();
+                        //the old ws and closures are now a memory leak, but small
+                        let window = unwrap!(web_sys::window(), "error: web_sys::window");
+                        let href = root_rendering_component.game_data.href.clone();
+                        let my_ws_uid = root_rendering_component.game_data.my_ws_uid;
+                        console::log_1(&JsValue::from_str(&format!(
+                            "href {}  my_ws_uid {}",
+                            href,
+                            my_ws_uid,
+                        )));
+                        console::log_1(&"before connect".into());
+                        let ws = setup_ws_connection(href, my_ws_uid);
+                        setup_all_ws_events(&ws,vdom.clone());
+
+                        root_rendering_component.game_data.ws=ws;
+                        console::log_1(&"before game_data.is_reconnect = false and schedule_render".into());
+                        root_rendering_component.game_data.is_reconnect = false;
+                        vdom.schedule_render();
+                    }}>
+                        <h3 id= "ws_elem" style= "color:green;">
+                            {vec![text(
+                            //Reconnect?
+                            bumpalo::format!(in bump, "Reconnect?{}", "").into_bump_str(),
+                            )]}
+                        </h3>
+                    </div>
+                    <h3 style= "color:red;">
+                        {vec![text(
+                            //connection lost
+                            bumpalo::format!(in bump, "Connection lost.{}", "").into_bump_str(),
+                        )]}
+                    </h3>
+                </div>
+                )
+            } else if let GameState::Start = root_rendering_component.game_data.game_state {
                 // 1S Ask Player2 to play!
                 console::log_1(&"GameState::Start".into());
                 //return Ask Player2 to play!
