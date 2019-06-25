@@ -1,4 +1,4 @@
-Things are changing fast. This is the situation on 2019-05-21. LucianoBestia
+Things are changing fast. This is the situation on 2019-06-25. LucianoBestia
 # mem4_game
 Learning Rust Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication - part four.
 Read the `Last project`:  
@@ -16,22 +16,24 @@ There must be many friends around the table watching one another and stealing mo
 Today I assume everybody has a decent smartphone. If all friends open the mem4 game and put their smartphones on the table one near the other, everybody can see them and touch them, this is the closest to a classic board game it gets.  
 All the phones will have a 4x4 card grid. If we put 4 smartphones on the table it is now a 8x8 game. That is now much more interesting to play for 4 players.  
 It can be played with as many friends as there are: 3,4,5,6,7,8,... More friends - more fun.  
-##Typed html
+## Typed html
 Writing html inside Rust code is much easier with the macro `html!` from the `crate typed-html`  
 https://github.com/bodil/typed-html  
 It has also a macro `dodrio!` created exclusively for the dodrio vdom.  
 Everything is done in compile time, so the runtime is nothing slower.
+## WS reconnect
+It looks that plain web sockets have often connection problems and they disconnect here and there. Creating a good reconnect it pretty challenging. 
 ## TODO:
 - better documentation. Do I really have to write very long doc-comments in the code ? It looks terrible. But it is useful when reading the code. Maybe I can hide it in a region block. Dodrio has beautiful docs. How did he do it?  
-- cargo release is a subcommand to increment the version and make a git tag  
-- websocket abruptly ends connection. Must implement reconnect  
-  
+- reconnect can produce different state on different player. Need ad action to sync all players after reconnect. The main data has player1, others have a copy.
+- bigger card with 3x3 grid or any custom grid  
 ## Changelog
 2019-05-24 completed a working version  
 2019-06-06 google cloud platform, docker, DockerHub  
 2019-06-13 typed html  
 2019-06-20 added Triestine, calculate grid size in rust  
 2019-06-25 integer arithmetic unwrap!(x.checked_add(y)), checked_sub, checked_mul, checked_div
-floating f64 cast to usize and vice versa with x.approx_as::<f64>() from crate conv
+- floating f64 cast to usize and vice versa with x.approx_as::<f64>() from crate conv
+- manual reconnect for ws disconnect
 
   
