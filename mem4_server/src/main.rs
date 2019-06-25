@@ -44,6 +44,8 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate warp;
+#[macro_use]
+extern crate unwrap;
 
 use clap::{App, Arg};
 use env_logger::Env;
@@ -182,9 +184,11 @@ fn main() {
         // The `ws2()` filter will prepare Websocket handshake...
         .and(warp::ws2())
         .and(users)
-        .map(|ws: warp::ws::Ws2, users| {
+        // Match `/mem4ws/url_param` it can be any string.
+        .and(warp::path::param::<String>())
+        .map(|ws: warp::ws::Ws2, users, url_param| {
             // This will call our function if the handshake succeeds.
-            ws.on_upgrade(move |socket| user_connected(socket, users))
+            ws.on_upgrade(move |socket| user_connected(socket, users, url_param))
         });
 
     //static file server
@@ -195,12 +199,27 @@ fn main() {
     warp::serve(routes).run(local_addr);
 }
 
+//the url_param is not consumed in this function and Clippy wants a reference instead a value
+#[allow(clippy::needless_pass_by_value)]
 //region: websocket callbacks: connect, msg, disconnect
 ///new user connects
-fn user_connected(ws: WebSocket, users: Users) -> impl Future<Item = (), Error = ()> {
-    // Use a counter to assign a new unique ID for this user.
-    let my_id = NEXT_USER_ID.fetch_add(1, Ordering::Relaxed);
+fn user_connected(
+    ws: WebSocket,
+    users: Users,
+    url_param: String,
+) -> impl Future<Item = (), Error = ()> {
+    //if this is a reconnect, then the old ws_id is passed in url_param to preserve the same ws_uid.
+    info!("url_param: {}", url_param);
+    //convert string to usize
+    //hahahhaha syntax 'turbofish' ::<>
+    let old_ws_id = unwrap!(url_param.parse::<usize>());
 
+    let my_id = if old_ws_id == 0 {
+        // Use a counter to assign a new unique ID for this user.
+        NEXT_USER_ID.fetch_add(1, Ordering::Relaxed)
+    } else {
+        old_ws_id
+    };
     info!("new websocket user: {}", my_id);
 
     // Split the socket into a sender and receive of messages.
@@ -234,10 +253,9 @@ fn user_connected(ws: WebSocket, users: Users) -> impl Future<Item = (), Error =
     >::clone(&users);
 
     user_ws_rx
-        // Every time the user sends a message, broadcast it to
-        // all other users...
+        // Every time the user sends a message, call receive message
         .for_each(move |msg| {
-            user_message(my_id, &msg, &users);
+            receive_message(my_id, &msg, &users);
             Ok(())
         })
         // for_each will keep processing as long as the user stays
@@ -253,7 +271,7 @@ fn user_connected(ws: WebSocket, users: Users) -> impl Future<Item = (), Error =
 }
 
 ///on receive websocket message
-fn user_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
+fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
     // Skip any non-Text messages...
     let msg = if let Ok(s) = messg.to_str() {
         s

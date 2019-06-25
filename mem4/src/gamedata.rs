@@ -14,7 +14,6 @@ use web_sys::WebSocket;
 
 ///Aviation Spelling
 ///the zero element is card face down or empty, alphabet begins with 01 : A
-///TODO: read dynamically from json file. Now I know how to do it in javascript, but not in Rust.
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Spelling {
     ///names of spelling
@@ -95,6 +94,8 @@ pub struct GameData {
     pub spelling: Option<Spelling>,
     ///error text
     pub error_text: String,
+    ///href
+    pub href: String,
 }
 impl GameData {
     ///prepare new random data
@@ -222,6 +223,7 @@ impl GameData {
             ],
             spelling: None,
             error_text: "".to_string(),
+            href: "".to_string(),
         }
     }
 }

@@ -5,24 +5,30 @@ use crate::RootRenderingComponent;
 use futures::Future;
 use js_sys::Reflect;
 use mem4_common::WsMessage;
-use wasm_bindgen::prelude::*;
+use std::{thread, time};
 use wasm_bindgen::JsCast;
 use web_sys::{console, ErrorEvent, WebSocket};
 
+
 ///setup websocket connection
-pub fn setup_ws_connection(location_href: &str) -> WebSocket {
+pub fn setup_ws_connection(location_href: &str, old_ws_id: usize) -> WebSocket {
     //web-sys has websocket for Rust exactly like javascript has¸
     //location_href comes in this format  http://localhost:4000/
     let mut loc_href = location_href.replace("http://", "ws://");
     //Only for debugging in the development environment
     //let mut loc_href = String::from("ws://192.168.1.57:80/");
     loc_href.push_str("mem4ws/");
+
+    //send the old ws_id as url_param for reconnect on lost connection
+    //for the first connection the default is 0
+    loc_href.push_str(old_ws_id.to_string().as_str());
     console::log_1(&JsValue::from_str(&format!(
         "location_href {}  loc_href {}",
         location_href, loc_href,
     )));
 
     //same server address and port as http server
+    //for reconnect the old ws id will be an url param
     let ws = unwrap!(WebSocket::new(&loc_href), "WebSocket failed to connect.");
 
     //I don't know why is clone needed
@@ -48,7 +54,6 @@ pub fn setup_ws_connection(location_href: &str) -> WebSocket {
     cb_oh.forget();
     ws
 }
-
 /// receive websocket msg callback. I don't understand this much. Too much future and promises.
 pub fn setup_ws_msg_recv(ws: &WebSocket, vdom: &dodrio::Vdom) {
     //Player1 on machine1 have a button Ask player to play! before he starts to play.
@@ -259,4 +264,38 @@ pub fn setup_ws_onerror(ws: &WebSocket, vdom: &dodrio::Vdom) {
     }) as Box<dyn FnMut(ErrorEvent)>);
     ws.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
     onerror_callback.forget();
+}
+/// on close websocket connection
+pub fn setup_ws_onclose(ws: &WebSocket, vdom: &dodrio::Vdom) {
+    let weak = vdom.weak();
+    let onclose_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
+        let err_text = format!("error event {:?}", e);
+        console::log_1(&JsValue::from_str(&err_text));
+        {
+            wasm_bindgen_futures::spawn_local(
+                weak.with_component({
+                    let v2 = weak.clone();
+                    move |root| {
+                        console::log_1(&"error text".into());
+                        let root_rendering_component = root.unwrap_mut::<RootRenderingComponent>();
+                        // try to reconnect 5 times every second
+                        //wait interval
+                        //TODO: Wasm can't sleep !!!
+                        let thousand_millis = time::Duration::from_millis(1000);
+                        thread::sleep(thousand_millis);
+                        setup_ws_connection(
+                            &root_rendering_component.game_data.href,
+                            root_rendering_component.game_data.my_ws_uid,
+                        );
+
+                        root_rendering_component.game_data.error_text = err_text;
+                        v2.schedule_render();
+                    }
+                })
+                .map_err(|_| ()),
+            );
+        }
+    }) as Box<dyn FnMut(ErrorEvent)>);
+    ws.set_onclose(Some(onclose_callback.as_ref().unchecked_ref()));
+    onclose_callback.forget();
 }

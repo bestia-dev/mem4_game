@@ -76,6 +76,7 @@ use crate::rulesanddescription::RulesAndDescription;
 use crate::websocketcommunication::setup_ws_connection;
 use crate::websocketcommunication::setup_ws_msg_recv;
 use crate::websocketcommunication::setup_ws_onerror;
+use crate::websocketcommunication::setup_ws_onclose;
 
 //Strum is a set of macros and traits for working with enums and strings easier in Rust.
 extern crate console_error_panic_hook;
@@ -145,16 +146,18 @@ pub fn run() -> Result<(), JsValue> {
 
     //find out URL
     let location_href = unwrap!(window.location().href(), "href not known");
+    
 
     //websocket connection
-    let ws = setup_ws_connection(location_href.as_str());
+    let ws = setup_ws_connection(location_href.as_str(),0);
     //I don't know why is needed to clone the websocket connection
     let ws_c = ws.clone();
 
     // Construct a new `RootRenderingComponent`.
     //I added ws_c so that I can send messages on websocket
 
-    let root_rendering_component = RootRenderingComponent::new(ws_c, my_ws_uid);
+    let mut root_rendering_component = RootRenderingComponent::new(ws_c, my_ws_uid);
+    root_rendering_component.game_data.href=location_href;
 
     // Mount the component to the `<div id="div_for_virtual_dom">`.
     let vdom = dodrio::Vdom::new(&div_for_virtual_dom, root_rendering_component);
@@ -164,6 +167,9 @@ pub fn run() -> Result<(), JsValue> {
 
     //websocket on error message callback
     setup_ws_onerror(&ws, &vdom);
+
+    //websocket on close message callback
+    setup_ws_onclose(&ws, &vdom);
 
     // Run the component forever. Forget to drop the memory.
     vdom.forget();
@@ -895,39 +901,46 @@ impl Render for RootRenderingComponent {
                 //return wait for the other player
                 dodrio!(bump,
                 <div>
-                                <div class="div_clickable" onclick={move |root, vdom, _event| {
-                                            let root_rendering_component =
-                                                root.unwrap_mut::<RootRenderingComponent>();
-                                            //region: send WsMessage over websocket
-                                            root_rendering_component.game_data_init();
+                    <div class="div_clickable" onclick={move |root, vdom, _event| {
+                                let root_rendering_component =
+                                    root.unwrap_mut::<RootRenderingComponent>();
+                                //region: send WsMessage over websocket
+                                root_rendering_component.game_data_init();
 
-                                            unwrap!(root_rendering_component
-                                                .game_data
-                                                .ws
-                                                .send_with_str(
-                                                    &serde_json::to_string(&WsMessage::GameDataInit {
-                card_grid_data: unwrap!(serde_json::to_string(&root_rendering_component.game_data.vec_cards)
+                                unwrap!(root_rendering_component
+                                    .game_data
+                                    .ws
+                                    .send_with_str(
+                                        &serde_json::to_string(&WsMessage::GameDataInit {
+                    card_grid_data: unwrap!(serde_json::to_string(&root_rendering_component.game_data.vec_cards)
                                 ,"serde_json::to_string(&self.game_data.vec_cards)"),
-                players: unwrap!(serde_json::to_string(&root_rendering_component.game_data.players)
+                    players: unwrap!(serde_json::to_string(&root_rendering_component.game_data.players)
                                 ,"serde_json::to_string(&self.game_data.players)"),
-                spelling: unwrap!(serde_json::to_string(&root_rendering_component.game_data.spelling)
+                    spelling: unwrap!(serde_json::to_string(&root_rendering_component.game_data.spelling)
                                 ,"serde_json::to_string(&self.game_data.spelling)"),
-                                                    })
-                                                    .expect("error sending WantToPlay"),
-                                                )
-                                                ,"Failed to send WantToPlay");
+                            })
+                            .expect("error sending WantToPlay"),
+                        )
+                        ,"Failed to send WantToPlay");
 
-                                            //endregion
-                                            vdom.schedule_render();
-                                        }}>
-                                        <h3 id="ws_elem" style= "color:red;">
-                                                {vec![text(bumpalo::format!(in bump, "Players accepted: {}. Start Game?", root_rendering_component.game_data.players.len()-1).into_bump_str()),]}
-                                        </h3>
-                                    </div>
-                                    //TODO: end want to play instead of reinvite.
-                                    {vec![ask_to_play(root_rendering_component, bump, "Reinvite")]}
-                                </div>
-                                )
+                    //endregion
+                    vdom.schedule_render();
+                    }}>
+                        <h3 id="ws_elem" style= "color:green;">
+                            {vec![
+                                text(bumpalo::format!(in bump, "Start Game?{}", "").into_bump_str()),
+                            ]}
+                        </h3>
+                    </div>
+                    <div>
+                        <h3 style= "color:red;">
+                            {vec![
+                                text(bumpalo::format!(in bump, "Players accepted: {}.", root_rendering_component.game_data.players.len()-1).into_bump_str()),
+                            ]}
+                        </h3>
+                    </div>
+                </div>
+                )
             } else if let GameState::Accepted = root_rendering_component.game_data.game_state {
                 console::log_1(&"GameState::Accepted".into());
                 dodrio!(bump,
@@ -1143,7 +1156,7 @@ impl Render for RootRenderingComponent {
             //because I want to debug the websocket lost connection
             dodrio!(bump,
                 <div>
-                    <h1>
+                    <h1 style= "color:red;" >
                         {vec![text(
                             bumpalo::format!(in bump, "error_text {} !", self.game_data.error_text)
                                 .into_bump_str(),
