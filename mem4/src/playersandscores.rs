@@ -19,6 +19,8 @@ pub struct PlayersAndScores {
     my_points: usize,
     ///What player am I
     my_player_number: usize,
+    ///my ws client instance unique id.
+    my_ws_uid: usize,
 }
 
 impl PlayersAndScores {
@@ -28,6 +30,7 @@ impl PlayersAndScores {
             my_points: 0,
             my_player_number: 1,
             player_turn: 0,
+            my_ws_uid: 0,
         }
     }
     ///copies the data from game data to internal cache
@@ -69,6 +72,10 @@ impl PlayersAndScores {
             self.player_turn = game_data.player_turn;
             is_invalidated = true;
         }
+        if self.my_ws_uid != game_data.my_ws_uid {
+            self.my_ws_uid = game_data.my_ws_uid;
+            is_invalidated = true;
+        }
         is_invalidated
     }
 }
@@ -85,8 +92,9 @@ impl Render for PlayersAndScores {
             if self.player_turn==self.my_player_number {"green"} else {"red"}
         )
         .into_bump_str();
-        let text1 = bumpalo::format!(in bump, "player{}: {}",self.my_player_number, self.my_points)
-            .into_bump_str();
+        let text1 = bumpalo::format!(in bump, "Player{}: {} points   (ws_uid: {})",
+        self.my_player_number, self.my_points, self.my_ws_uid)
+        .into_bump_str();
         //return
         dodrio!(bump,
         <div class="grid_container_players" style= "grid-template-columns: auto;">

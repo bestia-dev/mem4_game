@@ -202,19 +202,18 @@ fn user_connected(
     url_param: String,
 ) -> impl Future<Item = (), Error = ()> {
     //the client sends his ws_uid in url_param. it is a random number.
-    info!("url_param: {}", url_param);
+    info!("user_connect() url_param: {}", url_param);
     //convert string to usize
     //hahahhaha syntax 'turbofish' ::<>
     let my_id = unwrap!(url_param.parse::<usize>());
     //if uid already exists, it is an error
     for (&uid, ..) in users.lock().expect("error users.lock()").iter() {
         if uid == my_id {
-            //TODO: send error to this client, but don't panic the server
-            //but if it is a reconnect is there the possiblity that the server
-            //didn't know he closed the client websocket?
+            //disconnect the old user
+            info!("user_disconnected for reconnect: {}", my_id);
+            user_disconnected(my_id, &users);
         }
     }
-    info!("websocket user: {}", my_id);
 
     // Split the socket into a sender and receive of messages.
     let (user_ws_tx, user_ws_rx) = ws.split();
@@ -230,6 +229,7 @@ fn user_connected(
     );
 
     // Save the sender in our list of connected users.
+    info!("users.insert: {}", my_id);
     users.lock().expect("error uses.lock()").insert(my_id, tx);
 
     // Return a `Future` that is basically a state machine managing

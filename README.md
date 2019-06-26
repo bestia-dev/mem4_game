@@ -25,15 +25,15 @@ Everything is done in compile time, so the runtime is nothing slower.
 It looks that plain web sockets have often connection problems and they disconnect here and there. Creating a good reconnect it pretty challenging. 
 ## TODO:
 - better documentation. Do I really have to write very long doc-comments in the code ? It looks terrible. But it is useful when reading the code. Maybe I can hide it in a region block. Dodrio has beautiful docs. How did he do it?  
-- reconnect can produce different state on different player. Need ad action to sync all players after reconnect. The main data has player1, others have a copy.
-- bigger card with 3x3 grid or any custom grid  
+- sync data from player1 to others after reconnect.
+- sometimes the grid is bigger after every click, but sometimes not
 ## Changelog
 2019-05-24 completed a working version  
 2019-06-06 google cloud platform, docker, DockerHub  
 2019-06-13 typed html  
 2019-06-20 added Triestine, calculate grid size in rust  
-2019-06-25 integer arithmetic unwrap!(x.checked_add(y)), checked_sub, checked_mul, checked_div
-- floating f64 cast to usize and vice versa with x.approx_as::<f64>() from crate conv
-- manual reconnect for ws disconnect
-
+2019-06-25 integer arithmetic unwrap!(x.checked_add(y)), checked_sub, checked_mul, checked_div  
+- floating f64 cast to usize and vice versa with x.approx_as::<f64>() from crate conv  
+- manual reconnect for ws disconnect  
+2019-06-26 3x3 or 3x2 grids. GameConfig.  
   
