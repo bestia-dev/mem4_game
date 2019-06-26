@@ -70,7 +70,7 @@ mod gamedata;
 mod playersandscores;
 mod rulesanddescription;
 mod websocketcommunication;
-use crate::gamedata::{CardStatusCardFace, GameData, GameState};
+use crate::gamedata::{CardStatusCardFace, GameData, GameState, Size2d};
 use crate::playersandscores::PlayersAndScores;
 use crate::rulesanddescription::RulesAndDescription;
 
@@ -1056,20 +1056,17 @@ impl Render for RootRenderingComponent {
                     "player_turn {}",
                     &root_rendering_component.game_data.player_turn
                 )));
-
-                if root_rendering_component.game_data.my_player_number
-                    == (if root_rendering_component.game_data.player_turn
-                        < root_rendering_component.game_data.players.len()
-                    {
-                        unwrap!(root_rendering_component
-                            .game_data
-                            .player_turn
-                            .checked_add(1))
-                    } else {
-                        1
-                    })
+                let next_player = if root_rendering_component.game_data.player_turn
+                    < root_rendering_component.game_data.players.len()
                 {
-                    //return Click here to take your turn
+                    unwrap!(root_rendering_component
+                        .game_data
+                        .player_turn
+                        .checked_add(1))
+                } else {
+                    1
+                };
+                if root_rendering_component.game_data.my_player_number == next_player {
                     dodrio!(bump,
                     <div class="div_clickable" onclick={move |root, vdom, _event| {
                                 let root_rendering_component =
@@ -1105,7 +1102,7 @@ impl Render for RootRenderingComponent {
                     )
                 } else {
                     //return wait for the other player
-                    div_wait_for_other_player(bump)
+                    div_wait_for_other_player(bump, next_player)
                 }
             } else if root_rendering_component
                 .game_data
@@ -1118,13 +1115,13 @@ impl Render for RootRenderingComponent {
                     dodrio!(bump,
                     <div class="div_clickable">
                         <h3 id= "ws_elem" style= "color:orange;">
-                            {vec![text(bumpalo::format!(in bump, "Play !{}", "").into_bump_str())]}
+                            {vec![text(bumpalo::format!(in bump, "Play player{} !", root_rendering_component.game_data.player_turn).into_bump_str())]}
                         </h3>
                     </div>
                     )
                 } else {
                     //return wait for the other player
-                    div_wait_for_other_player(bump)
+                    div_wait_for_other_player(bump, root_rendering_component.game_data.player_turn)
                 }
             } else {
                 //unpredictable situation
@@ -1137,20 +1134,18 @@ impl Render for RootRenderingComponent {
             }
         }
         ///the text 'wait for other player' is used multiple times
-        fn div_wait_for_other_player(bump: &Bump) -> Node {
+        fn div_wait_for_other_player(bump: &Bump, other_player: usize) -> Node {
             dodrio!(bump,
             <h3 id="ws_elem" style= "color:red;">
-                {vec![text(bumpalo::format!(in bump, "Wait for the other player.{}", "").into_bump_str())]}
+                {vec![text(bumpalo::format!(in bump, "Wait for player{} !", other_player).into_bump_str())]}
             </h3>
             )
         }
-        ///calculate max with and height for a grid and returns a tuple
-        fn max_grid_width_height(
-            root_rendering_component: &RootRenderingComponent,
-        ) -> (usize, usize) {
+        ///calculate max with and height for a grid
+        fn max_grid_size(root_rendering_component: &RootRenderingComponent) -> Size2d {
             //if the game_config is None, then return default
             if root_rendering_component.game_data.game_config.is_none() {
-                (500, 500)
+                Size2d { hor: 500, ver: 500 }
             } else {
                 //grid_container width and height
                 let mut max_grid_width = grid_width();
@@ -1208,15 +1203,18 @@ impl Render for RootRenderingComponent {
                     max_grid_width, max_grid_height
                 )));
 
-                //return tuple
-                (max_grid_width, max_grid_height)
+                //return
+                Size2d {
+                    hor: max_grid_width,
+                    ver: max_grid_height,
+                }
             }
         }
         ///prepare the grid container
         fn div_grid_container<'a, 'bump>(
             root_rendering_component: &'a RootRenderingComponent,
             bump: &'bump Bump,
-            xmax_grid_width_height: (usize, usize),
+            xmax_grid_size: &Size2d,
         ) -> Node<'bump>
         where
             'a: 'bump,
@@ -1236,8 +1234,8 @@ impl Render for RootRenderingComponent {
             } else {
                 let xstyle = format!(
                     "width:{}px; height:{}px;grid-template-columns: {} {} {} {};",
-                    xmax_grid_width_height.0,
-                    xmax_grid_width_height.1,
+                    xmax_grid_size.hor,
+                    xmax_grid_size.ver,
                     if unwrap!(root_rendering_component.game_data.game_config.as_ref())
                         .grid_items_hor
                         >= 1
@@ -1285,15 +1283,12 @@ impl Render for RootRenderingComponent {
         //region: create the whole virtual dom. The verbose stuff is in private functions
 
         if self.game_data.error_text == "" {
-            let xmax_grid_width_height = max_grid_width_height(self);
-            let xstyle2 = format!(
-                "width:{}px;",
-                unwrap!(xmax_grid_width_height.0.checked_add(2))
-            );
+            let xmax_grid_size = max_grid_size(self);
+            let xstyle2 = format!("width:{}px;", unwrap!(xmax_grid_size.hor.checked_add(2)));
 
             dodrio!(bump,
             <div class= "m_container" style={xstyle2}>
-                {vec![div_grid_container(self,bump,xmax_grid_width_height)]}
+                {vec![div_grid_container(self,bump,&xmax_grid_size)]}
                 {vec![div_game_status_and_player_actions(self, bump)]}
                 {vec![div_grid_header(self, bump)]}
                 {vec![self.players_and_scores.render(bump)]}

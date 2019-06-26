@@ -12,6 +12,15 @@ use wasm_bindgen::prelude::*;
 use web_sys::console;
 use web_sys::WebSocket;
 
+///2d size (any UM -pixel, items, percent)
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Size2d {
+    ///horizontal
+    pub hor: usize,
+    ///vertical
+    pub ver: usize,
+}
+
 ///game config
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GameConfig {
@@ -23,7 +32,7 @@ pub struct GameConfig {
     ///card image height
     pub card_height: usize,
     ///number of cards horizontally
-    pub grid_items_hor:usize,
+    pub grid_items_hor: usize,
     ///number of card vertically
     pub grid_items_ver: usize,
 }
@@ -106,23 +115,23 @@ pub struct GameData {
 impl GameData {
     ///prepare new random data
     pub fn prepare_random_data(&mut self) {
-        let item_count_minus_one =
-            unwrap!(unwrap!(self.game_config.as_ref())
-                .spelling
-                .len()
-                .checked_sub(1));
+        let item_count_minus_one = unwrap!(unwrap!(self.game_config.as_ref())
+            .spelling
+            .len()
+            .checked_sub(1));
         let players_count = self.players.len();
-        let cards_count = unwrap!(players_count.checked_mul(unwrap!(
-            unwrap!(self.game_config.as_ref()).grid_items_hor
-            .checked_mul(unwrap!(self.game_config.as_ref()).grid_items_ver))));
+        let cards_count = unwrap!(players_count.checked_mul(unwrap!(unwrap!(self
+            .game_config
+            .as_ref())
+        .grid_items_hor
+        .checked_mul(unwrap!(self.game_config.as_ref()).grid_items_ver))));
         let random_count = unwrap!(cards_count.checked_div(2));
         //if the number of cards is bigger than the images, i choose all the images.
         //for the rest I use random.
         //integer division rounds toward zero
         let multiple: usize = unwrap!(random_count.checked_div(item_count_minus_one));
-        let rest = unwrap!(
-            random_count.checked_sub(unwrap!(item_count_minus_one.checked_mul(multiple)))
-        );
+        let rest =
+            unwrap!(random_count.checked_sub(unwrap!(item_count_minus_one.checked_mul(multiple))));
         //region: find random numbers between 1 and item_count
         //vec_of_random_numbers is 0 based
         let mut vec_of_random_numbers = Vec::new();
