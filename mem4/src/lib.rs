@@ -563,15 +563,19 @@ impl Render for RootRenderingComponent {
                 )));
 
                 //((game_data.my_player_number - 1) * grid_width*grid_height) + 1
-                let start_index =
-                    unwrap!(unwrap!((unwrap!(game_data.my_player_number.checked_sub(1)))
-                        .checked_mul(unwrap!(game_data
-                            .grid_items_hor
-                            .checked_mul(game_data.grid_items_ver))))
-                    .checked_add(1));
-                let end_index = unwrap!(game_data.my_player_number.checked_mul(unwrap!(game_data
+                let start_index = unwrap!(unwrap!((unwrap!(game_data
+                    .my_player_number
+                    .checked_sub(1)))
+                .checked_mul(unwrap!(unwrap!(game_data.game_config.as_ref())
                     .grid_items_hor
-                    .checked_mul(game_data.grid_items_ver))));
+                    .checked_mul(unwrap!(game_data.game_config.as_ref()).grid_items_ver))))
+                .checked_add(1));
+                let end_index =
+                    unwrap!(game_data
+                        .my_player_number
+                        .checked_mul(unwrap!(unwrap!(game_data.game_config.as_ref())
+                            .grid_items_hor
+                            .checked_mul(unwrap!(game_data.game_config.as_ref()).grid_items_ver))));
                 for x in start_index..=end_index {
                     let index: usize = x;
                     //region: prepare variables and closures for inserting into vdom
@@ -1140,97 +1144,156 @@ impl Render for RootRenderingComponent {
             </h3>
             )
         }
+        ///calculate max with and height for a grid and returns a tuple
+        fn max_grid_width_height(
+            root_rendering_component: &RootRenderingComponent,
+        ) -> (usize, usize) {
+            //if the game_config is None, then return default
+            if root_rendering_component.game_data.game_config.is_none() {
+                (500, 500)
+            } else {
+                //grid_container width and height
+                let mut max_grid_width = grid_width();
+                let mut max_grid_height = grid_height();
+                console::log_1(&JsValue::from_str(&format!(
+                    "inner_width {} inner_height {}",
+                    max_grid_width, max_grid_height
+                )));
+                //default if not choosen
+                let mut card_width = 115;
+                let mut card_height = 115;
+                match &root_rendering_component.game_data.game_config {
+                    None => (),
+                    Some(_x) => {
+                        card_width =
+                            unwrap!(root_rendering_component.game_data.game_config.clone())
+                                .card_width;
+                        card_height =
+                            unwrap!(root_rendering_component.game_data.game_config.clone())
+                                .card_height;
+                    }
+                }
+                console::log_1(&JsValue::from_str(&format!(
+                    "card_width {} card_height {}",
+                    card_width, card_height
+                )));
+                //ratio between width and height must stay the same
+                let ratio = (unwrap!(card_height.approx_as::<f64>())
+                    * unwrap!(
+                        unwrap!(root_rendering_component.game_data.game_config.as_ref())
+                            .grid_items_ver
+                            .approx_as::<f64>()
+                    ))
+                    / (unwrap!(card_width.approx_as::<f64>())
+                        * unwrap!(unwrap!(root_rendering_component
+                            .game_data
+                            .game_config
+                            .as_ref())
+                        .grid_items_hor
+                        .approx_as::<f64>()));
+
+                if unwrap!(max_grid_width.approx_as::<f64>()) * ratio
+                    > unwrap!(max_grid_height.approx_as::<f64>())
+                {
+                    max_grid_width =
+                        unwrap!((unwrap!(max_grid_height.approx_as::<f64>()) / ratio)
+                            .approx_as::<usize>());
+                } else {
+                    max_grid_height =
+                        unwrap!((unwrap!(max_grid_width.approx_as::<f64>()) * ratio)
+                            .approx_as::<usize>());
+                }
+                console::log_1(&JsValue::from_str(&format!(
+                    "max_grid_width {} max_grid_height {}",
+                    max_grid_width, max_grid_height
+                )));
+
+                //return tuple
+                (max_grid_width, max_grid_height)
+            }
+        }
+        ///prepare the grid container
+        fn div_grid_container<'a, 'bump>(
+            root_rendering_component: &'a RootRenderingComponent,
+            bump: &'bump Bump,
+            xmax_grid_width_height: (usize, usize),
+        ) -> Node<'bump>
+        where
+            'a: 'bump,
+        {
+            //if the game config is none return empty <div>
+            //or the game state is one, that does not render grid container
+            if root_rendering_component.game_data.game_config.is_none()
+                || !root_rendering_component
+                    .game_data
+                    .is_state_for_grid_container()
+            {
+                //return
+                dodrio!(bump,
+                    <div>
+                    </div>
+                )
+            } else {
+                let xstyle = format!(
+                    "width:{}px; height:{}px;grid-template-columns: {} {} {} {};",
+                    xmax_grid_width_height.0,
+                    xmax_grid_width_height.1,
+                    if unwrap!(root_rendering_component.game_data.game_config.as_ref())
+                        .grid_items_hor
+                        >= 1
+                    {
+                        "auto"
+                    } else {
+                        ""
+                    },
+                    if unwrap!(root_rendering_component.game_data.game_config.as_ref())
+                        .grid_items_hor
+                        >= 2
+                    {
+                        "auto"
+                    } else {
+                        ""
+                    },
+                    if unwrap!(root_rendering_component.game_data.game_config.as_ref())
+                        .grid_items_hor
+                        >= 3
+                    {
+                        "auto"
+                    } else {
+                        ""
+                    },
+                    if unwrap!(root_rendering_component.game_data.game_config.as_ref())
+                        .grid_items_hor
+                        >= 4
+                    {
+                        "auto"
+                    } else {
+                        ""
+                    },
+                );
+                let xgrid_container = dodrio!(bump,
+                    <div class= "grid_container" style={xstyle}>
+                        {div_grid_items(root_rendering_component, bump)}
+                    </div>
+                );
+                //return
+                xgrid_container
+            }
+        }
         //endregion
 
         //region: create the whole virtual dom. The verbose stuff is in private functions
 
         if self.game_data.error_text == "" {
-            //grid_container width and height
-            let mut max_grid_width = grid_width();
-            let mut max_grid_height = grid_height();
-            console::log_1(&JsValue::from_str(&format!(
-                "inner_width {} inner_height {}",
-                max_grid_width, max_grid_height
-            )));
-            //default if not choosen
-            let mut card_width = 115;
-            let mut card_height = 115;
-            match &self.game_data.game_config {
-                None => (),
-                Some(_x) => {
-                    card_width = unwrap!(self.game_data.game_config.clone()).card_width;
-                    card_height = unwrap!(self.game_data.game_config.clone()).card_height;
-                }
-            }
-            console::log_1(&JsValue::from_str(&format!(
-                "card_width {} card_height {}",
-                card_width, card_height
-            )));
-            //ratio between width and height must stay the same
-            let ratio = (unwrap!(card_height.approx_as::<f64>())
-                * unwrap!(self.game_data.grid_items_ver.approx_as::<f64>()))
-                / (unwrap!(card_width.approx_as::<f64>())
-                    * unwrap!(self.game_data.grid_items_hor.approx_as::<f64>()));
-
-            if unwrap!(max_grid_width.approx_as::<f64>()) * ratio
-                > unwrap!(max_grid_height.approx_as::<f64>())
-            {
-                max_grid_width = unwrap!(
-                    (unwrap!(max_grid_height.approx_as::<f64>()) / ratio).approx_as::<usize>()
-                );
-            } else {
-                max_grid_height = unwrap!(
-                    (unwrap!(max_grid_width.approx_as::<f64>()) * ratio).approx_as::<usize>()
-                );
-            }
-            console::log_1(&JsValue::from_str(&format!(
-                "max_grid_width {} max_grid_height {}",
-                max_grid_width, max_grid_height
-            )));
-
-            let xstyle = format!(
-                "width:{}px; height:{}px;grid-template-columns: {} {} {} {};",
-                max_grid_width,
-                max_grid_height,
-                if self.game_data.grid_items_hor >= 1 {
-                    "auto"
-                } else {
-                    ""
-                },
-                if self.game_data.grid_items_hor >= 2 {
-                    "auto"
-                } else {
-                    ""
-                },
-                if self.game_data.grid_items_hor >= 3 {
-                    "auto"
-                } else {
-                    ""
-                },
-                if self.game_data.grid_items_hor >= 4 {
-                    "auto"
-                } else {
-                    ""
-                },
+            let xmax_grid_width_height = max_grid_width_height(self);
+            let xstyle2 = format!(
+                "width:{}px;",
+                unwrap!(xmax_grid_width_height.0.checked_add(2))
             );
-            let xstyle2 = format!("width:{}px;", unwrap!(max_grid_width.checked_add(2)));
-
-            //first prepare empty container, later it will change if necesary.
-            let mut xgrid_container = dodrio!(bump,
-            <div>
-            </div>
-            );
-            if let GameState::Play | GameState::EndGame = self.game_data.game_state {
-                xgrid_container = dodrio!(bump,
-                    <div class= "grid_container" style={xstyle}>
-                        {div_grid_items(self, bump)}
-                    </div>
-                );
-            }
 
             dodrio!(bump,
             <div class= "m_container" style={xstyle2}>
-                {vec![xgrid_container]}
+                {vec![div_grid_container(self,bump,xmax_grid_width_height)]}
                 {vec![div_game_status_and_player_actions(self, bump)]}
                 {vec![div_grid_header(self, bump)]}
                 {vec![self.players_and_scores.render(bump)]}

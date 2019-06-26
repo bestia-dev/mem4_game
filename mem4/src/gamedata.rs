@@ -102,23 +102,19 @@ pub struct GameData {
     pub href: String,
     /// is reconnect
     pub is_reconnect: bool,
-    ///number of cards horizontally
-    pub grid_items_hor: usize,
-    ///number of cards vertically
-    pub grid_items_ver: usize,
 }
 impl GameData {
     ///prepare new random data
     pub fn prepare_random_data(&mut self) {
         let item_count_minus_one =
-            unwrap!(unwrap!(self.game_config.as_ref(), "self.game_config.as_ref()")
+            unwrap!(unwrap!(self.game_config.as_ref())
                 .spelling
                 .len()
                 .checked_sub(1));
         let players_count = self.players.len();
-        let cards_count = unwrap!(players_count.checked_mul(unwrap!(self
-            .grid_items_hor
-            .checked_mul(self.grid_items_ver))));
+        let cards_count = unwrap!(players_count.checked_mul(unwrap!(
+            unwrap!(self.game_config.as_ref()).grid_items_hor
+            .checked_mul(unwrap!(self.game_config.as_ref()).grid_items_ver))));
         let random_count = unwrap!(cards_count.checked_div(2));
         //if the number of cards is bigger than the images, i choose all the images.
         //for the rest I use random.
@@ -237,8 +233,6 @@ impl GameData {
             error_text: "".to_string(),
             href: "".to_string(),
             is_reconnect: false,
-            grid_items_hor: 2,
-            grid_items_ver: 3,
         }
     }
     ///check only if state Start
@@ -246,6 +240,14 @@ impl GameData {
         #[allow(clippy::wildcard_enum_match_arm)]
         match self.game_state {
             GameState::Start => true,
+            _ => false,
+        }
+    }
+    ///the only states for rendering the grid container
+    pub fn is_state_for_grid_container(&self) -> bool {
+        #[allow(clippy::wildcard_enum_match_arm)]
+        match self.game_state {
+            GameState::Play | GameState::EndGame => true,
             _ => false,
         }
     }
