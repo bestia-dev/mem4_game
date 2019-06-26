@@ -71,7 +71,6 @@ h6 {
 /* using simple css-grid for the layout of the game grid */
 .grid_container {
     display: grid;
-    grid-template-columns: auto auto auto auto;
     grid-row-gap: 5px;
     grid-column-gap: 5px;
     margin-left: auto;

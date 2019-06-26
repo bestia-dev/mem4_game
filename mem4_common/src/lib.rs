@@ -72,8 +72,8 @@ pub enum WsMessage {
     GameDataInit {
         ///act is the action to take on the receiver
         card_grid_data: String,
-        ///json of spelling
-        spelling: String,
+        ///json of game_config
+        game_config: String,
         ///json of vector of players
         players: String,
     },
@@ -102,14 +102,14 @@ pub enum WsMessage {
         ///all players
         players: String,
     },
-    ///Request the spelling from the WebSocket server
-    RequestSpelling {
-        ///the file with the spelling
+    ///Request the game_config from the WebSocket server
+    RequestGameConfig {
+        ///the file with the game_config
         filename: String,
     },
-    ///Receive the spelling from the WebSocket server
-    ResponseSpellingJson {
-        ///the spelling from the server
+    ///Receive the game_config from the WebSocket server
+    ResponseGameConfigJson {
+        ///the game_config from the server
         json: String,
     },
 }

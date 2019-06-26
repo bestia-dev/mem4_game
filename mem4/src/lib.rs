@@ -141,14 +141,15 @@ pub fn run() -> Result<(), JsValue> {
     );
 
     let mut rng = SmallRng::from_entropy();
-    //gen_range is lower inclusive, upper exclusive 26 + 1
+    //my_ws_uid is random generated on the client and sent to
+    //websocket server with an url param
     let my_ws_uid: usize = rng.gen_range(1, 9999);
 
     //find out URL
     let location_href = unwrap!(window.location().href(), "href not known");
 
     //websocket connection
-    let ws = setup_ws_connection(location_href.clone(), 0);
+    let ws = setup_ws_connection(location_href.clone(), my_ws_uid);
     //I don't know why is needed to clone the websocket connection
     let ws_c = ws.clone();
 
@@ -362,26 +363,30 @@ impl RootRenderingComponent {
         self.game_data.asked_folder_name = "".to_string();
         self.game_data.my_player_number = 1;
         self.game_data.player_turn = 0;
-        self.game_data.spelling = None;
+        self.game_data.game_config = None;
 
         self.check_invalidate_for_all_components();
     }
     //region: all functions for receive message (like events)
     // I separate the code into functions to avoid looking at all that boilerplate in the big match around futures and components.
     // All the data changing must be encapsulated inside these functions.
-    ///msg response we uid
+    ///msg response with uid, just to check. because the websocket server
+    ///gets the uid from the client in the url_param. The client generates a random number.
     fn on_response_ws_uid(&mut self, your_ws_uid: usize) {
-        self.game_data.my_ws_uid = your_ws_uid;
+        if self.game_data.my_ws_uid != your_ws_uid {
+            self.game_data.error_text = "my_ws_uid is incorrect!".to_string();
+        }
     }
     ///msg want to play
     fn on_want_to_play(&mut self, my_ws_uid: usize, asked_folder_name: String) {
         console::log_1(&"rcv wanttoplay".into());
         self.reset();
         self.game_data.game_state = GameState::Asked;
+        //the first player is the initiator
         self.game_data.players.push(Player {
             ws_uid: my_ws_uid,
             points: 0,
-        }); //the first player is the initiator
+        });
         self.game_data.players.push(Player {
             ws_uid: self.game_data.my_ws_uid,
             points: 0,
@@ -400,7 +405,7 @@ impl RootRenderingComponent {
         }
     }
     ///on game data init
-    fn on_game_data_init(&mut self, card_grid_data: &str, spelling: &str, players: &str) {
+    fn on_game_data_init(&mut self, card_grid_data: &str, game_config: &str, players: &str) {
         self.game_data.content_folder_name = self.game_data.asked_folder_name.clone();
         self.game_data.game_state = GameState::Play;
         self.game_data.player_turn = 1;
@@ -409,9 +414,9 @@ impl RootRenderingComponent {
             "error serde_json::from_str(card_grid_data)"
         );
 
-        self.game_data.spelling = unwrap!(
-            serde_json::from_str(spelling),
-            "error serde_json::from_str(spelling)"
+        self.game_data.game_config = unwrap!(
+            serde_json::from_str(game_config),
+            "error serde_json::from_str(game_config)"
         );
 
         self.game_data.players = unwrap!(
@@ -438,11 +443,11 @@ impl RootRenderingComponent {
     fn on_end_game(&mut self) {
         self.game_data.game_state = GameState::EndGame;
     }
-    ///msg response spelling json
-    fn on_response_spelling_json(&mut self, json: &str) {
-        self.game_data.spelling = unwrap!(
+    ///msg response game_config json
+    fn on_response_game_config_json(&mut self, json: &str) {
+        self.game_data.game_config = unwrap!(
             serde_json::from_str(json),
-            "error root_rendering_component.game_data.spelling = serde_json::from_str(&json)",
+            "error root_rendering_component.game_data.game_config = serde_json::from_str(&json)",
         );
     }
     ///msg player change
@@ -548,20 +553,25 @@ impl Render for RootRenderingComponent {
             let game_data = &root_rendering_component.game_data;
 
             let mut vec_grid_item_bump: Vec<Node<'bump>> = Vec::new();
-            if game_data.spelling.is_some() {
-                //4x4 is 16 cards. index goes from PlayerNUmber-1*16+1 to Player
+            if game_data.game_config.is_some() {
+                //The format 4x4 was too small for the game with multiple smartphones on the table.
+                //Now I can choose different sizes gx x gy
+                //grid_width x grid_height is wh cards. index goes from PlayerNUmber-1*wh+1 to Player
                 console::log_1(&JsValue::from_str(&format!(
                     "my_player_number {}",
                     &root_rendering_component.game_data.my_player_number
                 )));
 
-                //((game_data.my_player_number - 1) * 16) + 1
-                let start_index = unwrap!(unwrap!((unwrap!(game_data
-                    .my_player_number
-                    .checked_sub(1)))
-                .checked_mul(16))
-                .checked_add(1));
-                let end_index = unwrap!(game_data.my_player_number.checked_mul(16));
+                //((game_data.my_player_number - 1) * grid_width*grid_height) + 1
+                let start_index =
+                    unwrap!(unwrap!((unwrap!(game_data.my_player_number.checked_sub(1)))
+                        .checked_mul(unwrap!(game_data
+                            .grid_items_hor
+                            .checked_mul(game_data.grid_items_ver))))
+                    .checked_add(1));
+                let end_index = unwrap!(game_data.my_player_number.checked_mul(unwrap!(game_data
+                    .grid_items_hor
+                    .checked_mul(game_data.grid_items_ver))));
                 for x in start_index..=end_index {
                     let index: usize = x;
                     //region: prepare variables and closures for inserting into vdom
@@ -603,7 +613,7 @@ impl Render for RootRenderingComponent {
                     };
                     //endregion
 
-                    //creating 16 <div> in loop
+                    //creating grid_width*grid_height <div> in loop
                     let grid_item_bump = dodrio!(bump,
                     <div class= "grid_item">
                         <img src={img_src} id={img_id} style={opacity} onclick={move |root, vdom, event| {
@@ -762,8 +772,8 @@ impl Render for RootRenderingComponent {
                         <div class= "grid_item" style= "text-align: left;">
                             {vec![text(
                             bumpalo::format!(in bump, "{}",
-                            unwrap!(unwrap!(root_rendering_component.game_data.spelling.clone(),"root_rendering_component.game_data.spelling.clone()")
-                            .name.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_first_click),"game_data.vec_cards.get(game_data.card_index_of_first_click")
+                            unwrap!(unwrap!(root_rendering_component.game_data.game_config.clone(),"root_rendering_component.game_data.game_config.clone()")
+                            .spelling.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_first_click),"game_data.vec_cards.get(game_data.card_index_of_first_click")
                                                     .card_number_and_img_src),".card_number_and_img_src")
                                                     )
                             .into_bump_str(),
@@ -772,8 +782,8 @@ impl Render for RootRenderingComponent {
                             <div class= "grid_item" style= "text-align: right;">
                                 {vec![text(
                                 bumpalo::format!(in bump, "{}",
-                                unwrap!(unwrap!(root_rendering_component.game_data.spelling.clone(),"root_rendering_component.game_data.spelling.clone()")
-                                .name.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_second_click)
+                                unwrap!(unwrap!(root_rendering_component.game_data.game_config.clone(),"root_rendering_component.game_data.game_config.clone()")
+                                .spelling.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_second_click)
                                 ,"game_data.card_index_of_second_click)")
                                     .card_number_and_img_src),".card_number_and_img_src)")
                                     )
@@ -824,18 +834,18 @@ impl Render for RootRenderingComponent {
                         root_rendering_component.game_data.asked_folder_name =
                             folder_name.clone();
 
-                        //send request to Websocket server for spellings (async over websocket messages)
+                        //send request to Websocket server for game_configs (async over websocket messages)
                         unwrap!(
                             root_rendering_component.game_data.ws.send_with_str(
-                                &serde_json::to_string(&WsMessage::RequestSpelling {
+                                &serde_json::to_string(&WsMessage::RequestGameConfig {
                                     filename: format!(
-                                        "content/{}/text.json",
+                                        "content/{}/game_config.json",
                                         root_rendering_component.game_data.asked_folder_name
                                     ),
                                 })
-                                .expect("error sending RequestSpelling"),
+                                .expect("error sending RequestGameConfig"),
                             ),
-                            "Failed to send RequestSpelling"
+                            "Failed to send RequestGameConfig"
                         );
 
                         unwrap!(
@@ -892,13 +902,14 @@ impl Render for RootRenderingComponent {
                         //the old ws and closures are now a memory leak, but small
                         let window = unwrap!(web_sys::window(), "error: web_sys::window");
                         let href = root_rendering_component.game_data.href.clone();
+                        //usize is Copy(), so I don't need clone()
                         let my_ws_uid = root_rendering_component.game_data.my_ws_uid;
                         console::log_1(&JsValue::from_str(&format!(
                             "href {}  my_ws_uid {}",
                             href,
                             my_ws_uid,
                         )));
-                        console::log_1(&"before connect".into());
+                        console::log_1(&"before reconnect".into());
                         let ws = setup_ws_connection(href, my_ws_uid);
                         setup_all_ws_events(&ws,vdom.clone());
 
@@ -928,14 +939,13 @@ impl Render for RootRenderingComponent {
                 //return Ask Player2 to play!
                 ask_to_play(root_rendering_component, bump, "Invite")
             } else if let GameState::EndGame = root_rendering_component.game_data.game_state {
-                //end game ,Play again?
+                //end game ,Play again?  reload webpage
                 dodrio!(bump,
                 <div class="div_clickable" onclick={
                             move |root, vdom, _event| {
-                            let root_rendering_component = root.unwrap_mut::<RootRenderingComponent>();
-                            root_rendering_component.reset();
-                            root_rendering_component.game_data.game_state = GameState::Start;
-                            vdom.schedule_render();
+                            //reload the webpage
+                            let window = unwrap!(web_sys::window(), "error: web_sys::window");
+                            let x = window.location().reload();
                         }}>
                 <h3 class= "m_container" id= "ws_elem" style= "color:green;">
                         {vec![text(
@@ -964,8 +974,8 @@ impl Render for RootRenderingComponent {
                                 ,"serde_json::to_string(&self.game_data.vec_cards)"),
                     players: unwrap!(serde_json::to_string(&root_rendering_component.game_data.players)
                                 ,"serde_json::to_string(&self.game_data.players)"),
-                    spelling: unwrap!(serde_json::to_string(&root_rendering_component.game_data.spelling)
-                                ,"serde_json::to_string(&self.game_data.spelling)"),
+                    game_config: unwrap!(serde_json::to_string(&root_rendering_component.game_data.game_config)
+                                ,"serde_json::to_string(&self.game_data.game_config)"),
                             })
                             .expect("error sending WantToPlay"),
                         )
@@ -1145,11 +1155,11 @@ impl Render for RootRenderingComponent {
             //default if not choosen
             let mut card_width = 115;
             let mut card_height = 115;
-            match &self.game_data.spelling {
+            match &self.game_data.game_config {
                 None => (),
                 Some(_x) => {
-                    card_width = unwrap!(self.game_data.spelling.clone()).card_width;
-                    card_height = unwrap!(self.game_data.spelling.clone()).card_height;
+                    card_width = unwrap!(self.game_data.game_config.clone()).card_width;
+                    card_height = unwrap!(self.game_data.game_config.clone()).card_height;
                 }
             }
             console::log_1(&JsValue::from_str(&format!(
@@ -1157,8 +1167,11 @@ impl Render for RootRenderingComponent {
                 card_width, card_height
             )));
             //ratio between width and height must stay the same
-            let ratio =
-                unwrap!(card_height.approx_as::<f64>()) / unwrap!(card_width.approx_as::<f64>());
+            let ratio = (unwrap!(card_height.approx_as::<f64>())
+                * unwrap!(self.game_data.grid_items_ver.approx_as::<f64>()))
+                / (unwrap!(card_width.approx_as::<f64>())
+                    * unwrap!(self.game_data.grid_items_hor.approx_as::<f64>()));
+
             if unwrap!(max_grid_width.approx_as::<f64>()) * ratio
                 > unwrap!(max_grid_height.approx_as::<f64>())
             {
@@ -1175,12 +1188,37 @@ impl Render for RootRenderingComponent {
                 max_grid_width, max_grid_height
             )));
 
-            let xstyle = format!("width:{}px; height:{}px;", max_grid_width, max_grid_height);
+            let xstyle = format!(
+                "width:{}px; height:{}px;grid-template-columns: {} {} {} {};",
+                max_grid_width,
+                max_grid_height,
+                if self.game_data.grid_items_hor >= 1 {
+                    "auto"
+                } else {
+                    ""
+                },
+                if self.game_data.grid_items_hor >= 2 {
+                    "auto"
+                } else {
+                    ""
+                },
+                if self.game_data.grid_items_hor >= 3 {
+                    "auto"
+                } else {
+                    ""
+                },
+                if self.game_data.grid_items_hor >= 4 {
+                    "auto"
+                } else {
+                    ""
+                },
+            );
             let xstyle2 = format!("width:{}px;", unwrap!(max_grid_width.checked_add(2)));
 
+            //first prepare empty container, later it will change if necesary.
             let mut xgrid_container = dodrio!(bump,
-            <div class= "grid_container" >
-                </div>
+            <div>
+            </div>
             );
             if let GameState::Play | GameState::EndGame = self.game_data.game_state {
                 xgrid_container = dodrio!(bump,

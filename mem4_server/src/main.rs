@@ -60,18 +60,12 @@ use std::io::prelude::*;
 use std::net::SocketAddr;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::process::Command;
-use std::sync::{
-    atomic::{AtomicUsize, Ordering},
-    Arc, Mutex,
-};
+use std::sync::{Arc, Mutex};
 use warp::ws::{Message, WebSocket};
 use warp::Filter;
 //endregion
 
 //region: enum, structs, const,...
-/// Our global unique user id counter.
-static NEXT_USER_ID: AtomicUsize = AtomicUsize::new(1);
-
 /// Our state of currently connected users.
 /// - Key is their id
 /// - Value is a sender of `warp::ws::Message`
@@ -207,19 +201,20 @@ fn user_connected(
     users: Users,
     url_param: String,
 ) -> impl Future<Item = (), Error = ()> {
-    //if this is a reconnect, then the old ws_id is passed in url_param to preserve the same ws_uid.
+    //the client sends his ws_uid in url_param. it is a random number.
     info!("url_param: {}", url_param);
     //convert string to usize
     //hahahhaha syntax 'turbofish' ::<>
-    let old_ws_id = unwrap!(url_param.parse::<usize>());
-
-    let my_id = if old_ws_id == 0 {
-        // Use a counter to assign a new unique ID for this user.
-        NEXT_USER_ID.fetch_add(1, Ordering::Relaxed)
-    } else {
-        old_ws_id
-    };
-    info!("new websocket user: {}", my_id);
+    let my_id = unwrap!(url_param.parse::<usize>());
+    //if uid already exists, it is an error
+    for (&uid, ..) in users.lock().expect("error users.lock()").iter() {
+        if uid == my_id {
+            //TODO: send error to this client, but don't panic the server
+            //but if it is a reconnect is there the possiblity that the server
+            //didn't know he closed the client websocket?
+        }
+    }
+    info!("websocket user: {}", my_id);
 
     // Split the socket into a sender and receive of messages.
     let (user_ws_tx, user_ws_rx) = ws.split();
@@ -283,7 +278,7 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
 
     //There are different messages coming from the mem4 wasm app
     //WantToPlay must be broadcasted to all users
-    //RequestSpelling must return a message ResponseSpellingJson to the same user
+    //RequestGameConfig must return a message ResponseGameConfigJson to the same user
     //all others must be forwarded to exactly the other player.
 
     let msg: WsMessage = serde_json::from_str(&new_msg).unwrap_or_else(|_x| WsMessage::Dummy {
@@ -308,8 +303,8 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
                 Err(_disconnected) => {}
             }
         }
-        WsMessage::RequestSpelling { filename } => {
-            info!("RequestSpelling: {}", filename);
+        WsMessage::RequestGameConfig { filename } => {
+            info!("RequestGameConfig: {}", filename);
             // read the file
             let mut pathbuf = env::current_dir().expect("env::current_dir()");
             pathbuf.push("mem4");
@@ -322,11 +317,11 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
             file.read_to_string(&mut contents)
                 .expect("Unable to read the file");
             info!("read file : {}", contents);
-            let j = serde_json::to_string(&WsMessage::ResponseSpellingJson { json: contents })
+            let j = serde_json::to_string(&WsMessage::ResponseGameConfigJson { json: contents })
                 .expect(
-                    "serde_json::to_string(&WsMessage::ResponseSpellingJson { json: contents })",
+                    "serde_json::to_string(&WsMessage::ResponseGameConfigJson { json: contents })",
                 );
-            info!("send ResponseSpellingJson: {}", j);
+            info!("send ResponseGameConfigJson: {}", j);
             match users
                 .lock()
                 .expect("error users.lock()")
@@ -340,7 +335,7 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
         }
         WsMessage::WantToPlay { .. } => broadcast(users, ws_uid_of_message, &new_msg),
         WsMessage::ResponseWsUid { .. } => info!("ResponseWsUid: {}", ""),
-        WsMessage::ResponseSpellingJson { .. } => info!("ResponseSpellingJson: {}", ""),
+        WsMessage::ResponseGameConfigJson { .. } => info!("ResponseGameConfigJson: {}", ""),
         WsMessage::AcceptPlay { players, .. }
         | WsMessage::PlayerClick { players, .. }
         | WsMessage::GameDataInit { players, .. }

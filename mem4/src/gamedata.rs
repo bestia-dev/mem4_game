@@ -12,16 +12,20 @@ use wasm_bindgen::prelude::*;
 use web_sys::console;
 use web_sys::WebSocket;
 
-///Aviation Spelling
-///the zero element is card face down or empty, alphabet begins with 01 : A
+///game config
 #[derive(Serialize, Deserialize, Clone)]
-pub struct Spelling {
-    ///names of spelling
-    pub name: Vec<String>,
+pub struct GameConfig {
+    ///aviation spelling
+    ///the zero element is card face down or empty, alphabet begins with 01 : A
+    pub spelling: Vec<String>,
     ///card image width
     pub card_width: usize,
     ///card image height
     pub card_height: usize,
+    ///number of cards horizontally
+    pub grid_items_hor:usize,
+    ///number of card vertically
+    pub grid_items_ver: usize,
 }
 
 ///the game can be in various states and that differentiate the UI and actions
@@ -90,34 +94,40 @@ pub struct GameData {
     pub player_turn: usize,
     ///content folders vector
     pub content_folders: Vec<String>,
-    ///spellings
-    pub spelling: Option<Spelling>,
+    ///game_configs
+    pub game_config: Option<GameConfig>,
     ///error text
     pub error_text: String,
     ///href
     pub href: String,
     /// is reconnect
     pub is_reconnect: bool,
+    ///number of cards horizontally
+    pub grid_items_hor: usize,
+    ///number of cards vertically
+    pub grid_items_ver: usize,
 }
 impl GameData {
     ///prepare new random data
     pub fn prepare_random_data(&mut self) {
-        let spelling_count_minus_one =
-            unwrap!(unwrap!(self.spelling.as_ref(), "self.spelling.as_ref()")
-                .name
+        let item_count_minus_one =
+            unwrap!(unwrap!(self.game_config.as_ref(), "self.game_config.as_ref()")
+                .spelling
                 .len()
                 .checked_sub(1));
         let players_count = self.players.len();
-        let cards_count = unwrap!(players_count.checked_mul(16));
+        let cards_count = unwrap!(players_count.checked_mul(unwrap!(self
+            .grid_items_hor
+            .checked_mul(self.grid_items_ver))));
         let random_count = unwrap!(cards_count.checked_div(2));
         //if the number of cards is bigger than the images, i choose all the images.
         //for the rest I use random.
         //integer division rounds toward zero
-        let multiple: usize = unwrap!(random_count.checked_div(spelling_count_minus_one));
+        let multiple: usize = unwrap!(random_count.checked_div(item_count_minus_one));
         let rest = unwrap!(
-            random_count.checked_sub(unwrap!(spelling_count_minus_one.checked_mul(multiple)))
+            random_count.checked_sub(unwrap!(item_count_minus_one.checked_mul(multiple)))
         );
-        //region: find random numbers between 1 and spelling_count
+        //region: find random numbers between 1 and item_count
         //vec_of_random_numbers is 0 based
         let mut vec_of_random_numbers = Vec::new();
         let mut rng = SmallRng::from_entropy();
@@ -128,7 +138,7 @@ impl GameData {
             // a do-while is written as a  loop-break
             loop {
                 //gen_range is lower inclusive, upper exclusive 26 + 1
-                num = rng.gen_range(1, unwrap!(spelling_count_minus_one.checked_add(1)));
+                num = rng.gen_range(1, unwrap!(item_count_minus_one.checked_add(1)));
                 if !vec_of_random_numbers.contains(&num) {
                     break;
                 }
@@ -138,14 +148,14 @@ impl GameData {
             vec_of_random_numbers.push(num);
         }
         for _m in 1..=multiple {
-            for i in 1..=spelling_count_minus_one {
+            for i in 1..=item_count_minus_one {
                 vec_of_random_numbers.push(i);
                 vec_of_random_numbers.push(i);
             }
         }
         console::log_1(&JsValue::from_str(&format!(
-            "spelling_count {}  rest {}   vec.len {}",
-            spelling_count_minus_one,
+            "item_count {}  rest {}   vec.len {}",
+            item_count_minus_one,
             rest,
             vec_of_random_numbers.len()
         )));
@@ -223,10 +233,12 @@ impl GameData {
                 String::from("playingcards"),
                 String::from("triestine"),
             ],
-            spelling: None,
+            game_config: None,
             error_text: "".to_string(),
             href: "".to_string(),
             is_reconnect: false,
+            grid_items_hor: 2,
+            grid_items_ver: 3,
         }
     }
     ///check only if state Start

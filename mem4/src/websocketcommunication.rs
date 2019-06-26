@@ -13,7 +13,7 @@ use web_sys::{console, ErrorEvent, WebSocket};
 //but I don't want references, because they have the lifetime problem.
 #[allow(clippy::needless_pass_by_value)]
 ///setup websocket connection
-pub fn setup_ws_connection(location_href: String, old_ws_id: usize) -> WebSocket {
+pub fn setup_ws_connection(location_href: String, client_ws_id: usize) -> WebSocket {
     //web-sys has websocket for Rust exactly like javascript has¸
     //location_href comes in this format  http://localhost:4000/
     let mut loc_href = location_href.replace("http://", "ws://");
@@ -21,12 +21,12 @@ pub fn setup_ws_connection(location_href: String, old_ws_id: usize) -> WebSocket
     //let mut loc_href = String::from("ws://192.168.1.57:80/");
     loc_href.push_str("mem4ws/");
 
-    //send the old ws_id as url_param for reconnect on lost connection
-    //for the first connection the default is 0
-    loc_href.push_str(old_ws_id.to_string().as_str());
+    //send the client ws id as url_param for the first connect
+    //and reconnect on lost connection
+    loc_href.push_str(client_ws_id.to_string().as_str());
     console::log_1(&JsValue::from_str(&format!(
-        "location_href {}  loc_href {}",
-        location_href, loc_href,
+        "location_href {}  loc_href {} client_ws_id {}",
+        location_href, loc_href, client_ws_id
     )));
 
     //same server address and port as http server
@@ -148,7 +148,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
             }
             WsMessage::GameDataInit {
                 card_grid_data,
-                spelling,
+                game_config,
                 players,
             } => {
                 wasm_bindgen_futures::spawn_local(
@@ -163,7 +163,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             {
                                 root_rendering_component.on_game_data_init(
                                     &card_grid_data,
-                                    &spelling,
+                                    &game_config,
                                     &players,
                                 );
                                 v2.schedule_render();
@@ -210,15 +210,15 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                 );
             }
             //this message is for the WebSocket server
-            WsMessage::RequestSpelling { filename } => console::log_1(&filename.into()),
-            WsMessage::ResponseSpellingJson { json } => {
+            WsMessage::RequestGameConfig { filename } => console::log_1(&filename.into()),
+            WsMessage::ResponseGameConfigJson { json } => {
                 wasm_bindgen_futures::spawn_local(
                     weak.with_component({
                         move |root| {
-                            console::log_1(&"ResponseSpellingJson".into());
+                            console::log_1(&"ResponseGameConfigJson".into());
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
-                            root_rendering_component.on_response_spelling_json(&json)
+                            root_rendering_component.on_response_game_config_json(&json)
                         }
                     })
                     .map_err(|_| ()),
