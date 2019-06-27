@@ -39,6 +39,7 @@ pub struct GameConfig {
     pub grid_items_ver: usize,
 }
 ///the game can be in various states and that differentiate the UI and actions
+/// all players have the same game state
 #[derive(AsRefStr)]
 pub enum GameState {
     ///the start of the game
@@ -49,10 +50,18 @@ pub enum GameState {
     Asked,
     ///Accepted
     Accepted,
-    ///play (the turn is in RootRenderingComponent.player_turn)
+    ///Play before first card
+    PlayBefore1Card,
+    ///Play before second card
+    PlayBefore2Card,
+    ///obsolete play (the turn is in RootRenderingComponent.player_turn)
     Play,
+    ///take turn (after the second card)
+    TakeTurn,
     ///end game
     EndGame,
+    ///Reconnect after a lost connection
+    Reconnect,
 }
 ///the 3 possible states of one card
 #[derive(Serialize, Deserialize)]

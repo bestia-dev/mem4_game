@@ -3,7 +3,7 @@
 //region: use
 use crate::gamedata::GameData;
 
-use dodrio::builder::text;
+use dodrio::builder::{text,br};
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Node, Render};
 use typed_html::dodrio;
@@ -104,7 +104,9 @@ impl Render for PlayersAndScores {
             <div class= "grid_item" style="text-align: center;">
                 {vec![
                     text(text1),
-                    text(text2)]}
+                    br(bump).finish(),
+                    text(text2)
+                ]}
             </div>
         </div>
         )

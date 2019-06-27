@@ -190,6 +190,7 @@ pub fn div_grid_items<'a, 'bump>(
                                 //?? Don't understand what this does. The original was written for Input element.
                                 Some(input) => input,
                             };
+                            //TODO: only if the card is facedown and the gamestate is PlayBefore1Card & PlayBefore2Card .
 
                             //id attribute of image html element is prefixed with img ex. "img12"
                             let this_click_card_index = unwrap!(
@@ -281,6 +282,7 @@ pub fn div_grid_items<'a, 'bump>(
     //return
     vec_grid_item_bump
 }
+
 
 ///grid width in pixels
 pub fn grid_width() -> usize {

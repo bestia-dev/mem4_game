@@ -67,13 +67,14 @@
 
 //region: extern and use statements
 //region: mod is used only in lib file. All the rest use `use crate`
-mod gamedata;
+mod cardmoniker;
 mod gridcontainer;
 mod playeractions;
 mod playersandscores;
 mod rulesanddescription;
 mod websocketcommunication;
-mod cardmoniker;
+mod gamedata;
+
 //endregion
 use crate::gamedata::{CardStatusCardFace, GameData, GameState};
 
@@ -93,7 +94,7 @@ extern crate unwrap;
 extern crate conv;
 
 
-use dodrio::builder::*;
+use dodrio::builder::{br, text};
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Cached, Node, Render};
 use mem4_common::{Player, WsMessage};
