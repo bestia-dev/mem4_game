@@ -73,6 +73,7 @@ mod playeractions;
 mod playersandscores;
 mod rulesanddescription;
 mod websocketcommunication;
+mod cardmoniker;
 //endregion
 use crate::gamedata::{CardStatusCardFace, GameData, GameState};
 
@@ -105,8 +106,6 @@ use web_sys::{console, WebSocket};
 //endregion
 
 //region: enum, structs, const,...
-///game title
-const GAME_TITLE: &str = "mem4";
 
 ///Root Render Component: the card grid struct has all the needed data for play logic and rendering
 pub struct RootRenderingComponent {
@@ -476,82 +475,6 @@ impl Render for RootRenderingComponent {
         //`pub` not permitted there because it's implied
         //so I have to write functions outside of the impl block but inside my "module"
 
-        ///the header can show only the game title or two spellings. Not everything together.
-        fn div_grid_header<'a>(
-            root_rendering_component: &'a RootRenderingComponent,
-            bump: &'a Bump,
-        ) -> Node<'a> {
-            //this game_data mutable reference is dropped on the end of the function
-            let game_data = &root_rendering_component.game_data;
-            //if the Spellings are visible, than don't show GameTitle, because there is not
-            //enought space on smartphones
-            if game_data.card_index_of_first_click != 0 || game_data.card_index_of_second_click != 0
-            {
-                //if the two opened card match use green else use red color
-                let color; //haha variable does not need to be mutable. Great !
-
-                if unwrap!(
-                    game_data.vec_cards.get(game_data.card_index_of_first_click),
-                    "error index"
-                )
-                .card_number_and_img_src
-                    == unwrap!(
-                        game_data
-                            .vec_cards
-                            .get(game_data.card_index_of_second_click),
-                        "error index"
-                    )
-                    .card_number_and_img_src
-                {
-                    color = "green";
-                } else if game_data.card_index_of_first_click == 0
-                    || game_data.card_index_of_second_click == 0
-                {
-                    color = "yellow";
-                } else {
-                    color = "red";
-                }
-
-                {
-                    //return
-                    dodrio!(bump,
-                    <div class= "grid_container_header" style={bumpalo::format!(in bump, "grid-template-columns: auto auto; color:{}",color).into_bump_str()}>
-                        <div class= "grid_item" style= "text-align: left;">
-                            {vec![text(
-                            bumpalo::format!(in bump, "{}",
-                            unwrap!(unwrap!(root_rendering_component.game_data.game_config.clone(),"root_rendering_component.game_data.game_config.clone()")
-                            .spelling.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_first_click),"game_data.vec_cards.get(game_data.card_index_of_first_click")
-                                                    .card_number_and_img_src),".card_number_and_img_src")
-                                                    )
-                            .into_bump_str(),
-                            )]}
-                            </div>
-                            <div class= "grid_item" style= "text-align: right;">
-                                {vec![text(
-                                bumpalo::format!(in bump, "{}",
-                                unwrap!(unwrap!(root_rendering_component.game_data.game_config.clone(),"root_rendering_component.game_data.game_config.clone()")
-                                .spelling.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_second_click)
-                                ,"game_data.card_index_of_second_click)")
-                                    .card_number_and_img_src),".card_number_and_img_src)")
-                                    )
-                            .into_bump_str(),
-                            )]}
-                            </div>
-                        </div>
-                        )
-                }
-            } else {
-                {
-                    dodrio!(bump,
-                    <div class= "grid_container_header" style= "grid-template-columns: auto;">
-                        <div class= "grid_item" style= "text-align: center;">
-                            {vec![text(GAME_TITLE)]}
-                        </div>
-                    </div>
-                    )
-                }
-            }
-        }
 
         //region: create the whole virtual dom. The verbose stuff is in private functions
 
@@ -561,9 +484,9 @@ impl Render for RootRenderingComponent {
 
             dodrio!(bump,
             <div class= "m_container" style={xstyle2}>
+                {vec![cardmoniker::div_grid_card_moniker(self, bump)]}
                 {vec![gridcontainer::div_grid_container(self,bump,&xmax_grid_size)]}
                 {vec![playeractions::div_player_actions_from_game_status(self, bump)]}
-                {vec![div_grid_header(self, bump)]}
                 {vec![self.players_and_scores.render(bump)]}
                 {vec![self.cached_rules_and_description.render(bump)]}
             </div>

@@ -85,19 +85,19 @@ where
             root_rendering_component.game_data.is_reconnect = false;
             vdom.schedule_render();
         }}>
-            <h3 id= "ws_elem" style= "color:green;">
+            <h2 id= "ws_elem" style= "color:green;">
                 {vec![text(
                 //Reconnect?
                 bumpalo::format!(in bump, "Reconnect?{}", "").into_bump_str(),
                 )]}
-            </h3>
+            </h2>
         </div>
-        <h3 style= "color:red;">
+        <h2 style= "color:red;">
             {vec![text(
                 //connection lost
                 bumpalo::format!(in bump, "Connection lost.{}", "").into_bump_str(),
             )]}
-        </h3>
+        </h2>
     </div>
     )
 }
@@ -159,13 +159,13 @@ where
                 //endregion
                 vdom.schedule_render();
                 }}>
-            <h3 id= "ws_elem" style= "color:green;">
+            <h2 id= "ws_elem" style= "color:green;">
                 {vec![text(
                 //show Ask Player2 to Play!
                 bumpalo::format!(in bump, "Invite for {} !", folder_name_clone2)
                     .into_bump_str(),
                 )]}
-            </h3>
+            </h2>
         </div>
         ));
     }
@@ -191,12 +191,12 @@ where
                 let window = unwrap!(web_sys::window(), "error: web_sys::window");
                 let x = window.location().reload();
             }}>
-    <h3 class= "m_container" id= "ws_elem" style= "color:green;">
+    <h2 class= "m_container" id= "ws_elem" style= "color:green;">
             {vec![text(
                 //Play again?
                 bumpalo::format!(in bump, "Play again{}?", "").into_bump_str(),
             )]}
-    </h3>
+    </h2>
     </div>
     )
 }
@@ -235,18 +235,18 @@ where
         //endregion
         vdom.schedule_render();
         }}>
-            <h3 id="ws_elem" style= "color:green;">
+            <h2 id="ws_elem" style= "color:green;">
                 {vec![
                     text(bumpalo::format!(in bump, "Start Game?{}", "").into_bump_str()),
                 ]}
-            </h3>
+            </h2>
         </div>
         <div>
-            <h3 style= "color:red;">
+            <h2 style= "color:red;">
                 {vec![
                     text(bumpalo::format!(in bump, "Players accepted: {}.", root_rendering_component.game_data.players.len()-1).into_bump_str()),
                 ]}
-            </h3>
+            </h2>
         </div>
     </div>
     )
@@ -261,9 +261,9 @@ where
 {
     console::log_1(&"GameState::Accepted".into());
     dodrio!(bump,
-    <h3 id= "ws_elem" style= "color:red;">
+    <h2 id= "ws_elem" style= "color:red;">
         {vec![text(bumpalo::format!(in bump, "Game {} accepted.", root_rendering_component.game_data.asked_folder_name).into_bump_str(),)]}
-    </h3>
+    </h2>
     )
 }
 ///render asked
@@ -297,13 +297,13 @@ where
                     ,"Failed to send");
                 vdom.schedule_render();
             }}>
-        <h3 id= "ws_elem" style= "color:green;">
+        <h2 id= "ws_elem" style= "color:green;">
                 {vec![text(
                     //show Ask Player2 to Play!
                     bumpalo::format!(in bump, "Click here to Accept {}!", root_rendering_component.game_data.asked_folder_name)
                         .into_bump_str(),
                 )]}
-        </h3>
+        </h2>
     </div>
     )
 }
@@ -320,17 +320,17 @@ where
     {
         dodrio!(bump,
         <div class="div_clickable">
-            <h3 id= "ws_elem" style= "color:orange;">
+            <h2 id= "ws_elem" style= "color:orange;">
                 {vec![text(bumpalo::format!(in bump, "Play player{} !", root_rendering_component.game_data.player_turn).into_bump_str())]}
-            </h3>
+            </h2>
         </div>
         )
     } else {
         //return wait for the other player
         dodrio!(bump,
-        <h3 id="ws_elem" style= "color:red;">
+        <h2 id="ws_elem" style= "color:red;">
             {vec![text(bumpalo::format!(in bump, "Wait for player{} !", root_rendering_component.game_data.player_turn).into_bump_str())]}
-        </h3>
+        </h2>
         )
     }
 }
@@ -386,20 +386,20 @@ where
                     // Finally, re-render the component on the next animation frame.
                     vdom.schedule_render();
                 }}>
-            <h3 id= "ws_elem" style= "color:green;">
+            <h2 id= "ws_elem" style= "color:green;">
                 {vec![text(
                     bumpalo::format!(in bump, "Click here to take your turn !{}", "")
                         .into_bump_str(),
                 )]}
-            </h3>
+            </h2>
         </div>
         )
     } else {
         //return wait for the other player
         dodrio!(bump,
-        <h3 id="ws_elem" style= "color:red;">
+        <h2 id="ws_elem" style= "color:red;">
             {vec![text(bumpalo::format!(in bump, "Wait for player{} !", next_player).into_bump_str())]}
-        </h3>
+        </h2>
         )
     }
 }
@@ -414,8 +414,8 @@ where
     //unpredictable situation
     //return
     dodrio!(bump,
-    <h3 id= "ws_elem">
+    <h2 id= "ws_elem">
         {vec![text(bumpalo::format!(in bump, "gamestate: {} player {}", root_rendering_component.game_data.game_state.as_ref(),root_rendering_component.game_data.my_player_number).into_bump_str())]}
-    </h3>
+    </h2>
     )
 }

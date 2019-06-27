@@ -26,9 +26,9 @@ pub struct Size2d {
 ///game config
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GameConfig {
-    ///aviation spelling
-    ///the zero element is card face down or empty, alphabet begins with 01 : A
-    pub spelling: Vec<String>,
+    ///card moniker - the text/name of the card
+    ///the zero element is card face down or empty, example alphabet begins with index 01 : A
+    pub card_moniker: Vec<String>,
     ///card image width
     pub card_width: usize,
     ///card image height
@@ -117,7 +117,7 @@ impl GameData {
     ///prepare new random data
     pub fn prepare_random_data(&mut self) {
         let item_count_minus_one = unwrap!(unwrap!(self.game_config.as_ref())
-            .spelling
+            .card_moniker
             .len()
             .checked_sub(1));
         let players_count = self.players.len();

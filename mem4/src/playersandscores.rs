@@ -91,18 +91,20 @@ impl Render for PlayersAndScores {
     where
         'a: 'bump,
     {
-        let style1 = bumpalo::format!(in bump,"text-align: center;color:{};",
-            if self.player_turn==self.my_player_number {"green"} else {"red"}
-        )
+        let text1 = bumpalo::format!(in bump, "Player{}: {} points",
+        self.my_player_number, self.my_points)
         .into_bump_str();
-        let text1 = bumpalo::format!(in bump, "Player{}: {} points   (ws_uid: {})",
-        self.my_player_number, self.my_points, self.my_ws_uid)
+        //for debugging only
+        let text2 = bumpalo::format!(in bump, "(ws_uid: {})",
+        self.my_ws_uid)
         .into_bump_str();
         //return
         dodrio!(bump,
         <div class="grid_container_players" style= "grid-template-columns: auto;">
-            <div class= "grid_item" style={style1}>
-                {vec![text(text1)]}
+            <div class= "grid_item" style="text-align: center;">
+                {vec![
+                    text(text1),
+                    text(text2)]}
             </div>
         </div>
         )

@@ -100,16 +100,25 @@ pub fn div_grid_items<'a, 'bump>(
                 .grid_items_hor
                 .checked_mul(unwrap!(game_data.game_config.as_ref()).grid_items_ver))))
         .checked_add(1));
-        let end_index =
+        let mut end_index =
             unwrap!(game_data
                 .my_player_number
                 .checked_mul(unwrap!(unwrap!(game_data.game_config.as_ref())
                     .grid_items_hor
                     .checked_mul(unwrap!(game_data.game_config.as_ref()).grid_items_ver))));
 
+        //the count of cards can now be not divisible with 2 for card pairs.
+        //so I need to make a different last card that is not clickable.
+        if end_index >= game_data.vec_cards.len() {
+            end_index -= 1;
+        }
+
         console::log_1(&JsValue::from_str(&format!(
-            "my_player_number {} start_index {} end_index {}",
-            &root_rendering_component.game_data.my_player_number, start_index, end_index
+            "div_grid_items: my_player_number {} start_index {} end_index {} vec_cards.len {}",
+            &root_rendering_component.game_data.my_player_number,
+            start_index,
+            end_index,
+            game_data.vec_cards.len()
         )));
 
         for x in start_index..=end_index {
