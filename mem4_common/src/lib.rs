@@ -33,6 +33,9 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
+extern crate strum_macros;
+
+use strum_macros::AsRefStr;
 //endregion
 
 ///`WsMessage` enum for websocket
@@ -83,10 +86,10 @@ pub enum WsMessage {
         my_ws_uid: usize,
         ///all players
         players: String,
-        ///card_index
+        ///card index
         card_index: usize,
-        ///count click inside one turn
-        count_click_inside_one_turn: usize,
+        ///game state PlayerBefore1Card or PlayerBefore2Card
+        game_state: GameState,
     },
     ///player change
     PlayerChange {
@@ -112,6 +115,30 @@ pub enum WsMessage {
         ///the game_config from the server
         json: String,
     },
+}
+
+///the game can be in various states and that differentiate the UI and actions
+/// all players have the same game state
+#[derive(AsRefStr, Serialize, Deserialize)]
+pub enum GameState {
+    ///the start of the game
+    Start,
+    ///Player1 Asking WantToPlay
+    Asking,
+    ///Player2 is asked WantToPlay
+    Asked,
+    ///Accepted
+    Accepted,
+    ///Play before first card
+    PlayBefore1Card,
+    ///Play before second card
+    PlayBefore2Card,
+    ///take turn (after the second card)
+    TakeTurn,
+    ///end game
+    EndGame,
+    ///Reconnect after a lost connection
+    Reconnect,
 }
 
 ///data for one player

@@ -76,7 +76,7 @@ mod websocketcommunication;
 mod gamedata;
 
 //endregion
-use crate::gamedata::{CardStatusCardFace, GameData, GameState};
+use crate::gamedata::{CardStatusCardFace, GameData};
 
 //Strum is a set of macros and traits for working with enums and strings easier in Rust.
 extern crate console_error_panic_hook;
@@ -97,7 +97,7 @@ extern crate conv;
 use dodrio::builder::{br, text};
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Cached, Node, Render};
-use mem4_common::{Player, WsMessage};
+use mem4_common::{Player, WsMessage,GameState};
 use rand::rngs::SmallRng;
 use rand::FromEntropy;
 use rand::Rng;
@@ -216,14 +216,14 @@ impl RootRenderingComponent {
     ///That stuct is the only permanent data storage for later render the virtual dom.
     fn card_on_click(&mut self) {
         //get this_click_card_index from game_data
-        let this_click_card_index = if self.game_data.count_click_inside_one_turn == 1 {
+        let this_click_card_index = if self.game_data.game_state.as_ref()==GameState::PlayBefore1Card.as_ref() {
             self.game_data.card_index_of_first_click
         } else {
             self.game_data.card_index_of_second_click
         };
 
-        if self.game_data.count_click_inside_one_turn == 1
-            || self.game_data.count_click_inside_one_turn == 2
+        if self.game_data.game_state.as_ref()==GameState::PlayBefore1Card.as_ref()
+            || self.game_data.game_state.as_ref()==GameState::PlayBefore2Card.as_ref()
         {
             //flip the card up
             unwrap!(
@@ -232,7 +232,7 @@ impl RootRenderingComponent {
             )
             .status = CardStatusCardFace::UpTemporary;
 
-            if self.game_data.count_click_inside_one_turn == 2 {
+            if self.game_data.game_state.as_ref()==GameState::PlayBefore2Card.as_ref() {
                 //if is the second click, flip the card and then check for card match
 
                 //if the cards match, player get one point and continues another turn
@@ -273,7 +273,7 @@ impl RootRenderingComponent {
                         "error game_data.card_index_of_second_click"
                     )
                     .status = CardStatusCardFace::UpPermanently;
-                    self.game_data.count_click_inside_one_turn = 0;
+                    self.game_data.game_state=GameState::PlayBefore1Card;
                     //if the sum of points is number of card/2, the game is over
                     let mut point_sum = 0;
                     for x in &self.game_data.players {
@@ -324,20 +324,20 @@ impl RootRenderingComponent {
         .status = CardStatusCardFace::Down;
         self.game_data.card_index_of_first_click = 0;
         self.game_data.card_index_of_second_click = 0;
-        self.game_data.count_click_inside_one_turn = 0;
+        self.game_data.game_state = GameState::PlayBefore1Card;
+
         self.check_invalidate_for_all_components();
     }
     ///prepares the game data
     fn game_data_init(&mut self) {
         self.game_data.content_folder_name = self.game_data.asked_folder_name.clone();
         self.game_data.prepare_random_data();
-        self.game_data.game_state = GameState::Play;
+        self.game_data.game_state = GameState::PlayBefore1Card;
         self.game_data.player_turn = 1;
     }
     ///reset the data to replay the game
     fn reset(&mut self) {
         self.game_data.vec_cards = GameData::prepare_for_empty();
-        self.game_data.count_click_inside_one_turn = 0;
         self.game_data.card_index_of_first_click = 0;
         self.game_data.card_index_of_second_click = 0;
         self.game_data.players.clear();
@@ -390,7 +390,7 @@ impl RootRenderingComponent {
     ///on game data init
     fn on_game_data_init(&mut self, card_grid_data: &str, game_config: &str, players: &str) {
         self.game_data.content_folder_name = self.game_data.asked_folder_name.clone();
-        self.game_data.game_state = GameState::Play;
+        self.game_data.game_state = GameState::PlayBefore1Card;
         self.game_data.player_turn = 1;
         self.game_data.vec_cards = unwrap!(
             serde_json::from_str(card_grid_data),
@@ -407,7 +407,6 @@ impl RootRenderingComponent {
             "error serde_json::from_str(players)"
         );
 
-        self.game_data.game_state = GameState::Play;
         //find my player number
         for index in 0..self.game_data.players.len() {
             if unwrap!(
@@ -438,14 +437,14 @@ impl RootRenderingComponent {
         self.take_turn();
     }
     ///msg player click
-    fn on_player_click(&mut self, count_click_inside_one_turn: usize, card_index: usize) {
-        self.game_data.count_click_inside_one_turn = count_click_inside_one_turn;
-        if count_click_inside_one_turn == 1 {
+    fn on_player_click(&mut self, game_state: GameState, card_index: usize) {
+        self.game_data.game_state = game_state;
+        if self.game_data.game_state.as_ref() == GameState::PlayBefore1Card.as_ref() {
             self.game_data.card_index_of_first_click = card_index;
-        } else if count_click_inside_one_turn == 2 {
+        } else if self.game_data.game_state.as_ref() == GameState::PlayBefore2Card.as_ref()  {
             self.game_data.card_index_of_second_click = card_index;
         } else {
-            //nothing
+            //the last else for satisfing Clippy
         }
         self.card_on_click();
     }

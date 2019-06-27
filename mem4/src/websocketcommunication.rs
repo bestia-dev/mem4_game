@@ -1,6 +1,5 @@
 //! websocket communication
 //region: use
-use crate::gamedata::GameState;
 use crate::RootRenderingComponent;
 use futures::Future;
 use js_sys::Reflect;
@@ -8,6 +7,7 @@ use mem4_common::WsMessage;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{console, ErrorEvent, WebSocket};
+use mem4_common::{GameState};
 //endregion
 
 //the location_href is not consumed in this function and Clippy wants a reference instead a value
@@ -176,7 +176,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
             }
             WsMessage::PlayerClick {
                 card_index,
-                count_click_inside_one_turn,
+                game_state,
                 ..
             } => {
                 wasm_bindgen_futures::spawn_local(
@@ -188,7 +188,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                                 root.unwrap_mut::<RootRenderingComponent>();
                             console::log_1(&"players".into());
                             root_rendering_component
-                                .on_player_click(count_click_inside_one_turn, card_index);
+                                .on_player_click(game_state, card_index);
                             v2.schedule_render();
                         }
                     })

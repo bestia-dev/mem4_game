@@ -1,13 +1,12 @@
 //!html element to inform player what to do next and get a click action from user
 //region: use
-use crate::gamedata::GameState;
 use crate::websocketcommunication;
 use crate::RootRenderingComponent;
 
 use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
-use mem4_common::{Player, WsMessage};
+use mem4_common::{Player, WsMessage,GameState};
 use typed_html::dodrio;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
@@ -37,17 +36,9 @@ where
         div_accepted(root_rendering_component, bump)
     } else if let GameState::Asked = root_rendering_component.game_data.game_state {
         div_asked(root_rendering_component, bump)
-    } else if root_rendering_component
-        .game_data
-        .count_click_inside_one_turn
-        < 2
-    {
+    } else if let GameState::PlayBefore1Card = root_rendering_component.game_data.game_state{
         div_click_one(root_rendering_component, bump)
-    } else if root_rendering_component
-        .game_data
-        .count_click_inside_one_turn
-        >= 2
-    {
+    } else if let GameState::PlayBefore2Card = root_rendering_component.game_data.game_state{
         div_click_two(root_rendering_component, bump)
     } else {
         div_unpredicted(root_rendering_component, bump)

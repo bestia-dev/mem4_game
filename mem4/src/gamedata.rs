@@ -3,15 +3,15 @@
 //region: extern, use,
 extern crate mem4_common;
 
-use mem4_common::Player;
+use mem4_common::{Player,GameState};
 use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
 use rand::FromEntropy;
 use rand::Rng;
-use strum_macros::AsRefStr;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 use web_sys::WebSocket;
+use strum_macros::AsRefStr;
 //endregion
 
 //region: struct, enum
@@ -38,33 +38,9 @@ pub struct GameConfig {
     ///number of card vertically
     pub grid_items_ver: usize,
 }
-///the game can be in various states and that differentiate the UI and actions
-/// all players have the same game state
-#[derive(AsRefStr)]
-pub enum GameState {
-    ///the start of the game
-    Start,
-    ///Player1 Asking WantToPlay
-    Asking,
-    ///Player2 is asked WantToPlay
-    Asked,
-    ///Accepted
-    Accepted,
-    ///Play before first card
-    PlayBefore1Card,
-    ///Play before second card
-    PlayBefore2Card,
-    ///obsolete play (the turn is in RootRenderingComponent.player_turn)
-    Play,
-    ///take turn (after the second card)
-    TakeTurn,
-    ///end game
-    EndGame,
-    ///Reconnect after a lost connection
-    Reconnect,
-}
+
 ///the 3 possible states of one card
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, AsRefStr )]
 pub enum CardStatusCardFace {
     ///card face down
     Down,
@@ -85,10 +61,10 @@ pub struct Card {
 }
 ///game data
 pub struct GameData {
+    ///game state: Start,Asking,Asked,Player1,Player2
+    pub game_state: GameState,
     ///vector of cards
     pub vec_cards: Vec<Card>,
-    ///count click inside one turn
-    pub count_click_inside_one_turn: usize,
     ///card index of first click
     pub card_index_of_first_click: usize,
     ///card index of second click
@@ -99,8 +75,6 @@ pub struct GameData {
     pub my_ws_uid: usize,
     ///players
     pub players: Vec<Player>,
-    ///game state: Start,Asking,Asked,Player1,Player2
-    pub game_state: GameState,
     ///content folder name
     pub content_folder_name: String,
     ///want to play asks for a specific game
@@ -237,7 +211,6 @@ impl GameData {
         //return from constructor
         GameData {
             vec_cards: Self::prepare_for_empty(),
-            count_click_inside_one_turn: 0,
             card_index_of_first_click: 0,
             card_index_of_second_click: 0,
             ws,
@@ -272,7 +245,7 @@ impl GameData {
     pub fn is_state_for_grid_container(&self) -> bool {
         #[allow(clippy::wildcard_enum_match_arm)]
         match self.game_state {
-            GameState::Play | GameState::EndGame => true,
+            GameState::PlayBefore1Card | GameState::PlayBefore2Card | GameState::TakeTurn | GameState::EndGame => true,
             _ => false,
         }
     }
