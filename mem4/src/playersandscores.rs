@@ -1,4 +1,6 @@
 //! file and module for playersandscores
+
+//region: use
 use crate::gamedata::GameData;
 
 use dodrio::builder::text;
@@ -7,6 +9,7 @@ use dodrio::{Node, Render};
 use typed_html::dodrio;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
+//endregion
 
 ///Render Component: player score
 ///Its private fields are a cache copy from `game_data` fields.
@@ -25,12 +28,12 @@ pub struct PlayersAndScores {
 
 impl PlayersAndScores {
     ///constructor
-    pub const fn new() -> Self {
+    pub const fn new(my_ws_uid: usize) -> Self {
         PlayersAndScores {
             my_points: 0,
             my_player_number: 1,
             player_turn: 0,
-            my_ws_uid: 0,
+            my_ws_uid,
         }
     }
     ///copies the data from game data to internal cache

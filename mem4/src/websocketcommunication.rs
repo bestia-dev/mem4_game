@@ -1,5 +1,5 @@
 //! websocket communication
-
+//region: use
 use crate::gamedata::GameState;
 use crate::RootRenderingComponent;
 use futures::Future;
@@ -8,6 +8,7 @@ use mem4_common::WsMessage;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{console, ErrorEvent, WebSocket};
+//endregion
 
 //the location_href is not consumed in this function and Clippy wants a reference instead a value
 //but I don't want references, because they have the lifetime problem.
@@ -293,4 +294,15 @@ pub fn setup_ws_onclose(ws: &WebSocket, weak: dodrio::VdomWeak) {
     }) as Box<dyn FnMut(ErrorEvent)>);
     ws.set_onclose(Some(onclose_callback.as_ref().unchecked_ref()));
     onclose_callback.forget();
+}
+///setup all ws events
+pub fn setup_all_ws_events(ws: &WebSocket, weak: dodrio::VdomWeak) {
+    //websocket on receive message callback
+    setup_ws_msg_recv(ws, weak.clone());
+
+    //websocket on error message callback
+    setup_ws_onerror(ws, weak.clone());
+
+    //websocket on close message callback
+    setup_ws_onclose(ws, weak);
 }

@@ -1,5 +1,6 @@
 //! game data
 
+//region: extern, use,
 extern crate mem4_common;
 
 use mem4_common::Player;
@@ -11,7 +12,9 @@ use strum_macros::AsRefStr;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 use web_sys::WebSocket;
+//endregion
 
+//region: struct, enum
 ///2d size (any UM -pixel, items, percent)
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Size2d {
@@ -20,7 +23,6 @@ pub struct Size2d {
     ///vertical
     pub ver: usize,
 }
-
 ///game config
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GameConfig {
@@ -36,7 +38,6 @@ pub struct GameConfig {
     ///number of card vertically
     pub grid_items_ver: usize,
 }
-
 ///the game can be in various states and that differentiate the UI and actions
 #[derive(AsRefStr)]
 pub enum GameState {
@@ -63,7 +64,6 @@ pub enum CardStatusCardFace {
     ///card face up Permanently
     UpPermanently,
 }
-
 ///all the data for one card
 #[derive(Serialize, Deserialize)]
 pub struct Card {
@@ -74,7 +74,6 @@ pub struct Card {
     ///field for id attribute for HTML element image contains the card index
     pub card_index_and_id: usize,
 }
-
 ///game data
 pub struct GameData {
     ///vector of cards
@@ -112,6 +111,8 @@ pub struct GameData {
     /// is reconnect
     pub is_reconnect: bool,
 }
+//endregion
+
 impl GameData {
     ///prepare new random data
     pub fn prepare_random_data(&mut self) {
@@ -132,6 +133,13 @@ impl GameData {
         let multiple: usize = unwrap!(random_count.checked_div(item_count_minus_one));
         let rest =
             unwrap!(random_count.checked_sub(unwrap!(item_count_minus_one.checked_mul(multiple))));
+
+        console::log_1(&JsValue::from_str(&format!(
+            "item_count_minus_one {}  players_count {} cards_count {} random_count {} multiple {} rest {}",
+            item_count_minus_one,players_count,cards_count,random_count,multiple,
+            rest,
+        )));
+
         //region: find random numbers between 1 and item_count
         //vec_of_random_numbers is 0 based
         let mut vec_of_random_numbers = Vec::new();
@@ -158,12 +166,6 @@ impl GameData {
                 vec_of_random_numbers.push(i);
             }
         }
-        console::log_1(&JsValue::from_str(&format!(
-            "item_count {}  rest {}   vec.len {}",
-            item_count_minus_one,
-            rest,
-            vec_of_random_numbers.len()
-        )));
         //endregion
 
         //region: shuffle the numbers
@@ -195,6 +197,11 @@ impl GameData {
         }
         //endregion
         self.vec_cards = vec_cards;
+        console::log_1(&JsValue::from_str(&format!(
+            "vec_of_random_numbers.len {} vec_cards.len {}",
+            vec_of_random_numbers.len(),
+            self.vec_cards.len()
+        )));
     }
     ///asociated function: before Accept, there are not random numbers, just default cards.
     pub fn prepare_for_empty() -> Vec<Card> {
