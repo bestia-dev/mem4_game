@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["enable_ansi_support","ansi support"],["local_ip_get","get local ip for windows with ipconfig"]]});

@@ -1,0 +1,347 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `mem4\src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../mem4/index.html'><img src='../../rust-logo.png' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! **mem4 game - Learning Rust and Wasm/WebAssembly with Virtual Dom Dodrio and `WebSocket` communication**  </span>
+
+<span class="doccomment">//! mem4 is a simple memory game made primarily for learning the Rust programming language.  </span>
+<span class="doccomment">//! ## Virtual DOM</span>
+<span class="doccomment">//! Constructing a HTML page with Virtual DOM (vdom) is simple because it is rendered completely on every tick (animation frame).  </span>
+<span class="doccomment">//! Sometimes is hard for the developer to think what should change in the UI when some data changes.  </span>
+<span class="doccomment">//! The data can change from many different events and very chaotically (asyncronously).  </span>
+<span class="doccomment">//! It is easier to think how to render the complete DOM for the given data.  </span>
+<span class="doccomment">//! The dodrio library has ticks, time intervals when it do something.  </span>
+<span class="doccomment">//! If a rendering is scheduled, it will be done on the next tick.  </span>
+<span class="doccomment">//! If a rendering is not scheduled I believe nothing happens.  </span>
+<span class="doccomment">//! This enables asyncronous changing of data and rendering. They cannot happen in the same moment.  </span>
+<span class="doccomment">//! When `GameData` change and we now it will affect the DOM, then rendering must be scheduled.  </span>
+<span class="doccomment">//! ## State - action - message - state</span>
+<span class="doccomment">//! In one moment the game is in a cetrain `GameState`. The user then makes an action. This action changes the GameData.  </span>
+<span class="doccomment">//! Then a message is sent to other players so they can also chenge their local `GameData`.  </span>
+<span class="doccomment">//! The rendering is scheduled and it will happen eventually. The result is a new `GameState`.  </span>
+<span class="doccomment">//! ## Futures and promises, Rust and JavaScript</span>
+<span class="doccomment">//! Javascript is all asyncronous. Wasm is nothing else then a shortcut to the javascript engine.  </span>
+<span class="doccomment">//! So everything is asynchronous. This is pretty hard to grasp. Everything is Promises and futures.  </span>
+<span class="doccomment">//! Still better then `CallBacks`, but very hard to understand. And there is a constant</span>
+<span class="doccomment">//! jumping from thinking in Rust to thinking is JavaScript and back that is pretty confusing.  </span>
+<span class="doccomment">//! Javascript does not have a good idea of Rust datatypes. All there is is a `JSValue` type.  </span>
+<span class="doccomment">//! The library wasm-bindgen has made a fantastic job of giving to Rust the ability to call</span>
+<span class="doccomment">//! anything JavaScript can call, but the wayof doing it is sometimes very hard to understand.  </span>
+<span class="doccomment">//! ## Browser console</span>
+<span class="doccomment">//! At least in modern browsers (FireFox and Chrome) we have the developer tools F12 and ther is a</span>
+<span class="doccomment">//! console we can output to. So we can debug what is going on with our program.  </span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!</span>
+
+<span class="comment">//needed for dodrio! macro (typed-html)</span>
+<span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;512&quot;</span>]</span>
+<span class="comment">//region: Clippy</span>
+<span class="attribute">#![<span class="ident">warn</span>(
+    <span class="ident">clippy</span>::<span class="ident">all</span>,
+    <span class="ident">clippy</span>::<span class="ident">restriction</span>,
+    <span class="ident">clippy</span>::<span class="ident">pedantic</span>,
+    <span class="ident">clippy</span>::<span class="ident">nursery</span>,
+    <span class="ident">clippy</span>::<span class="ident">cargo</span>,
+    <span class="comment">//variable shadowing is idiomatic to Rust, but unnatural to me.</span>
+    <span class="ident">clippy</span>::<span class="ident">shadow_reuse</span>,
+    <span class="ident">clippy</span>::<span class="ident">shadow_same</span>,
+    <span class="ident">clippy</span>::<span class="ident">shadow_unrelated</span>,
+
+)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(
+    <span class="comment">//library from dependencies have this clippy warnings. Not my code.</span>
+    <span class="comment">//Why is this bad: It will be more difficult for users to discover the purpose of the crate, </span>
+    <span class="comment">//and key information related to it.</span>
+    <span class="ident">clippy</span>::<span class="ident">cargo_common_metadata</span>,
+    <span class="comment">//Why is this bad : This bloats the size of targets, and can lead to confusing error messages when </span>
+    <span class="comment">//structs or traits are used interchangeably between different versions of a crate.</span>
+    <span class="ident">clippy</span>::<span class="ident">multiple_crate_versions</span>,
+    <span class="comment">//Why is this bad : As the edition guide says, it is highly unlikely that you work with any possible </span>
+    <span class="comment">//version of your dependency, and wildcard dependencies would cause unnecessary </span>
+    <span class="comment">//breakage in the ecosystem.</span>
+    <span class="ident">clippy</span>::<span class="ident">wildcard_dependencies</span>,
+    <span class="comment">//Rust is more idiomatic without return statement</span>
+    <span class="comment">//Why is this bad : Actually omitting the return keyword is idiomatic Rust code. </span>
+    <span class="comment">//Programmers coming from other languages might prefer the expressiveness of return. </span>
+    <span class="comment">//It’s possible to miss the last returning statement because the only difference </span>
+    <span class="comment">//is a missing ;. Especially in bigger code with multiple return paths having a </span>
+    <span class="comment">//return keyword makes it easier to find the corresponding statements.</span>
+    <span class="ident">clippy</span>::<span class="ident">implicit_return</span>,
+    <span class="comment">//I have private function inside a function. Self does not work there.</span>
+    <span class="comment">//Why is this bad: Unnecessary repetition. Mixed use of Self and struct name feels inconsistent.</span>
+    <span class="ident">clippy</span>::<span class="ident">use_self</span>,
+    <span class="comment">//Cannot add #[inline] to the start function with #[wasm_bindgen(start)]</span>
+    <span class="comment">//because then wasm-pack build --target web returns an error: export `run` not found </span>
+    <span class="comment">//Why is this bad: In general, it is not. Functions can be inlined across crates when that’s profitable </span>
+    <span class="comment">//as long as any form of LTO is used. When LTO is disabled, functions that are not #[inline] </span>
+    <span class="comment">//cannot be inlined across crates. Certain types of crates might intend for most of the </span>
+    <span class="comment">//methods in their public API to be able to be inlined across crates even when LTO is disabled. </span>
+    <span class="comment">//For these types of crates, enabling this lint might make sense. It allows the crate to </span>
+    <span class="comment">//require all exported methods to be #[inline] by default, and then opt out for specific </span>
+    <span class="comment">//methods where this might not make sense.</span>
+    <span class="ident">clippy</span>::<span class="ident">missing_inline_in_public_items</span>,
+    <span class="comment">//Why is this bad: This is only checked against overflow in debug builds. In some applications one wants explicitly checked, wrapping or saturating arithmetic.</span>
+    <span class="comment">//clippy::integer_arithmetic,</span>
+    <span class="comment">//Why is this bad: For some embedded systems or kernel development, it can be useful to rule out floating-point numbers.</span>
+    <span class="ident">clippy</span>::<span class="ident">float_arithmetic</span>,
+)]</span>
+<span class="comment">//endregion</span>
+
+<span class="comment">//region: mod is used only in lib file. All the rest use `use crate`</span>
+<span class="kw">mod</span> <span class="ident">cardmoniker</span>;
+<span class="kw">mod</span> <span class="ident">gamedata</span>;
+<span class="kw">mod</span> <span class="ident">gridcontainer</span>;
+<span class="kw">mod</span> <span class="ident">playeractions</span>;
+<span class="kw">mod</span> <span class="ident">playersandscores</span>;
+<span class="kw">mod</span> <span class="ident">rootrenderingcomponent</span>;
+<span class="kw">mod</span> <span class="ident">rulesanddescription</span>;
+<span class="kw">mod</span> <span class="ident">websocketcommunication</span>;
+<span class="comment">//endregion</span>
+
+<span class="comment">//region: extern and use statements</span>
+<span class="comment">//Strum is a set of macros and traits for working with enums and strings easier in Rust.</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">console_error_panic_hook</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">log</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde</span>;
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde_derive</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">mem4_common</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde_json</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">strum</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">strum_macros</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">web_sys</span>;
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">unwrap</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">conv</span>;
+
+<span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">rngs</span>::<span class="ident">SmallRng</span>;
+<span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">FromEntropy</span>;
+<span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">Rng</span>;
+<span class="kw">use</span> <span class="ident">wasm_bindgen</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="comment">//endregion</span>
+
+<span class="comment">//region: wasm_bindgen(start) is where everything starts</span>
+<span class="attribute">#[<span class="ident">wasm_bindgen</span>(<span class="ident">start</span>)]</span>
+<span class="doccomment">///To start the Wasm application, wasm_bindgen runs this functions</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">JsValue</span><span class="op">&gt;</span> {
+    <span class="comment">// Initialize debugging for when/if something goes wrong.</span>
+    <span class="ident">console_error_panic_hook</span>::<span class="ident">set_once</span>();
+
+    <span class="comment">// Get the document&#39;s container to render the virtual dom component.</span>
+    <span class="kw">let</span> <span class="ident">window</span> <span class="op">=</span> <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">web_sys</span>::<span class="ident">window</span>(), <span class="string">&quot;error: web_sys::window&quot;</span>);
+    <span class="kw">let</span> <span class="ident">document</span> <span class="op">=</span> <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">window</span>.<span class="ident">document</span>(), <span class="string">&quot;error: window.document&quot;</span>);
+    <span class="kw">let</span> <span class="ident">div_for_virtual_dom</span> <span class="op">=</span> <span class="macro">unwrap</span><span class="macro">!</span>(
+        <span class="ident">document</span>.<span class="ident">get_element_by_id</span>(<span class="string">&quot;div_for_virtual_dom&quot;</span>),
+        <span class="string">&quot;No #div_for_virtual_dom&quot;</span>
+    );
+
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">SmallRng</span>::<span class="ident">from_entropy</span>();
+    <span class="comment">//my_ws_uid is random generated on the client and sent to</span>
+    <span class="comment">//websocket server with an url param</span>
+    <span class="kw">let</span> <span class="ident">my_ws_uid</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">gen_range</span>(<span class="number">1</span>, <span class="number">9999</span>);
+
+    <span class="comment">//find out URL</span>
+    <span class="kw">let</span> <span class="ident">location_href</span> <span class="op">=</span> <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">window</span>.<span class="ident">location</span>().<span class="ident">href</span>(), <span class="string">&quot;href not known&quot;</span>);
+
+    <span class="comment">//websocket connection</span>
+    <span class="kw">let</span> <span class="ident">ws</span> <span class="op">=</span> <span class="ident">websocketcommunication</span>::<span class="ident">setup_ws_connection</span>(<span class="ident">location_href</span>.<span class="ident">clone</span>(), <span class="ident">my_ws_uid</span>);
+    <span class="comment">//I don&#39;t know why is needed to clone the websocket connection</span>
+    <span class="kw">let</span> <span class="ident">ws_c</span> <span class="op">=</span> <span class="ident">ws</span>.<span class="ident">clone</span>();
+
+    <span class="comment">// Construct a new `RootRenderingComponent`.</span>
+    <span class="comment">//I added ws_c so that I can send messages on websocket</span>
+
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">root_rendering_component</span> <span class="op">=</span>
+        <span class="ident">rootrenderingcomponent</span>::<span class="ident">RootRenderingComponent</span>::<span class="ident">new</span>(<span class="ident">ws_c</span>, <span class="ident">my_ws_uid</span>);
+    <span class="ident">root_rendering_component</span>.<span class="ident">game_data</span>.<span class="ident">href</span> <span class="op">=</span> <span class="ident">location_href</span>;
+
+    <span class="comment">// Mount the component to the `&lt;div id=&quot;div_for_virtual_dom&quot;&gt;`.</span>
+    <span class="kw">let</span> <span class="ident">vdom</span> <span class="op">=</span> <span class="ident">dodrio</span>::<span class="ident">Vdom</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">div_for_virtual_dom</span>, <span class="ident">root_rendering_component</span>);
+
+    <span class="ident">websocketcommunication</span>::<span class="ident">setup_all_ws_events</span>(<span class="kw-2">&amp;</span><span class="ident">ws</span>, <span class="ident">vdom</span>.<span class="ident">weak</span>());
+
+    <span class="comment">// Run the component forever. Forget to drop the memory.</span>
+    <span class="ident">vdom</span>.<span class="ident">forget</span>();
+
+    <span class="prelude-val">Ok</span>(())
+}
+<span class="comment">//endregion</span>
+
+<span class="doccomment">/// Get the top-level window&#39;s session storage.</span>
+<span class="doccomment">/// TODO: to save user preferences maybe?</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session_storage</span>() <span class="op">-&gt;</span> <span class="ident">web_sys</span>::<span class="ident">Storage</span> {
+    <span class="kw">let</span> <span class="ident">window</span> <span class="op">=</span> <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">web_sys</span>::<span class="ident">window</span>(), <span class="string">&quot;error: web_sys::window&quot;</span>);
+    <span class="ident">window</span>.<span class="ident">session_storage</span>().<span class="ident">unwrap_throw</span>().<span class="ident">unwrap_throw</span>()
+}
+<span class="comment">//endregion</span>
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "mem4";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["RootRenderingComponent","Root Render Component: the card grid struct has all the needed data for play logic and rendering"]]});
