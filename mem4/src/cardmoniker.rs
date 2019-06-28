@@ -1,6 +1,7 @@
-//!render the card moniker (name/title)
+//! cardmoniker.rs - renders the card moniker (card name/title)
+
 //region: use, const
-use crate::RootRenderingComponent;
+use crate::rootrenderingcomponent::RootRenderingComponent;
 
 use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};

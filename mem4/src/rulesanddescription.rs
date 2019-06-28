@@ -1,8 +1,7 @@
-//! rules and descriptions
-//! is a static content. great for cache.
+//! rulesanddescription.rs - renders the div that shows rules and descriptions
+//! All is a static content. Great for implementing dodrio cache.
 
-use crate::text_with_br_newline;
-use dodrio::builder::text;
+use dodrio::builder::{br, text};
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Node, Render};
 use typed_html::dodrio;
@@ -66,4 +65,15 @@ impl Render for RulesAndDescription {
         </div>
         )
     }
+}
+
+///change the newline lines ending into <br> node
+fn text_with_br_newline<'a>(txt: &'a str, bump: &'a Bump) -> Vec<Node<'a>> {
+    let mut vec_text_node = Vec::new();
+    let spl = txt.lines();
+    for part in spl {
+        vec_text_node.push(text(part));
+        vec_text_node.push(br(bump).finish());
+    }
+    vec_text_node
 }

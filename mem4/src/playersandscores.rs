@@ -1,9 +1,9 @@
-//! file and module for playersandscores
+//! playersandscores.rs - renders the div that shows players and scores
 
 //region: use
 use crate::gamedata::GameData;
 
-use dodrio::builder::{text,br};
+use dodrio::builder::{br, text};
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Node, Render};
 use typed_html::dodrio;

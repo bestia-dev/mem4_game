@@ -1,8 +1,9 @@
-//! Learning to code Rust for a http + websocket server on the same port  
+//! `mem4_server` - html and websocket server for the mem4 game
+//! Primarily made for learning to code Rust for a http + websocket server on the same port  
 //! using Warp for a simple memory game for kids - mem4.
 //! On the local public IP address on port 80 listens to http and websocket.
-//! Route for http / serves static files from folder /mem4/
-//! Route /mem4ws/ broadcast all websocket msg to all connected clients except sender
+//! Route for http `/` serves static files from folder `/mem4/`
+//! Route `/mem4ws/` broadcast all websocket msg to all connected clients except sender
 
 //region: Clippy
 #![warn(

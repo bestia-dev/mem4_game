@@ -1,40 +1,68 @@
-#https://github.com/sagiegurari/cargo-make/blob/master/src/lib/Makefile.stable.toml
+# mem4_game/mem4/Makefile.toml
+# https://github.com/sagiegurari/cargo-make/blob/master/src/lib/Makefile.stable.toml
 
 [config]
 skip_core_tasks = true
 
-#region: flows
-[tasks.default]
-dependencies = [
-    "build",
-    "post-build",
-]
+#region: public callable tasks/flows
 
-[tasks.release]
-dependencies = [
-    "build-release",
-    "post-build",
-]
-#endregion
+    [tasks.default]
+    description = "show list of public callable tasks"
+    clear = true
+    command = "cargo"
+    args = ["make","--list-all-steps"]
 
-[tasks.build]
+    [tasks.dev]
+    description = "cargo build development"
+    clear = true
+    dependencies = [
+        "build-dev",
+        "post-build",
+    ]
+
+    [tasks.release]
+    description = "cargo build release"
+    clear = true
+    dependencies = [
+        "build-release",
+        "post-build",
+    ]
+
+    [tasks.doc]
+    description = "call cargo doc"
+    command="cargo"
+    args=["doc","--no-deps","--document-private-items","--open"]
+
+# endregion
+
+[tasks.build-dev]
+clear = true
+private = true
 command = "wasm-pack"
 args = ["build", "--target", "web"]
 
 [tasks.build-release]
+clear = true
+private = true
 command = "wasm-pack"
 args = ["build","--target", "web"]
 
 [tasks.post-build]
+clear = true
+private = true
 linux_alias = "linux_post-build"
 windows_alias = "windows_post-build"
 
 [tasks.linux_post-build]
+clear = true
+private = true
 script = [
     "\\cp ~/rustprojects/mem4_game/mem4/pkg/* -rf -v ~/rustprojects/mem4_game/webfolder/mem4/pkg",
 ]
 
 [tasks.windows_post-build]
+clear = true
+private = true
 script = [
     "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\mem4\\pkg\\*.* c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\mem4\\pkg\\ /y ",
 ]

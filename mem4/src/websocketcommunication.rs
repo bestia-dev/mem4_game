@@ -1,13 +1,14 @@
-//! websocket communication
+//! websocketcommunication.rs  - module that cares about websocket communication
+
 //region: use
-use crate::RootRenderingComponent;
+use crate::rootrenderingcomponent::RootRenderingComponent;
 use futures::Future;
 use js_sys::Reflect;
+use mem4_common::GameState;
 use mem4_common::WsMessage;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{console, ErrorEvent, WebSocket};
-use mem4_common::{GameState};
 //endregion
 
 //the location_href is not consumed in this function and Clippy wants a reference instead a value
@@ -187,8 +188,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             console::log_1(&"players".into());
-                            root_rendering_component
-                                .on_player_click(game_state, card_index);
+                            root_rendering_component.on_player_click(game_state, card_index);
                             v2.schedule_render();
                         }
                     })

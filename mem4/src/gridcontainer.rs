@@ -1,12 +1,14 @@
-//!render the grid container with the images
+//! gridcontainer.rs - renders the grid container with the images
+//! and most important the onclick event
+//!
 //region: use, const
 use crate::gamedata::{CardStatusCardFace, Size2d};
-use crate::RootRenderingComponent;
+use crate::rootrenderingcomponent::RootRenderingComponent;
 
 use conv::*;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
-use mem4_common::{WsMessage,GameState};
+use mem4_common::{GameState, WsMessage};
 use typed_html::dodrio;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -167,7 +169,8 @@ pub fn div_grid_items<'a, 'bump>(
             //endregion
 
             //creating grid_width*grid_height <div> in loop
-            let grid_item_bump = div_grid_item_click(root_rendering_component,bump,img_src,img_id,opacity);
+            let grid_item_bump =
+                div_grid_item_click(root_rendering_component, bump, img_src, img_id, opacity);
             vec_grid_item_bump.push(grid_item_bump);
         }
     }
@@ -183,104 +186,103 @@ pub fn div_grid_item_click<'a, 'bump>(
     img_id: &str,
     opacity: &str,
 ) -> Node<'bump> {
-dodrio!(bump,
-<div class= "grid_item">
-<img src={img_src} id={img_id} style={opacity} onclick={move |root, vdom, event| {
-//on click needs a code Closure in Rust. Dodrio and wasm-bindgen
-//generate the javascript code to call it properly.
-//we need our Struct RootRenderingComponent for Rust to write any data.
-//It comes in the parameter root.
-//All we can change is inside the struct RootRenderingComponent fields.
-//The method render will later use that for rendering the new html.
-let root_rendering_component = root.unwrap_mut::<RootRenderingComponent>();
-//this game_data mutable reference is dropped on the end of the function
-let mut game_data = &mut root_rendering_component.game_data;
-//only if the gamestate is play (1 or 2)
-if game_data.game_state.as_ref() == GameState::PlayBefore1Card.as_ref()
-|| game_data.game_state.as_ref() == GameState::PlayBefore2Card.as_ref() {
-    //region:get the card index
-    // If the event's target is our image...
-    let img = match event
-        .target()
-        .and_then(|t| t.dyn_into::<web_sys::HtmlImageElement>().ok())
-    {
-        None => return,
-        //?? Don't understand what this does. The original was written for Input element.
-        Some(input) => input,
-    };
+    dodrio!(bump,
+    <div class= "grid_item">
+    <img src={img_src} id={img_id} style={opacity} onclick={move |root, vdom, event| {
+    //on click needs a code Closure in Rust. Dodrio and wasm-bindgen
+    //generate the javascript code to call it properly.
+    //we need our Struct RootRenderingComponent for Rust to write any data.
+    //It comes in the parameter root.
+    //All we can change is inside the struct RootRenderingComponent fields.
+    //The method render will later use that for rendering the new html.
+    let root_rendering_component = root.unwrap_mut::<RootRenderingComponent>();
+    //this game_data mutable reference is dropped on the end of the function
+    let mut game_data = &mut root_rendering_component.game_data;
+    //only if the gamestate is play (1 or 2)
+    if game_data.game_state.as_ref() == GameState::PlayBefore1Card.as_ref()
+    || game_data.game_state.as_ref() == GameState::PlayBefore2Card.as_ref() {
+        //region:get the card index
+        // If the event's target is our image...
+        let img = match event
+            .target()
+            .and_then(|t| t.dyn_into::<web_sys::HtmlImageElement>().ok())
+        {
+            None => return,
+            //?? Don't understand what this does. The original was written for Input element.
+            Some(input) => input,
+        };
 
-    //id attribute of image html element is prefixed with img ex. "img12"
-    let this_click_card_index = unwrap!(
-        (unwrap!(img.id().get(3..), "error slicing")).parse::<usize>(),
-        "error parse img id to usize"
-    );
-    //endregion
-
-    //click is usefull only od facedown cards
-    if unwrap!(
-        game_data.vec_cards.get(this_click_card_index),
-        "error this_click_card_index"
-    ).status.as_ref()==CardStatusCardFace::Down.as_ref(){
-
-        if game_data.game_state.as_ref() == GameState::PlayBefore1Card.as_ref(){
-            game_data.card_index_of_first_click = this_click_card_index;
-        } else if game_data.game_state.as_ref() == GameState::PlayBefore2Card.as_ref() {
-            game_data.card_index_of_second_click = this_click_card_index;
-        }
-
-        //region: send WsMessage over websocket
-        let game_state= game_data.game_state.clone();
-        unwrap!(
-            game_data.ws.send_with_str(
-                &serde_json::to_string(&WsMessage::PlayerClick {
-                    my_ws_uid: game_data.my_ws_uid,
-                    players: unwrap!(
-                        serde_json::to_string(&game_data.players),
-                        "serde_json::to_string(&game_data.players)",
-                    ),
-                    card_index: this_click_card_index,
-                    game_state,
-                })
-                .expect("error sending PlayerClick"),
-            ),
-            "Failed to send PlayerClick"
+        //id attribute of image html element is prefixed with img ex. "img12"
+        let this_click_card_index = unwrap!(
+            (unwrap!(img.id().get(3..), "error slicing")).parse::<usize>(),
+            "error parse img id to usize"
         );
         //endregion
 
-        //region: audio play
-        //prepare the audio element with src filename of mp3
-        let audio_element = web_sys::HtmlAudioElement::new_with_src(
-            format!(
-                "content/{}/sound/mem_sound_{:02}.mp3",
-                game_data.content_folder_name,
-                unwrap!(
-                    game_data.vec_cards.get(this_click_card_index),
-                    "error this_click_card_index"
+        //click is usefull only od facedown cards
+        if unwrap!(
+            game_data.vec_cards.get(this_click_card_index),
+            "error this_click_card_index"
+        ).status.as_ref()==CardStatusCardFace::Down.as_ref(){
+
+            if game_data.game_state.as_ref() == GameState::PlayBefore1Card.as_ref(){
+                game_data.card_index_of_first_click = this_click_card_index;
+            } else if game_data.game_state.as_ref() == GameState::PlayBefore2Card.as_ref() {
+                game_data.card_index_of_second_click = this_click_card_index;
+            }
+
+            //region: send WsMessage over websocket
+            let game_state= game_data.game_state.clone();
+            unwrap!(
+                game_data.ws.send_with_str(
+                    &serde_json::to_string(&WsMessage::PlayerClick {
+                        my_ws_uid: game_data.my_ws_uid,
+                        players: unwrap!(
+                            serde_json::to_string(&game_data.players),
+                            "serde_json::to_string(&game_data.players)",
+                        ),
+                        card_index: this_click_card_index,
+                        game_state,
+                    })
+                    .expect("error sending PlayerClick"),
+                ),
+                "Failed to send PlayerClick"
+            );
+            //endregion
+
+            //region: audio play
+            //prepare the audio element with src filename of mp3
+            let audio_element = web_sys::HtmlAudioElement::new_with_src(
+                format!(
+                    "content/{}/sound/mem_sound_{:02}.mp3",
+                    game_data.content_folder_name,
+                    unwrap!(
+                        game_data.vec_cards.get(this_click_card_index),
+                        "error this_click_card_index"
+                    )
+                    .card_number_and_img_src
                 )
-                .card_number_and_img_src
-            )
-            .as_str(),
-        );
+                .as_str(),
+            );
 
-        //play() return a Promise in JSValue. That is too hard for me to deal with now.
-        unwrap!(
-            unwrap!(audio_element, "Error: HtmlAudioElement new.")
-                .play(),
-            "Error: HtmlAudioElement.play() "
-        );
-        //endregion
+            //play() return a Promise in JSValue. That is too hard for me to deal with now.
+            unwrap!(
+                unwrap!(audio_element, "Error: HtmlAudioElement new.")
+                    .play(),
+                "Error: HtmlAudioElement.play() "
+            );
+            //endregion
 
-        root_rendering_component.card_on_click();
-        // Finally, re-render the component on the next animation frame.
-        vdom.schedule_render();
+            root_rendering_component.card_on_click();
+            // Finally, re-render the component on the next animation frame.
+            vdom.schedule_render();
+        }
     }
+    }}>
+    </img>
+    </div>
+    )
 }
-}}>
-</img>
-</div>
-)
-}
-
 
 ///grid width in pixels
 pub fn grid_width() -> usize {

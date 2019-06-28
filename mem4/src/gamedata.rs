@@ -1,17 +1,17 @@
-//! game data
+//! game data - structs and methods around game data
 
 //region: extern, use,
 extern crate mem4_common;
 
-use mem4_common::{Player,GameState};
+use mem4_common::{GameState, Player};
 use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
 use rand::FromEntropy;
 use rand::Rng;
+use strum_macros::AsRefStr;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 use web_sys::WebSocket;
-use strum_macros::AsRefStr;
 //endregion
 
 //region: struct, enum
@@ -40,7 +40,7 @@ pub struct GameConfig {
 }
 
 ///the 3 possible states of one card
-#[derive(Serialize, Deserialize, AsRefStr )]
+#[derive(Serialize, Deserialize, AsRefStr)]
 pub enum CardStatusCardFace {
     ///card face down
     Down,
@@ -245,9 +245,11 @@ impl GameData {
     pub fn is_state_for_grid_container(&self) -> bool {
         #[allow(clippy::wildcard_enum_match_arm)]
         match self.game_state {
-            GameState::PlayBefore1Card | GameState::PlayBefore2Card | GameState::TakeTurn | GameState::EndGame => true,
+            GameState::PlayBefore1Card
+            | GameState::PlayBefore2Card
+            | GameState::TakeTurn
+            | GameState::EndGame => true,
             _ => false,
         }
     }
 }
-

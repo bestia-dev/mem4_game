@@ -1,9 +1,32 @@
+# mem4_game/Makefile.toml
+# Workspace with members
+
 [config]
 skip_core_tasks = true
 
-#flow
+#region: public callable tasks/flows
+[tasks.default]
+description = "show list of callable public tasks"
+clear = true
+command = "cargo"
+args = ["make","--list-all-steps"]
+
+[tasks.dev]
+description = "cargo make dev for every workspace member"
+workspace = false
+command = "cargo"
+args = ["make","dev"]
+
 [tasks.release]
+description = "cargo make release for every workspace member"
 workspace = false
 command = "cargo"
 args = ["make","release"]
-#end region
+
+[tasks.doc]
+description = "cargo make doc for every workspace member"
+workspace = false
+command="cargo"
+args=["make", "doc"]
+
+#endregion

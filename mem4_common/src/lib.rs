@@ -1,5 +1,5 @@
-//! Learning to code Rust for a http + websocket server on the same port  
-//! commons for mem4 wasm and server
+//! mem4_common - commons for mem4 wasm and server
+//! Learning to code Rust for a http + websocket  
 
 //region: Clippy
 #![warn(
@@ -119,7 +119,7 @@ pub enum WsMessage {
 
 ///the game can be in various states and that differentiate the UI and actions
 /// all players have the same game state
-#[derive(AsRefStr, Serialize, Deserialize)]
+#[derive(AsRefStr, Serialize, Deserialize, Clone)]
 pub enum GameState {
     ///the start of the game
     Start,
