@@ -1,16 +1,21 @@
-//! mem4 game - Wasm/WebAssembly written in Rust with Virtual Dom Dodrio and `WebSocket` communication  
-//region: App Description for docs
-/*! mem4 is a simple memory game made primarily for learning Rust
-Constructing a HTML page with Virtual DOM (vdom) is simple because it is rendered completely every tick (animation frame).
-For the developer it is hard to think what should change in the UI when some data changes.
-It is easier to think how to render the complete DOM for the given data.
-The dodrio library has ticks, time intervals when it do something.
-If a rendering is scheduled it will be done on the next tick.
-If a rendering is not scheduled I believe nothing happens.
-read Readme.md
-read StructModel.md
-*/
-//endregion
+//! **mem4 game - Wasm/WebAssembly written in Rust with Virtual Dom Dodrio and `WebSocket` communication**
+
+//! mem4 is a simple memory game made primarily for learning Rust.  
+//! ## Virtual DOM
+//! Constructing a HTML page with Virtual DOM (vdom) is simple because it is rendered completely on every tick (animation frame).  
+//! Sometimes is hard for the developer to think what should change in the UI when some data changes.  
+//! The data can change from many different events and very chaotically (asyncronous).  
+//! It is easier to think how to render the complete DOM for the given data.  
+//! The dodrio library has ticks, time intervals when it do something.  
+//! If a rendering is scheduled, it will be done on the next tick.  
+//! If a rendering is not scheduled I believe nothing happens.  
+//! This enables asyncronous changing of data and rendering. They cannot happen in the same moment.  
+//! When something changes that can change the DOM, the rendering must be scheduled.  
+//! ## State - action - message - state
+//! The game is in a cetrain GameState. The user then makes an action. This action changes the GameData.  
+//! Then a message is sent to other players so they can also chenge their local GameData.  
+//! The result is a new GameState.  
+//!
 
 //needed for dodrio! macro (typed-html)
 #![recursion_limit = "512"]
