@@ -7,6 +7,8 @@ You can play the game here (hosted on google cloud platform):
 http://34.87.17.103/mem4  
 For exercise I made a Docker image/container for mem4 on the google VM:  
 http://34.87.17.103/memdock4  
+Documentation generated from source code:  
+https://lucianobestia.github.io/mem4_game/mem4/index.html
 # Idea
 Playing the memory game alone is boring.  
 Playing it with one friend is better.  
