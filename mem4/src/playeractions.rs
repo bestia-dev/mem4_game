@@ -33,7 +33,7 @@ where
     } else if let GameState::EndGame = root_rendering_component.game_data.game_state {
         div_play_again(root_rendering_component, bump)
     } else if let GameState::Asking = root_rendering_component.game_data.game_state {
-        div_wait(root_rendering_component, bump)
+        div_asking(root_rendering_component, bump)
     } else if let GameState::Accepted = root_rendering_component.game_data.game_state {
         div_accepted(root_rendering_component, bump)
     } else if let GameState::Asked = root_rendering_component.game_data.game_state {
@@ -41,7 +41,7 @@ where
     } else if let GameState::PlayBefore1Card = root_rendering_component.game_data.game_state {
         div_click_one(root_rendering_component, bump)
     } else if let GameState::PlayBefore2Card = root_rendering_component.game_data.game_state {
-        div_click_two(root_rendering_component, bump)
+        div_take_turn(root_rendering_component, bump)
     } else {
         div_unpredicted(root_rendering_component, bump)
     }
@@ -194,7 +194,7 @@ where
     )
 }
 ///render wait
-fn div_wait<'a, 'bump>(
+fn div_asking<'a, 'bump>(
     root_rendering_component: &'a RootRenderingComponent,
     bump: &'bump Bump,
 ) -> Node<'bump>
@@ -327,8 +327,8 @@ where
         )
     }
 }
-///render click two
-fn div_click_two<'a, 'bump>(
+///render take turn
+fn div_take_turn<'a, 'bump>(
     root_rendering_component: &'a RootRenderingComponent,
     bump: &'bump Bump,
 ) -> Node<'bump>
