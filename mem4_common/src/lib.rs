@@ -1,4 +1,4 @@
-//! mem4_common - commons for mem4 wasm and server
+//! `mem4_common` - commons for mem4 wasm and server
 //! Learning to code Rust for a http + websocket  
 
 //region: Clippy
@@ -64,7 +64,7 @@ pub enum WsMessage {
         asked_folder_name: String,
     },
     /// accept play
-    AcceptPlay {
+    PlayAccept {
         ///ws client instance unique id. To not listen the echo to yourself.
         my_ws_uid: usize,
         ///json of vector of players
@@ -88,8 +88,8 @@ pub enum WsMessage {
         players: String,
         ///card index
         card_index: usize,
-        ///game state PlayerBefore1Card or PlayerBefore2Card
-        game_state: GameState,
+        ///game status PlayerBefore1Card or PlayerBefore2Card
+        game_status: GameStatus,
     },
     ///player change
     PlayerChange {
@@ -117,18 +117,18 @@ pub enum WsMessage {
     },
 }
 
-///the game can be in various states and that differentiate the UI and actions
-/// all players have the same game state
+///the game can be in various statuss and that differentiate the UI and actions
+/// all players have the same game status
 #[derive(AsRefStr, Serialize, Deserialize, Clone)]
-pub enum GameState {
-    ///the start of the game
-    Start,
-    ///Player1 Asking WantToPlay
-    Asking,
-    ///Player2 is asked WantToPlay
-    Asked,
-    ///Accepted
-    Accepted,
+pub enum GameStatus {
+    /// want to play ask begin
+    WantToPlayAskBegin,
+    ///Player1 WantToPlay Asking
+    WantToPlayAsking,
+    ///Player2 WantToPlay Asked
+    WantToPlayAsked,
+    ///PlayAccepted
+    PlayAccepted,
     ///Play before first card
     PlayBefore1Card,
     ///Play before second card

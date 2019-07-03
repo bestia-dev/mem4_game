@@ -3,7 +3,7 @@
 //region: extern, use,
 extern crate mem4_common;
 
-use mem4_common::{GameState, Player};
+use mem4_common::{GameStatus, Player};
 use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
 use rand::FromEntropy;
@@ -39,7 +39,7 @@ pub struct GameConfig {
     pub grid_items_ver: usize,
 }
 
-///the 3 possible states of one card
+///the 3 possible statuss of one card
 #[derive(Serialize, Deserialize, AsRefStr)]
 pub enum CardStatusCardFace {
     ///card face down
@@ -61,8 +61,8 @@ pub struct Card {
 }
 ///game data
 pub struct GameData {
-    ///game state: Start,Asking,Asked,Player1,Player2
-    pub game_state: GameState,
+    ///game status: WantToPlayAskBegin,WantToPlayAsking,WantToPlayAsked,Player1,Player2
+    pub game_status: GameStatus,
     ///vector of cards
     pub vec_cards: Vec<Card>,
     ///card index of first click
@@ -188,7 +188,7 @@ impl GameData {
     }
     ///asociated function: before Accept, there are not random numbers, just default cards.
     pub fn prepare_for_empty() -> Vec<Card> {
-        //prepare 32 empty cards. The random is calculated only on AcceptPlay.
+        //prepare 32 empty cards. The random is calculated only on PlayAccept.
         let mut vec_cards = Vec::new();
         //I must prepare the 0 index, but then I don't use it ever.
         for i in 0..=32 {
@@ -216,7 +216,7 @@ impl GameData {
             ws,
             my_ws_uid,
             players,
-            game_state: GameState::Start,
+            game_status: GameStatus::WantToPlayAskBegin,
             content_folder_name: "alphabet".to_string(),
             asked_folder_name: "".to_string(),
             my_player_number: 1,
@@ -233,22 +233,22 @@ impl GameData {
             is_reconnect: false,
         }
     }
-    ///check only if state Start
-    pub fn is_state_start(&self) -> bool {
+    ///check only if status WantToPlayAskBegin
+    pub fn is_status_want_to_play_ask_begin(&self) -> bool {
         #[allow(clippy::wildcard_enum_match_arm)]
-        match self.game_state {
-            GameState::Start => true,
+        match self.game_status {
+            GameStatus::WantToPlayAskBegin => true,
             _ => false,
         }
     }
-    ///the only states for rendering the grid container
-    pub fn is_state_for_grid_container(&self) -> bool {
+    ///the only statuss for rendering the grid container
+    pub fn is_status_for_grid_container(&self) -> bool {
         #[allow(clippy::wildcard_enum_match_arm)]
-        match self.game_state {
-            GameState::PlayBefore1Card
-            | GameState::PlayBefore2Card
-            | GameState::TakeTurn
-            | GameState::EndGame => true,
+        match self.game_status {
+            GameStatus::PlayBefore1Card
+            | GameStatus::PlayBefore2Card
+            | GameStatus::TakeTurn
+            | GameStatus::EndGame => true,
             _ => false,
         }
     }

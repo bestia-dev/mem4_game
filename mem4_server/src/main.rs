@@ -67,7 +67,7 @@ use warp::Filter;
 //endregion
 
 //region: enum, structs, const,...
-/// Our state of currently connected users.
+/// Our status of currently connected users.
 /// - Key is their id
 /// - Value is a sender of `warp::ws::Message`
 type Users = Arc<Mutex<HashMap<usize, mpsc::UnboundedSender<Message>>>>;
@@ -337,7 +337,7 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
         WsMessage::WantToPlay { .. } => broadcast(users, ws_uid_of_message, &new_msg),
         WsMessage::ResponseWsUid { .. } => info!("ResponseWsUid: {}", ""),
         WsMessage::ResponseGameConfigJson { .. } => info!("ResponseGameConfigJson: {}", ""),
-        WsMessage::AcceptPlay { players, .. }
+        WsMessage::PlayAccept { players, .. }
         | WsMessage::PlayerClick { players, .. }
         | WsMessage::GameDataInit { players, .. }
         | WsMessage::PlayerChange { players, .. }

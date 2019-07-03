@@ -15,10 +15,30 @@
 //! When `GameData` change and we now it will affect the DOM, then rendering must be scheduled.  
 //! ## Websocket communication
 //! TODO: description
-//! ## State - action - message - state
-//! In one moment the game is in a cetrain `GameState`. The user then makes an action. This action changes the `GameData`.  
-//! Then a message is sent to other players so they can also chenge their local `GameData`.  
-//! The rendering is scheduled and it will happen eventually. The result is a new `GameState`.  
+//! ## Status1 - User action - Status2, Status1 - WsMessage - Status2
+//! In one moment the game is in a cetrain Game Status. The user then makes an action. This action changes the `GameData`.  
+//! Then a message is sent to other players so they can also change their local `GameData`.  
+//! The rendering is scheduled and it will happen shortly (async). The result is a new `GameStatus`.  
+//!  
+//! | Game Status1        | Render                     | User action                                 | Condition                           | GameStatus2 t.p.  | Sends Msg        | On rcv Msg o.p.            | GameStatus2 o.p.                  |
+//! | ------------------ | -------------------------- | ------------------------------------------- | ----------------------------------- | ---------------- | ---------------- | -------------------------- | -------------------------------- |
+//! | WantToPlayAskBegin | div_want_to_play_ask_begin | div_want_to_play_ask_begin_on_click         | -                                   | WantToPlayAsking | WantToPlay       | on_msg_want_to_play        | WantToPlayAsked                  |
+//! | WantToPlayAsked    | div_want_to_play_asked     | div_want_to_play_asked_on_click             | -                                   | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |
+//! | WantToPlayAsking   | div_want_to_play_asking    | game_data_init                              | -                                   | PlayBefore1Card  | GameDataInit     | on_msg_game_data_init      | PlayBefore1Card                  |
+//! | PlayBefore1Card    | div_grid_container | div_grid_item_on_click, rrc.card_on_click_1_card(); | -                                   | PlayBefore2Card  | PlayerClick1Card | on_msg_player_click_1_card | PlayBefore2Card                  |
+//! | PlayBefore2Card    | div_grid_container | div_grid_item_on_click, rrc.card_on_click_2_Card(); | If card match and points<allpoint   | PlayBefore1Card  | PlayerClick2Card | on_msg player_click_2_card | PlayBefore1Card                  |
+//! | II                 | II                         | II                                          | If card match and points=>allpoints | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |
+//! | II                 | II                         | II                                          | else                                | TakeTurnBegin    | TakeTurnBegin    | on_msg_take_turn           | TakeTurnBegin                    |
+//! | TakeTurnBegin      | div_take_turn_begin (div_grid_container) | div_take_turn_begin_on_click  | -                                   | PlayBefore1Card  | TakeTurnEnd      | on_take_turn_end           | PlayBefore1Card, the next player |
+//! | PlayAgain          | div_play_again (div_grid_container) | window.location().reload()         | -                                   | -                | -                | -                          | -                                |
+//! |  |  |  |  |  |  |  |  |
+//!  
+//! t.p. = this player,   o.p. = other players,  rrc = root_rendering_component, rcv = receive
+//! 1. Some actions can have different results. For example the condition card match or card don’t match.  
+//! 2. one action must be only for one status1. This action changes Status for this player and sends Msg to other players.  
+//! 3. on receive msg can produce only one status2.  
+//! 4. in this table I ignore msgs for the server like GetConfig  
+//!  
 //! ## Futures and promises, Rust and JavaScript
 //! Javascript is all asyncronous. Wasm is nothing else then a shortcut to the javascript engine.  
 //! So everything is asynchronous. This is pretty hard to grasp. Everything is Promises and futures.  
@@ -87,6 +107,9 @@
     //clippy::integer_arithmetic,
     //Why is this bad: For some embedded systems or kernel development, it can be useful to rule out floating-point numbers.
     clippy::float_arithmetic,
+    //Why is this bad
+    //Doc is good. rustc has a MISSING_DOCS allowed-by-default lint for public members, but has no way to enforce documentation of private items. This lint fixes that.
+    clippy::doc_markdown,
 )]
 //endregion
 

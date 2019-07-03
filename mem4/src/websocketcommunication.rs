@@ -4,7 +4,7 @@
 use crate::rootrenderingcomponent::RootRenderingComponent;
 use futures::Future;
 use js_sys::Reflect;
-use mem4_common::GameState;
+use mem4_common::GameStatus;
 use mem4_common::WsMessage;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -121,11 +121,13 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
 
-                            if let GameState::EndGame | GameState::Start | GameState::Asked =
-                                root_rendering_component.game_data.game_state
+                            if let GameStatus::EndGame
+                            | GameStatus::WantToPlayAskBegin
+                            | GameStatus::WantToPlayAsked =
+                                root_rendering_component.game_data.game_status
                             {
                                 root_rendering_component
-                                    .on_want_to_play(my_ws_uid, asked_folder_name);
+                                    .on_msg_want_to_play(my_ws_uid, asked_folder_name);
                                 v2.schedule_render();
                             }
                         }
@@ -133,15 +135,15 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                     .map_err(|_| ()),
                 );
             }
-            WsMessage::AcceptPlay { my_ws_uid, .. } => {
+            WsMessage::PlayAccept { my_ws_uid, .. } => {
                 wasm_bindgen_futures::spawn_local(
                     weak.with_component({
                         let v2 = weak.clone();
                         move |root| {
-                            console::log_1(&"rcv AcceptPlay".into());
+                            console::log_1(&"rcv PlayAccept".into());
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
-                            root_rendering_component.on_accept_play(my_ws_uid);
+                            root_rendering_component.on_msg_play_accept(my_ws_uid);
                             v2.schedule_render();
                         }
                     })
@@ -160,10 +162,10 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
 
-                            if let GameState::Accepted =
-                                root_rendering_component.game_data.game_state
+                            if let GameStatus::PlayAccepted =
+                                root_rendering_component.game_data.game_status
                             {
-                                root_rendering_component.on_game_data_init(
+                                root_rendering_component.on_msg_game_data_init(
                                     &card_grid_data,
                                     &game_config,
                                     &players,
@@ -177,7 +179,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
             }
             WsMessage::PlayerClick {
                 card_index,
-                game_state,
+                game_status,
                 ..
             } => {
                 wasm_bindgen_futures::spawn_local(
@@ -188,7 +190,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             console::log_1(&"players".into());
-                            root_rendering_component.on_player_click(game_state, card_index);
+                            root_rendering_component.on_player_click(game_status, card_index);
                             v2.schedule_render();
                         }
                     })
@@ -305,4 +307,15 @@ pub fn setup_all_ws_events(ws: &WebSocket, weak: dodrio::VdomWeak) {
 
     //websocket on close message callback
     setup_ws_onclose(ws, weak);
+}
+
+///generic send ws message
+pub fn ws_send_msg(ws: &WebSocket, ws_message: &WsMessage) {
+    unwrap!(
+        ws.send_with_str(&unwrap!(
+            serde_json::to_string(ws_message),
+            "error serde_json to_string WsMessage"
+        ),),
+        "Failed to send"
+    );
 }

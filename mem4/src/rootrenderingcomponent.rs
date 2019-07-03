@@ -11,7 +11,7 @@ use crate::rulesanddescription;
 use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Cached, Node, Render};
-use mem4_common::{GameState, Player, WsMessage};
+use mem4_common::{GameStatus, Player, WsMessage};
 use typed_html::dodrio;
 use web_sys::{console, WebSocket};
 //endregion
@@ -53,96 +53,96 @@ impl RootRenderingComponent {
             Cached::invalidate(&mut self.players_and_scores);
         }
     }
+    ///on first click
+    pub fn card_on_click_1_card(&mut self) {
+        let this_click_card_index = self.game_data.card_index_of_first_click;
+        //flip the card up
+        unwrap!(
+            self.game_data.vec_cards.get_mut(this_click_card_index),
+            "error this_click_card_index"
+        )
+        .status = CardStatusCardFace::UpTemporary;
+        self.check_invalidate_for_all_components();
+    }
+
+    ///on second click
     ///The onclick event passed by javascript executes all the logic
     ///and changes only the fields of the Card Grid struct.
     ///That stuct is the only permanent data storage for later render the virtual dom.
-    pub fn card_on_click(&mut self) {
-        //get this_click_card_index from game_data
-        let this_click_card_index =
-            if self.game_data.game_state.as_ref() == GameState::PlayBefore1Card.as_ref() {
-                self.game_data.card_index_of_first_click
-            } else {
-                self.game_data.card_index_of_second_click
-            };
+    pub fn card_on_click_2_card(&mut self) {
+        let this_click_card_index = self.game_data.card_index_of_second_click;
+        //flip the card up
+        unwrap!(
+            self.game_data.vec_cards.get_mut(this_click_card_index),
+            "error this_click_card_index"
+        )
+        .status = CardStatusCardFace::UpTemporary;
 
-        if self.game_data.game_state.as_ref() == GameState::PlayBefore1Card.as_ref()
-            || self.game_data.game_state.as_ref() == GameState::PlayBefore2Card.as_ref()
-        {
-            //flip the card up
-            unwrap!(
-                self.game_data.vec_cards.get_mut(this_click_card_index),
-                "error this_click_card_index"
+        //if the cards match, player get one point and continues another turn
+        if unwrap!(
+            self.game_data
+                .vec_cards
+                .get(self.game_data.card_index_of_first_click),
+            "error game_data.card_index_of_first_click"
+        )
+        .card_number_and_img_src
+            == unwrap!(
+                self.game_data
+                    .vec_cards
+                    .get(self.game_data.card_index_of_second_click),
+                "error game_data.card_index_of_second_click"
             )
-            .status = CardStatusCardFace::UpTemporary;
+            .card_number_and_img_src
+        {
+            //give points
+            unwrap!(
+                self.game_data
+                    .players
+                    .get_mut(unwrap!(self.game_data.player_turn.checked_sub(1))),
+                "self.game_data.players.get_mu(self.game_data.player_turn - 1)"
+            )
+            .points += 1;
 
-            if self.game_data.game_state.as_ref() == GameState::PlayBefore2Card.as_ref() {
-                //if is the second click, flip the card and then check for card match
-
-                //if the cards match, player get one point and continues another turn
-                if unwrap!(
-                    self.game_data
-                        .vec_cards
-                        .get(self.game_data.card_index_of_first_click),
-                    "error game_data.card_index_of_first_click"
-                )
-                .card_number_and_img_src
-                    == unwrap!(
-                        self.game_data
-                            .vec_cards
-                            .get(self.game_data.card_index_of_second_click),
-                        "error game_data.card_index_of_second_click"
-                    )
-                    .card_number_and_img_src
-                {
-                    //give points
-                    unwrap!(
-                        self.game_data
-                            .players
-                            .get_mut(unwrap!(self.game_data.player_turn.checked_sub(1))),
-                        "self.game_data.players.get_mu(self.game_data.player_turn - 1)"
-                    )
-                    .points += 1;
-
-                    // the two cards matches. make them permanent FaceUp
-                    let x1 = self.game_data.card_index_of_first_click;
-                    let x2 = self.game_data.card_index_of_second_click;
-                    unwrap!(
-                        self.game_data.vec_cards.get_mut(x1),
-                        "error game_data.card_index_of_first_click"
-                    )
-                    .status = CardStatusCardFace::UpPermanently;
-                    unwrap!(
-                        self.game_data.vec_cards.get_mut(x2),
-                        "error game_data.card_index_of_second_click"
-                    )
-                    .status = CardStatusCardFace::UpPermanently;
-                    self.game_data.game_state = GameState::PlayBefore1Card;
-                    //if the sum of points is number of card/2, the game is over
-                    let mut point_sum = 0;
-                    for x in &self.game_data.players {
-                        point_sum += x.points;
-                    }
-                    if unwrap!(self.game_data.vec_cards.len().checked_div(2)) == point_sum {
-                        self.game_data.game_state = GameState::EndGame;
-                        //send message
-                        unwrap!(
-                            self.game_data.ws.send_with_str(
-                                &serde_json::to_string(&WsMessage::EndGame {
-                                    my_ws_uid: self.game_data.my_ws_uid,
-                                    players: unwrap!(
-                                        serde_json::to_string(&self.game_data.players),
-                                        "serde_json::to_string(&self.game_data.players)"
-                                    ),
-                                })
-                                .expect("error sending EndGame"),
+            // the two cards matches. make them permanent FaceUp
+            let x1 = self.game_data.card_index_of_first_click;
+            let x2 = self.game_data.card_index_of_second_click;
+            unwrap!(
+                self.game_data.vec_cards.get_mut(x1),
+                "error game_data.card_index_of_first_click"
+            )
+            .status = CardStatusCardFace::UpPermanently;
+            unwrap!(
+                self.game_data.vec_cards.get_mut(x2),
+                "error game_data.card_index_of_second_click"
+            )
+            .status = CardStatusCardFace::UpPermanently;
+            self.game_data.game_status = GameStatus::PlayBefore1Card;
+            //if the sum of points is number of card/2, the game is over
+            let mut point_sum = 0;
+            for x in &self.game_data.players {
+                point_sum += x.points;
+            }
+            if unwrap!(self.game_data.vec_cards.len().checked_div(2)) == point_sum {
+                self.game_data.game_status = GameStatus::EndGame;
+                //send message
+                unwrap!(
+                    self.game_data.ws.send_with_str(
+                        &serde_json::to_string(&WsMessage::EndGame {
+                            my_ws_uid: self.game_data.my_ws_uid,
+                            players: unwrap!(
+                                serde_json::to_string(&self.game_data.players),
+                                "serde_json::to_string(&self.game_data.players)"
                             ),
-                            "Failed to send EndGame"
-                        );
-                    }
-                }
+                        })
+                        .expect("error sending EndGame"),
+                    ),
+                    "Failed to send EndGame"
+                );
             }
         }
+        //TODO: where is if cards don't match???
         self.check_invalidate_for_all_components();
+
     }
     ///fn on change for both click and we msg.
     pub fn take_turn(&mut self) {
@@ -167,7 +167,7 @@ impl RootRenderingComponent {
         .status = CardStatusCardFace::Down;
         self.game_data.card_index_of_first_click = 0;
         self.game_data.card_index_of_second_click = 0;
-        self.game_data.game_state = GameState::PlayBefore1Card;
+        self.game_data.game_status = GameStatus::PlayBefore1Card;
 
         self.check_invalidate_for_all_components();
     }
@@ -175,7 +175,7 @@ impl RootRenderingComponent {
     pub fn game_data_init(&mut self) {
         self.game_data.content_folder_name = self.game_data.asked_folder_name.clone();
         self.game_data.prepare_random_data();
-        self.game_data.game_state = GameState::PlayBefore1Card;
+        self.game_data.game_status = GameStatus::PlayBefore1Card;
         self.game_data.player_turn = 1;
     }
     ///reset the data to replay the game
@@ -184,7 +184,7 @@ impl RootRenderingComponent {
         self.game_data.card_index_of_first_click = 0;
         self.game_data.card_index_of_second_click = 0;
         self.game_data.players.clear();
-        self.game_data.game_state = GameState::Start;
+        self.game_data.game_status = GameStatus::WantToPlayAskBegin;
         self.game_data.content_folder_name = "alphabet".to_string();
         self.game_data.asked_folder_name = "".to_string();
         self.game_data.my_player_number = 1;
@@ -204,10 +204,10 @@ impl RootRenderingComponent {
         }
     }
     ///msg want to play
-    pub fn on_want_to_play(&mut self, my_ws_uid: usize, asked_folder_name: String) {
+    pub fn on_msg_want_to_play(&mut self, my_ws_uid: usize, asked_folder_name: String) {
         console::log_1(&"rcv wanttoplay".into());
         self.reset();
-        self.game_data.game_state = GameState::Asked;
+        self.game_data.game_status = GameStatus::WantToPlayAsked;
         //the first player is the initiator
         self.game_data.players.push(Player {
             ws_uid: my_ws_uid,
@@ -221,7 +221,7 @@ impl RootRenderingComponent {
         self.game_data.asked_folder_name = asked_folder_name;
     }
     ///msg accept play
-    pub fn on_accept_play(&mut self, my_ws_uid: usize) {
+    pub fn on_msg_play_accept(&mut self, my_ws_uid: usize) {
         if self.game_data.my_player_number == 1 {
             self.game_data.players.push(Player {
                 ws_uid: my_ws_uid,
@@ -231,9 +231,14 @@ impl RootRenderingComponent {
         }
     }
     ///on game data init
-    pub fn on_game_data_init(&mut self, card_grid_data: &str, game_config: &str, players: &str) {
+    pub fn on_msg_game_data_init(
+        &mut self,
+        card_grid_data: &str,
+        game_config: &str,
+        players: &str,
+    ) {
         self.game_data.content_folder_name = self.game_data.asked_folder_name.clone();
-        self.game_data.game_state = GameState::PlayBefore1Card;
+        self.game_data.game_status = GameStatus::PlayBefore1Card;
         self.game_data.player_turn = 1;
         self.game_data.vec_cards = unwrap!(
             serde_json::from_str(card_grid_data),
@@ -266,7 +271,7 @@ impl RootRenderingComponent {
     }
     ///msg end game
     pub fn on_end_game(&mut self) {
-        self.game_data.game_state = GameState::EndGame;
+        self.game_data.game_status = GameStatus::EndGame;
     }
     ///msg response game_config json
     pub fn on_response_game_config_json(&mut self, json: &str) {
@@ -280,16 +285,22 @@ impl RootRenderingComponent {
         self.take_turn();
     }
     ///msg player click
-    pub fn on_player_click(&mut self, game_state: GameState, card_index: usize) {
-        self.game_data.game_state = game_state;
-        if self.game_data.game_state.as_ref() == GameState::PlayBefore1Card.as_ref() {
+    pub fn on_player_click(&mut self, game_status: GameStatus, card_index: usize) {
+        self.game_data.game_status = game_status;
+        if self.game_data.game_status.as_ref() == GameStatus::PlayBefore1Card.as_ref() {
             self.game_data.card_index_of_first_click = card_index;
-        } else if self.game_data.game_state.as_ref() == GameState::PlayBefore2Card.as_ref() {
+        } else if self.game_data.game_status.as_ref() == GameStatus::PlayBefore2Card.as_ref() {
             self.game_data.card_index_of_second_click = card_index;
         } else {
-            //the last else for satisfing Clippy
+            panic!("this else must never be reached!");
         }
-        self.card_on_click();
+        if self.game_data.game_status.as_ref() == GameStatus::PlayBefore1Card.as_ref() {
+            self.card_on_click_1_card();
+        } else if self.game_data.game_status.as_ref() == GameStatus::PlayBefore2Card.as_ref() {
+            self.card_on_click_2_card();
+        } else {
+            panic!("this else should never be reached");
+        }
     }
     //endregion
 }
