@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["on_msg_player_click_1_card","msg player click"]]});

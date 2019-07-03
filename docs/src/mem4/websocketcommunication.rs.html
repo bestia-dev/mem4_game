@@ -319,11 +319,48 @@
 <span id="319">319</span>
 <span id="320">320</span>
 <span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! websocketcommunication.rs  - module that cares about websocket communication</span>
+<span class="doccomment">//! WebSocketcommunication.rs  - module that cares about WebSocket communication</span>
 
 <span class="comment">//region: use</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">rootrenderingcomponent</span>::<span class="ident">RootRenderingComponent</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statuswanttoplayasked</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statuswanttoplayaskbegin</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusplaybefore1card</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusplaybefore2card</span>;
+
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">Future</span>;
 <span class="kw">use</span> <span class="ident">js_sys</span>::<span class="ident">Reflect</span>;
 <span class="kw">use</span> <span class="ident">mem4_common</span>::<span class="ident">GameStatus</span>;
@@ -336,9 +373,9 @@
 <span class="comment">//the location_href is not consumed in this function and Clippy wants a reference instead a value</span>
 <span class="comment">//but I don&#39;t want references, because they have the lifetime problem.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">needless_pass_by_value</span>)]</span>
-<span class="doccomment">///setup websocket connection</span>
+<span class="doccomment">///setup WebSocket connection</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_ws_connection</span>(<span class="ident">location_href</span>: <span class="ident">String</span>, <span class="ident">client_ws_id</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">WebSocket</span> {
-    <span class="comment">//web-sys has websocket for Rust exactly like javascript has¸</span>
+    <span class="comment">//web-sys has WebSocket for Rust exactly like JavaScript has¸</span>
     <span class="comment">//location_href comes in this format  http://localhost:4000/</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">loc_href</span> <span class="op">=</span> <span class="ident">location_href</span>.<span class="ident">replace</span>(<span class="string">&quot;http://&quot;</span>, <span class="string">&quot;ws://&quot;</span>);
     <span class="comment">//Only for debugging in the development environment</span>
@@ -360,7 +397,7 @@
     <span class="comment">//I don&#39;t know why is clone needed</span>
     <span class="kw">let</span> <span class="ident">ws_c</span> <span class="op">=</span> <span class="ident">ws</span>.<span class="ident">clone</span>();
     <span class="comment">//It looks that the first send is in some way a handshake and is part of the connection</span>
-    <span class="comment">//it will be execute onopen as a closure</span>
+    <span class="comment">//it will be execute on open as a closure</span>
     <span class="kw">let</span> <span class="ident">open_handler</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">||</span> {
         <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;Connection opened, sending RequestWsUid to server&quot;</span>.<span class="ident">into</span>());
         <span class="macro">unwrap</span><span class="macro">!</span>(
@@ -382,7 +419,7 @@
     <span class="ident">ws</span>
 }
 
-<span class="doccomment">/// receive websocket msg callback. I don&#39;t understand this much. Too much future and promises.</span>
+<span class="doccomment">/// receive WebSocket msg callback. I don&#39;t understand this much. Too much future and promises.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_ws_msg_recv</span>(<span class="ident">ws</span>: <span class="kw-2">&amp;</span><span class="ident">WebSocket</span>, <span class="ident">weak</span>: <span class="ident">dodrio</span>::<span class="ident">VdomWeak</span>) {
     <span class="comment">//Player1 on machine1 have a button Ask player to play! before he starts to play.</span>
     <span class="comment">//Click and it sends the WsMessage want_to_play. Player1 waits for the reply and cannot play.</span>
@@ -396,7 +433,7 @@
     <span class="kw">let</span> <span class="ident">msg_recv_handler</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">msg</span>: <span class="ident">JsValue</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">JsValue</span> <span class="op">=</span> <span class="macro">unwrap</span><span class="macro">!</span>(
             <span class="ident">Reflect</span>::<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="string">&quot;data&quot;</span>.<span class="ident">into</span>()),
-            <span class="string">&quot;No &#39;data&#39; field in websocket message!&quot;</span>
+            <span class="string">&quot;No &#39;data&#39; field in WebSocket message!&quot;</span>
         );
 
         <span class="comment">//serde_json can find out the variant of WsMessage</span>
@@ -443,13 +480,12 @@
                             <span class="kw">let</span> <span class="ident">root_rendering_component</span> <span class="op">=</span>
                                 <span class="ident">root</span>.<span class="ident">unwrap_mut</span>::<span class="op">&lt;</span><span class="ident">RootRenderingComponent</span><span class="op">&gt;</span>();
 
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GameStatus</span>::<span class="ident">EndGame</span>
+                            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GameStatus</span>::<span class="ident">PlayAgain</span>
                             <span class="op">|</span> <span class="ident">GameStatus</span>::<span class="ident">WantToPlayAskBegin</span>
                             <span class="op">|</span> <span class="ident">GameStatus</span>::<span class="ident">WantToPlayAsked</span> <span class="op">=</span>
                                 <span class="ident">root_rendering_component</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span>
                             {
-                                <span class="ident">root_rendering_component</span>
-                                    .<span class="ident">on_msg_want_to_play</span>(<span class="ident">my_ws_uid</span>, <span class="ident">asked_folder_name</span>);
+                                <span class="ident">statuswanttoplayaskbegin</span>::<span class="ident">on_msg_want_to_play</span>(<span class="ident">root_rendering_component</span>,<span class="ident">my_ws_uid</span>, <span class="ident">asked_folder_name</span>);
                                 <span class="ident">v2</span>.<span class="ident">schedule_render</span>();
                             }
                         }
@@ -465,7 +501,10 @@
                             <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;rcv PlayAccept&quot;</span>.<span class="ident">into</span>());
                             <span class="kw">let</span> <span class="ident">root_rendering_component</span> <span class="op">=</span>
                                 <span class="ident">root</span>.<span class="ident">unwrap_mut</span>::<span class="op">&lt;</span><span class="ident">RootRenderingComponent</span><span class="op">&gt;</span>();
-                            <span class="ident">root_rendering_component</span>.<span class="ident">on_msg_play_accept</span>(<span class="ident">my_ws_uid</span>);
+                            <span class="ident">statuswanttoplayasked</span>::<span class="ident">on_msg_play_accept</span>(
+                                <span class="ident">root_rendering_component</span>,
+                                <span class="ident">my_ws_uid</span>,
+                            );
                             <span class="ident">v2</span>.<span class="ident">schedule_render</span>();
                         }
                     })
@@ -499,7 +538,7 @@
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()),
                 );
             }
-            <span class="ident">WsMessage</span>::<span class="ident">PlayerClick</span> {
+            <span class="ident">WsMessage</span>::<span class="ident">PlayerClick1Card</span> {
                 <span class="ident">card_index</span>,
                 <span class="ident">game_status</span>,
                 ..
@@ -512,7 +551,45 @@
                             <span class="kw">let</span> <span class="ident">root_rendering_component</span> <span class="op">=</span>
                                 <span class="ident">root</span>.<span class="ident">unwrap_mut</span>::<span class="op">&lt;</span><span class="ident">RootRenderingComponent</span><span class="op">&gt;</span>();
                             <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;players&quot;</span>.<span class="ident">into</span>());
-                            <span class="ident">root_rendering_component</span>.<span class="ident">on_player_click</span>(<span class="ident">game_status</span>, <span class="ident">card_index</span>);
+                            <span class="ident">statusplaybefore1card</span>::<span class="ident">on_msg_player_click_1_card</span>(<span class="ident">root_rendering_component</span>,<span class="ident">game_status</span>, <span class="ident">card_index</span>);
+                            <span class="ident">v2</span>.<span class="ident">schedule_render</span>();
+                        }
+                    })
+                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()),
+                );
+            }
+            <span class="ident">WsMessage</span>::<span class="ident">PlayerClick2Card</span> {
+                <span class="ident">card_index</span>,
+                <span class="ident">game_status</span>,
+                ..
+            } <span class="op">=&gt;</span> {
+                <span class="ident">wasm_bindgen_futures</span>::<span class="ident">spawn_local</span>(
+                    <span class="ident">weak</span>.<span class="ident">with_component</span>({
+                        <span class="kw">let</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">weak</span>.<span class="ident">clone</span>();
+                        <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;player_click&quot;</span>.<span class="ident">into</span>());
+                        <span class="kw">move</span> <span class="op">|</span><span class="ident">root</span><span class="op">|</span> {
+                            <span class="kw">let</span> <span class="ident">root_rendering_component</span> <span class="op">=</span>
+                                <span class="ident">root</span>.<span class="ident">unwrap_mut</span>::<span class="op">&lt;</span><span class="ident">RootRenderingComponent</span><span class="op">&gt;</span>();
+                            <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;players&quot;</span>.<span class="ident">into</span>());
+                            <span class="ident">statusplaybefore2card</span>::<span class="ident">on_msg_player_click_2_card</span>(<span class="ident">root_rendering_component</span>,<span class="ident">game_status</span>, <span class="ident">card_index</span>);
+                            <span class="ident">v2</span>.<span class="ident">schedule_render</span>();
+                        }
+                    })
+                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()),
+                );
+            }
+            <span class="ident">WsMessage</span>::<span class="ident">PlayAgain</span> {
+                ..
+            } <span class="op">=&gt;</span> {
+                <span class="ident">wasm_bindgen_futures</span>::<span class="ident">spawn_local</span>(
+                    <span class="ident">weak</span>.<span class="ident">with_component</span>({
+                        <span class="kw">let</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">weak</span>.<span class="ident">clone</span>();
+                        <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;play again&quot;</span>.<span class="ident">into</span>());
+                        <span class="kw">move</span> <span class="op">|</span><span class="ident">root</span><span class="op">|</span> {
+                            <span class="kw">let</span> <span class="ident">root_rendering_component</span> <span class="op">=</span>
+                                <span class="ident">root</span>.<span class="ident">unwrap_mut</span>::<span class="op">&lt;</span><span class="ident">RootRenderingComponent</span><span class="op">&gt;</span>();
+                            <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;players&quot;</span>.<span class="ident">into</span>());
+                            <span class="ident">statusplaybefore2card</span>::<span class="ident">on_msg_play_again</span>(<span class="ident">root_rendering_component</span>);
                             <span class="ident">v2</span>.<span class="ident">schedule_render</span>();
                         }
                     })
@@ -549,19 +626,6 @@
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()),
                 );
             }
-            <span class="ident">WsMessage</span>::<span class="ident">EndGame</span> { .. } <span class="op">=&gt;</span> {
-                <span class="ident">wasm_bindgen_futures</span>::<span class="ident">spawn_local</span>(
-                    <span class="ident">weak</span>.<span class="ident">with_component</span>({
-                        <span class="kw">move</span> <span class="op">|</span><span class="ident">root</span><span class="op">|</span> {
-                            <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;EndGame&quot;</span>.<span class="ident">into</span>());
-                            <span class="kw">let</span> <span class="ident">root_rendering_component</span> <span class="op">=</span>
-                                <span class="ident">root</span>.<span class="ident">unwrap_mut</span>::<span class="op">&lt;</span><span class="ident">RootRenderingComponent</span><span class="op">&gt;</span>();
-                            <span class="ident">root_rendering_component</span>.<span class="ident">on_end_game</span>();
-                        }
-                    })
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()),
-                );
-            }
         }
     });
 
@@ -569,10 +633,10 @@
     <span class="kw">let</span> <span class="ident">cb_mrh</span>: <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">Fn</span>(<span class="ident">JsValue</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Closure</span>::<span class="ident">wrap</span>(<span class="ident">msg_recv_handler</span>);
     <span class="ident">ws</span>.<span class="ident">set_onmessage</span>(<span class="prelude-val">Some</span>(<span class="ident">cb_mrh</span>.<span class="ident">as_ref</span>().<span class="ident">unchecked_ref</span>()));
 
-    <span class="comment">//don&#39;t drop the eventlistener from memory</span>
+    <span class="comment">//don&#39;t drop the event listener from memory</span>
     <span class="ident">cb_mrh</span>.<span class="ident">forget</span>();
 }
-<span class="doccomment">/// on error write it on the screen for debuggng</span>
+<span class="doccomment">/// on error write it on the screen for debugging</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_ws_onerror</span>(<span class="ident">ws</span>: <span class="kw-2">&amp;</span><span class="ident">WebSocket</span>, <span class="ident">weak</span>: <span class="ident">dodrio</span>::<span class="ident">VdomWeak</span>) {
     <span class="kw">let</span> <span class="ident">onerror_callback</span> <span class="op">=</span> <span class="ident">Closure</span>::<span class="ident">wrap</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">e</span>: <span class="ident">ErrorEvent</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">err_text</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;error event {:?}&quot;</span>, <span class="ident">e</span>);
@@ -595,7 +659,7 @@
     <span class="ident">ws</span>.<span class="ident">set_onerror</span>(<span class="prelude-val">Some</span>(<span class="ident">onerror_callback</span>.<span class="ident">as_ref</span>().<span class="ident">unchecked_ref</span>()));
     <span class="ident">onerror_callback</span>.<span class="ident">forget</span>();
 }
-<span class="doccomment">/// on close websocket connection</span>
+<span class="doccomment">/// on close WebSocket connection</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_ws_onclose</span>(<span class="ident">ws</span>: <span class="kw-2">&amp;</span><span class="ident">WebSocket</span>, <span class="ident">weak</span>: <span class="ident">dodrio</span>::<span class="ident">VdomWeak</span>) {
     <span class="kw">let</span> <span class="ident">onclose_callback</span> <span class="op">=</span> <span class="ident">Closure</span>::<span class="ident">wrap</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">e</span>: <span class="ident">ErrorEvent</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">err_text</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;ws_onclose {:?}&quot;</span>, <span class="ident">e</span>);
@@ -621,13 +685,13 @@
 }
 <span class="doccomment">///setup all ws events</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_all_ws_events</span>(<span class="ident">ws</span>: <span class="kw-2">&amp;</span><span class="ident">WebSocket</span>, <span class="ident">weak</span>: <span class="ident">dodrio</span>::<span class="ident">VdomWeak</span>) {
-    <span class="comment">//websocket on receive message callback</span>
+    <span class="comment">//WebSocket on receive message callback</span>
     <span class="ident">setup_ws_msg_recv</span>(<span class="ident">ws</span>, <span class="ident">weak</span>.<span class="ident">clone</span>());
 
-    <span class="comment">//websocket on error message callback</span>
+    <span class="comment">//WebSocket on error message callback</span>
     <span class="ident">setup_ws_onerror</span>(<span class="ident">ws</span>, <span class="ident">weak</span>.<span class="ident">clone</span>());
 
-    <span class="comment">//websocket on close message callback</span>
+    <span class="comment">//WebSocket on close message callback</span>
     <span class="ident">setup_ws_onclose</span>(<span class="ident">ws</span>, <span class="ident">weak</span>);
 }
 

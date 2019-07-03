@@ -481,13 +481,16 @@
 <span id="481">481</span>
 <span id="482">482</span>
 <span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! `mem4_server` - html and websocket server for the mem4 game</span>
-<span class="doccomment">//! Primarily made for learning to code Rust for a http + websocket server on the same port  </span>
+<span class="doccomment">//! `mem4_server` - html and WebSocket server for the mem4 game</span>
+<span class="doccomment">//! Primarily made for learning to code Rust for a http + WebSocket server on the same port  </span>
 <span class="doccomment">//! using Warp for a simple memory game for kids - mem4.</span>
-<span class="doccomment">//! On the local public IP address on port 80 listens to http and websocket.</span>
+<span class="doccomment">//! On the local public IP address on port 80 listens to http and WebSocket.</span>
 <span class="doccomment">//! Route for http `/` serves static files from folder `/mem4/`</span>
-<span class="doccomment">//! Route `/mem4ws/` broadcast all websocket msg to all connected clients except sender</span>
+<span class="doccomment">//! Route `/mem4ws/` broadcast all WebSocket msg to all connected clients except sender</span>
 
 <span class="comment">//region: Clippy</span>
 <span class="attribute">#![<span class="ident">warn</span>(
@@ -513,6 +516,8 @@
     <span class="comment">//Cannot add #[inline] to the start function with #[wasm_bindgen(start)]</span>
     <span class="comment">//because then wasm-pack build --target no-modules returns an error: export `run` not found </span>
     <span class="comment">//clippy::missing_inline_in_public_items</span>
+    <span class="comment">//Why is this bad : Doc is good. rustc has a MISSING_DOCS allowed-by-default lint for public members, but has no way to enforce documentation of private items. This lint fixes that.</span>
+    <span class="ident">clippy</span>::<span class="ident">doc_markdown</span>,
 )]</span>
 <span class="comment">//endregion</span>
 
@@ -551,7 +556,7 @@
 <span class="comment">//endregion</span>
 
 <span class="comment">//region: enum, structs, const,...</span>
-<span class="doccomment">/// Our state of currently connected users.</span>
+<span class="doccomment">/// Our status of currently connected users.</span>
 <span class="doccomment">/// - Key is their id</span>
 <span class="doccomment">/// - Value is a sender of `warp::ws::Message`</span>
 <span class="kw">type</span> <span class="ident">Users</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">mpsc</span>::<span class="ident">UnboundedSender</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;&gt;</span><span class="op">&gt;&gt;</span>;
@@ -593,7 +598,7 @@
     <span class="kw">let</span> <span class="ident">matches</span> <span class="op">=</span> <span class="ident">App</span>::<span class="ident">new</span>(<span class="string">&quot;mem4_server&quot;</span>)
         .<span class="ident">version</span>(<span class="string">&quot;1.0.0&quot;</span>)
         .<span class="ident">author</span>(<span class="string">&quot;Luciano Bestia&quot;</span>)
-        .<span class="ident">about</span>(<span class="string">&quot;server http and websocket for mem4 game&quot;</span>)
+        .<span class="ident">about</span>(<span class="string">&quot;server http and WebSocket for mem4 game&quot;</span>)
         .<span class="ident">arg</span>(
             <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;prm_ip&quot;</span>)
                 .<span class="ident">value_name</span>(<span class="string">&quot;ip&quot;</span>)
@@ -634,17 +639,17 @@
     <span class="kw">let</span> <span class="ident">local_addr</span> <span class="op">=</span> <span class="ident">SocketAddr</span>::<span class="ident">new</span>(<span class="ident">local_ip</span>, <span class="ident">local_port</span>);
 
     <span class="macro">info</span><span class="macro">!</span>(
-        <span class="string">&quot;mem4 http server listening on {} and websocket on /mem4ws/&quot;</span>,
+        <span class="string">&quot;mem4 http server listening on {} and WebSocket on /mem4ws/&quot;</span>,
         <span class="ident">ansi_term</span>::<span class="ident">Colour</span>::<span class="ident">Red</span>.<span class="ident">paint</span>(<span class="ident">local_addr</span>.<span class="ident">to_string</span>())
     );
     <span class="comment">//endregion</span>
 
     <span class="comment">// Keep track of all connected users, key is usize, value</span>
-    <span class="comment">// is a websocket sender.</span>
+    <span class="comment">// is a WebSocket sender.</span>
     <span class="kw">let</span> <span class="ident">users</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">HashMap</span>::<span class="ident">new</span>()));
     <span class="comment">// Turn our &quot;state&quot; into a new Filter...</span>
     <span class="comment">//let users = warp::any().map(move || users.clone());</span>
-    <span class="comment">//Clippy recommands this crazyness instead of just users.clone()</span>
+    <span class="comment">//Clippy recommends this craziness instead of just users.clone()</span>
     <span class="kw">let</span> <span class="ident">users</span> <span class="op">=</span> <span class="ident">warp</span>::<span class="ident">any</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">||</span> {
         <span class="ident">Arc</span>::<span class="op">&lt;</span>
             <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span><span class="op">&lt;</span>
@@ -656,10 +661,10 @@
         <span class="op">&gt;</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="ident">users</span>)
     });
 
-    <span class="comment">//websocket server</span>
-    <span class="comment">// GET from route /mem4ws/ -&gt; websocket upgrade</span>
+    <span class="comment">//WebSocket server</span>
+    <span class="comment">// GET from route /mem4ws/ -&gt; WebSocket upgrade</span>
     <span class="kw">let</span> <span class="ident">websocket</span> <span class="op">=</span> <span class="ident">warp</span>::<span class="ident">path</span>(<span class="string">&quot;mem4ws&quot;</span>)
-        <span class="comment">// The `ws2()` filter will prepare Websocket handshake...</span>
+        <span class="comment">// The `ws2()` filter will prepare WebSocket handshake...</span>
         .<span class="ident">and</span>(<span class="ident">warp</span>::<span class="ident">ws2</span>())
         .<span class="ident">and</span>(<span class="ident">users</span>)
         <span class="comment">// Match `/mem4ws/url_param` it can be any string.</span>
@@ -679,7 +684,7 @@
 
 <span class="comment">//the url_param is not consumed in this function and Clippy wants a reference instead a value</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">needless_pass_by_value</span>)]</span>
-<span class="comment">//region: websocket callbacks: connect, msg, disconnect</span>
+<span class="comment">//region: WebSocket callbacks: connect, msg, disconnect</span>
 <span class="doccomment">///new user connects</span>
 <span class="kw">fn</span> <span class="ident">user_connected</span>(
     <span class="ident">ws</span>: <span class="ident">WebSocket</span>,
@@ -689,7 +694,7 @@
     <span class="comment">//the client sends his ws_uid in url_param. it is a random number.</span>
     <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;user_connect() url_param: {}&quot;</span>, <span class="ident">url_param</span>);
     <span class="comment">//convert string to usize</span>
-    <span class="comment">//hahahhaha syntax &#39;turbofish&#39; ::&lt;&gt;</span>
+    <span class="comment">//hahahahaha syntax &#39;turbofish&#39; ::&lt;&gt;</span>
     <span class="kw">let</span> <span class="ident">my_id</span> <span class="op">=</span> <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">url_param</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>());
     <span class="comment">//if uid already exists, it is an error</span>
     <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">uid</span>, ..) <span class="kw">in</span> <span class="ident">users</span>.<span class="ident">lock</span>().<span class="ident">expect</span>(<span class="string">&quot;error users.lock()&quot;</span>).<span class="ident">iter</span>() {
@@ -704,13 +709,13 @@
     <span class="kw">let</span> (<span class="ident">user_ws_tx</span>, <span class="ident">user_ws_rx</span>) <span class="op">=</span> <span class="ident">ws</span>.<span class="ident">split</span>();
 
     <span class="comment">// Use an unbounded channel to handle buffering and flushing of messages</span>
-    <span class="comment">// to the websocket...</span>
+    <span class="comment">// to the WebSocket...</span>
     <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">unbounded</span>();
     <span class="ident">warp</span>::<span class="ident">spawn</span>(
         <span class="ident">rx</span>.<span class="ident">map_err</span>(<span class="op">|</span>()<span class="op">|</span> <span class="op">-&gt;</span> <span class="ident">warp</span>::<span class="ident">Error</span> { <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;unbounded rx never errors&quot;</span>) })
             .<span class="ident">forward</span>(<span class="ident">user_ws_tx</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">_tx_rx</span><span class="op">|</span> ())
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">ws_err</span><span class="op">|</span> <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;websocket send error: {}&quot;</span>, <span class="ident">ws_err</span>)),
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">ws_err</span><span class="op">|</span> <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;WebSocket send error: {}&quot;</span>, <span class="ident">ws_err</span>)),
     );
 
     <span class="comment">// Save the sender in our list of connected users.</span>
@@ -721,7 +726,7 @@
     <span class="comment">// this specific user&#39;s connection.</span>
     <span class="comment">// Make an extra clone to give to our disconnection handler...</span>
     <span class="comment">//let users2 = users.clone();</span>
-    <span class="comment">//Clippy reccomands this crazyness insted of users.clone()</span>
+    <span class="comment">//Clippy recommends this craziness instead of users.clone()</span>
     <span class="kw">let</span> <span class="ident">users2</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="op">&lt;</span>
         <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span><span class="op">&lt;</span>
             <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span><span class="op">&lt;</span>
@@ -743,13 +748,13 @@
             <span class="ident">user_disconnected</span>(<span class="ident">my_id</span>, <span class="kw-2">&amp;</span><span class="ident">users2</span>);
             <span class="ident">result</span>
         })
-        <span class="comment">// If at any time, there was a websocket error, log here...</span>
+        <span class="comment">// If at any time, there was a WebSocket error, log here...</span>
         .<span class="ident">map_err</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-            <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;websocket error(uid={}): {}&quot;</span>, <span class="ident">my_id</span>, <span class="ident">e</span>);
+            <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;WebSocket error(uid={}): {}&quot;</span>, <span class="ident">my_id</span>, <span class="ident">e</span>);
         })
 }
 
-<span class="doccomment">///on receive websocket message</span>
+<span class="doccomment">///on receive WebSocket message</span>
 <span class="kw">fn</span> <span class="ident">receive_message</span>(<span class="ident">ws_uid_of_message</span>: <span class="ident">usize</span>, <span class="ident">messg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">users</span>: <span class="kw-2">&amp;</span><span class="ident">Users</span>) {
     <span class="comment">// Skip any non-Text messages...</span>
     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">messg</span>.<span class="ident">to_str</span>() {
@@ -822,10 +827,11 @@
         <span class="ident">WsMessage</span>::<span class="ident">ResponseWsUid</span> { .. } <span class="op">=&gt;</span> <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;ResponseWsUid: {}&quot;</span>, <span class="string">&quot;&quot;</span>),
         <span class="ident">WsMessage</span>::<span class="ident">ResponseGameConfigJson</span> { .. } <span class="op">=&gt;</span> <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;ResponseGameConfigJson: {}&quot;</span>, <span class="string">&quot;&quot;</span>),
         <span class="ident">WsMessage</span>::<span class="ident">PlayAccept</span> { <span class="ident">players</span>, .. }
-        <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayerClick</span> { <span class="ident">players</span>, .. }
+        <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayerClick1Card</span> { <span class="ident">players</span>, .. }
+        <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayerClick2Card</span> { <span class="ident">players</span>, .. }
         <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">GameDataInit</span> { <span class="ident">players</span>, .. }
         <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayerChange</span> { <span class="ident">players</span>, .. }
-        <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">EndGame</span> { <span class="ident">players</span>, .. } <span class="op">=&gt;</span> {
+        <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayAgain</span> { <span class="ident">players</span>, .. } <span class="op">=&gt;</span> {
             <span class="ident">send_to_other_players</span>(<span class="ident">users</span>, <span class="ident">ws_uid_of_message</span>, <span class="kw-2">&amp;</span><span class="ident">new_msg</span>, <span class="kw-2">&amp;</span><span class="ident">players</span>)
         }
     }
@@ -893,9 +899,9 @@
 }
 <span class="comment">//endregion</span>
 
-<span class="comment">//region: local ip (linux and windows distict versions)</span>
+<span class="comment">//region: local ip (Linux and windows distinct versions)</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_family</span> <span class="op">=</span> <span class="string">&quot;unix&quot;</span>)]</span>
-<span class="doccomment">///get local ip for unix with ifconfig</span>
+<span class="doccomment">///get local ip for Unix with ifconfig</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_ip_get</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span> {
     <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;local_ip_get for unix{}&quot;</span>, <span class="string">&quot;&quot;</span>);
     <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Command</span>::<span class="ident">new</span>(<span class="string">&quot;ifconfig&quot;</span>)

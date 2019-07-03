@@ -205,45 +205,116 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! **mem4 - Learning Rust and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication**  </span>
 <span class="comment">//region: documentation</span>
 <span class="doccomment">//! mem4 is a simple memory game made primarily for learning the Rust programming language.  </span>
 <span class="doccomment">//! ## Rust and Wasm/WebAssembly</span>
-<span class="doccomment">//! TODO: description</span>
+<span class="doccomment">//! Rust is a pretty new language created by Mozilla for really low level programming.  </span>
+<span class="doccomment">//! It is a step forward from the C language with functionality and features that are best practice today.  </span>
+<span class="doccomment">//! It is pretty hard to learn. Some concepts are so different from other languages it makes it</span>
+<span class="doccomment">//! hard for beginners. Lifetimes are the strangest and most confusing concept.  </span>
+<span class="doccomment">//! The Rust language has been made from the ground up with an ecosystem that makes it productive.  </span>
+<span class="doccomment">//! The language and most of the libraries are Open Source. That is good and bad, but mostly good.  </span>
+<span class="doccomment">//! Rust is the best language today to compile into Wasm/WebAssembly.  </span>
+<span class="doccomment">//! That compiled code works inside a browser directly with the JavaScript engine.  </span>
+<span class="doccomment">//! So finally no need for JavaScript to make cross-platform applications inside browsers.  </span>
+<span class="doccomment">//! I have a lot of hope here.  </span>
 <span class="doccomment">//! ## Virtual DOM</span>
 <span class="doccomment">//! Constructing a HTML page with Virtual DOM (vdom) is easier  </span>
 <span class="doccomment">//! because it is rendered completely on every tick (animation frame).  </span>
 <span class="doccomment">//! Sometimes is hard for the developer to think what should change in the UI when some data changes.  </span>
 <span class="doccomment">//! The data can change from many different events and very chaotically (asynchronously).  </span>
 <span class="doccomment">//! It is easier to think how to render the complete DOM for the given data.  </span>
-<span class="doccomment">//! The dodrio library has ticks, time intervals when it do something.  </span>
+<span class="doccomment">//! The Rust Dodrio library has ticks, time intervals when it do something.  </span>
 <span class="doccomment">//! If a rendering is scheduled, it will be done on the next tick.  </span>
 <span class="doccomment">//! If a rendering is not scheduled I believe nothing happens.  </span>
-<span class="doccomment">//! This enables asynchronous changing of data and rendering. They cannot happen theoretically in the same exact moment. So, no data race here.  </span>
-<span class="doccomment">//! When `GameData` change and we now it will affect the DOM, then rendering must be scheduled.  </span>
-<span class="doccomment">//! The root_rendering_component is splitted easily into sub-components.  </span>
+<span class="doccomment">//! This enables asynchronous changing of data and rendering. They cannot happen theoretically in the</span>
+<span class="doccomment">//! same exact moment. So, no data race here.  </span>
+<span class="doccomment">//! When GameData change and we know it will affect the DOM, then rendering must be scheduled.  </span>
+<span class="doccomment">//! The main component of the Dodrio Virtual Dom is the root rendering component.  </span>
+<span class="doccomment">//! It is the component that renders the complete user interface (HTML).  </span>
+<span class="doccomment">//! The root rendering component is easily splitted  into sub-components.  </span>
 <span class="doccomment">//! ![](https://github.com/LucianoBestia/mem4_game/raw/master/docs/img/subcomponents.png)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
+<span class="doccomment">//! Some subcomponents don&#39;t need any extra data and can be coded as simple functions.  </span>
+<span class="doccomment">//! The subcomponent &quot;players and scores&quot; has its own data. This data is cached from the GameData.  </span>
+<span class="doccomment">//! When this data does not match, invalidation is called to cache them.</span>
+<span class="doccomment">//! That also schedules the rendering of the subcomponent.  </span>
+<span class="doccomment">//! If no data has changed, the cached subcomponent Node is used. This is more efficient and performant.  </span>
+<span class="doccomment">//! ##GameData</span>
+<span class="doccomment">//! All the game data are in this simple struct.  </span>
 <span class="doccomment">//! ## WebSocket communication</span>
-<span class="doccomment">//! TODO: description</span>
-<span class="doccomment">//! ## Status1 - User action - Status2, Status1 - WsMessage - Status2</span>
-<span class="doccomment">//! In one moment the game is in a certain Game Status. The user then makes an action. This action changes the `GameData`.  </span>
-<span class="doccomment">//! Then a message is sent to other players so they can also change their local `GameData`.  </span>
-<span class="doccomment">//! The rendering is scheduled and it will happen shortly (async). The result is a new `GameStatus`.  </span>
+<span class="doccomment">//! HTML5 has finally bring a true stateful bidirectional communication.  </span>
+<span class="doccomment">//! Most of the programming problems are more easily and effectively solved this way.  </span>
+<span class="doccomment">//! The old unidirectional stateless communication is very good for static html pages,  </span>
+<span class="doccomment">//! but is terrible for any dynamic page. The WebSocket is very rudimental and often the  </span>
+<span class="doccomment">//! communication breaks for many different reasons. The programmer must deal with it inside the application.  </span>
+<span class="doccomment">//! The protocol has nothing that can be used to deal with reconnections.  </span>
+<span class="doccomment">//! I send simple structs text messages in json format between the players.  </span>
+<span class="doccomment">//! They are all in the WsMsg enum and therefore interchangeable.  </span>
+<span class="doccomment">//! The WebSocket server is coded especially for this game and recognizes 3 types of msg:</span>
+<span class="doccomment">//! - msg to broadcast to every other player</span>
+<span class="doccomment">//! - msg to send only to the actual game players</span>
+<span class="doccomment">//! - msg to the server to act and respond</span>
+<span class="doccomment">//! ## The game flow</span>
+<span class="doccomment">//! In a few words: Status1 - User action - Status2, Status1 - WsMessage - Status2</span>
+<span class="doccomment">//! In one moment the game is in a certain Game Status. The user then makes an action.</span>
+<span class="doccomment">//! This action changes the GameData and the GameStatus.  </span>
+<span class="doccomment">//! Then a message is sent to other players so they can also change their local GameData and GameStatus.  </span>
+<span class="doccomment">//! The rendering is scheduled and it will happen shortly (async).   </span>
 <span class="doccomment">//!  </span>
-<span class="doccomment">//! | Game Status1        | Render                     | User action                                 | Condition                           | GameStatus2 t.p.  | Sends Msg        | On rcv Msg o.p.            | GameStatus2 o.p.                  |</span>
-<span class="doccomment">//! | ------------------ | -------------------------- | ------------------------------------------- | ----------------------------------- | ---------------- | ---------------- | -------------------------- | -------------------------------- |</span>
-<span class="doccomment">//! | WantToPlayAskBegin | div_want_to_play_ask_begin | div_want_to_play_ask_begin_on_click         | -                                   | WantToPlayAsking | WantToPlay       | on_msg_want_to_play        | WantToPlayAsked                  |</span>
-<span class="doccomment">//! | WantToPlayAsked    | div_want_to_play_asked     | div_want_to_play_asked_on_click             | -                                   | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |</span>
-<span class="doccomment">//! | WantToPlayAsking   | div_want_to_play_asking    | game_data_init                              | -                                   | PlayBefore1Card  | GameDataInit     | on_msg_game_data_init      | PlayBefore1Card                  |</span>
-<span class="doccomment">//! | PlayBefore1Card    | div_grid_container | div_grid_item_on_click, rrc.card_on_click_1_card(); | -                                   | PlayBefore2Card  | PlayerClick1Card | on_msg_player_click_1_card | PlayBefore2Card                  |</span>
-<span class="doccomment">//! | PlayBefore2Card    | div_grid_container | div_grid_item_on_click, rrc.card_on_click_2_Card(); | If card match and points&lt;allpoint   | PlayBefore1Card  | PlayerClick2Card | on_msg player_click_2_card | PlayBefore1Card                  |</span>
-<span class="doccomment">//! | II                 | II                         | II                                          | If card match and points=&gt;allpoints | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |</span>
-<span class="doccomment">//! | II                 | II                         | II                                          | else                                | TakeTurnBegin    | TakeTurnBegin    | on_msg_take_turn           | TakeTurnBegin                    |</span>
-<span class="doccomment">//! | TakeTurnBegin      | div_take_turn_begin (div_grid_container) | div_take_turn_begin_on_click  | -                                   | PlayBefore1Card  | TakeTurnEnd      | on_take_turn_end           | PlayBefore1Card, the next player |</span>
-<span class="doccomment">//! | PlayAgain          | div_play_again (div_grid_container) | window.location().reload()         | -                                   | -                | -                | -                          | -                                |</span>
+<span class="doccomment">//! | Game Status1       | Render                     | User action                                 | Condition                            | GameStatus2 t.p.  | Sends Msg       | On rcv Msg o.p.            | GameStatus2 o.p.                 |</span>
+<span class="doccomment">//! | ------------------ | -------------------------- | ------------------------------------------- | ------------------------------------ | ---------------- | ---------------- | -------------------------- | -------------------------------- |</span>
+<span class="doccomment">//! | WantToPlayAskBegin | div_want_to_play_ask_begin | div_want_to_play_ask_begin_on_click         | -                                    | WantToPlayAsking | WantToPlay       | on_msg_want_to_play        | WantToPlayAsked                  |</span>
+<span class="doccomment">//! | WantToPlayAsked    | div_want_to_play_asked     | div_want_to_play_asked_on_click             | -                                    | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |</span>
+<span class="doccomment">//! | WantToPlayAsking   | div_want_to_play_asking    | game_data_init                              | -                                    | PlayBefore1Card  | GameDataInit     | on_msg_game_data_init      | PlayBefore1Card                  |</span>
+<span class="doccomment">//! | PlayBefore1Card    | div_grid_container | div_grid_item_on_click, rrc.card_on_click_1_card(); | -                                    | PlayBefore2Card  | PlayerClick1Card | on_msg_player_click_1_card | PlayBefore2Card                  |</span>
+<span class="doccomment">//! | PlayBefore2Card    | div_grid_container | div_grid_item_on_click, rrc.card_on_click_2_Card(); | If card match and points&lt;all point   | PlayBefore1Card  | PlayerClick2Card | on_msg_player_click_2_card | PlayBefore1Card                  |</span>
+<span class="doccomment">//! | II                 | II                         | II                                          | If card match and points=&gt;all points | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |</span>
+<span class="doccomment">//! | II                 | II                         | II                                          | else                                 | TakeTurnBegin    | TakeTurnBegin    | on_msg_take_turn           | TakeTurnBegin                    |</span>
+<span class="doccomment">//! | TakeTurnBegin      | div_take_turn_begin (div_grid_container) | div_take_turn_begin_on_click  | -                                    | PlayBefore1Card  | TakeTurnEnd      | on_take_turn_end           | PlayBefore1Card, the next player |</span>
+<span class="doccomment">//! | PlayAgain          | div_play_again (div_grid_container) | window.location().reload()         | -                                    | -                | -                | -                          | -                                |</span>
 <span class="doccomment">//! |  |  |  |  |  |  |  |  |</span>
 <span class="doccomment">//!  </span>
 <span class="doccomment">//! t.p. = this player,   o.p. = other players,  rrc = root_rendering_component, rcv = receive</span>
@@ -252,20 +323,25 @@
 <span class="doccomment">//! 3. on receive msg can produce only one status2.  </span>
 <span class="doccomment">//! 4. in this table I ignore msgs for the server like GetConfig  </span>
 <span class="doccomment">//!  </span>
-<span class="doccomment">//! ## Futures and promises, Rust and JavaScript</span>
+<span class="doccomment">//! ## Futures and Promises, Rust and JavaScript</span>
 <span class="doccomment">//! JavaScript is all asynchronous. Wasm is nothing else then a shortcut to the JavaScript engine.  </span>
-<span class="doccomment">//! So everything is asynchronous. This is pretty hard to grasp. Everything is Promises and futures.  </span>
-<span class="doccomment">//! Still better then `CallBacks`, but very hard to understand. And there is a constant</span>
-<span class="doccomment">//! jumping from thinking in Rust to thinking is JavaScript and back that is pretty confusing.  </span>
-<span class="doccomment">//! JavaScript does not have a good idea of Rust datatypes. All there is is a `JSValue` type.  </span>
-<span class="doccomment">//! The library wasm-bindgen has made a fantastic job of giving to Rust the ability to call</span>
+<span class="doccomment">//! So everything is asynchronous too. This is pretty hard to grasp. Everything is Promises and Futures.  </span>
+<span class="doccomment">//! There is a constant jumping from thinking in Rust to thinking is JavaScript and back. That is pretty confusing.  </span>
+<span class="doccomment">//! JavaScript does not have a good idea of Rust datatypes. All there is is a generic JSValue type.  </span>
+<span class="doccomment">//! The library `wasm-bindgen` has made a fantastic job of giving Rust the ability to call</span>
 <span class="doccomment">//! anything JavaScript can call, but the way of doing it is sometimes very hard to understand.  </span>
 <span class="doccomment">//! ## Browser console</span>
 <span class="doccomment">//! At least in modern browsers (Firefox and Chrome) we have the developer tools F12 and there is a</span>
-<span class="doccomment">//! console we can output to. So we can debug what is going on with our program.  </span>
+<span class="doccomment">//! console we can output to. So we can debug what is going on with our Wasm program.  </span>
 <span class="doccomment">//! ## Modules</span>
+<span class="doccomment">//! Rust code is splitted into modules. They are not exactly like classes, but can be similar.  </span>
+<span class="doccomment">//! Rust has much more freedom to group code in different ways. So that is best suits the problem.  </span>
+<span class="doccomment">//! I splitted the rendering into sub-components.  </span>
+<span class="doccomment">//! And then I splitted the User Actions by the Status1 to easy follow the flow of the game.  </span>
 <span class="doccomment">//! ## Clippy</span>
-<span class="doccomment">//!</span>
+<span class="doccomment">//! Clippy is very useful to teach us how to program in a better way.  </span>
+<span class="doccomment">//! These are not syntax errors, but hints how to do it in a more Rusty way (idiomatic).  </span>
+<span class="doccomment">//! Some lints are problematic and they are explicitly allowed here.</span>
 <span class="doccomment">//!</span>
 <span class="comment">//endregion</span>
 
@@ -307,7 +383,7 @@
     <span class="comment">//Why is this bad: Unnecessary repetition. Mixed use of Self and struct name feels inconsistent.</span>
     <span class="ident">clippy</span>::<span class="ident">use_self</span>,
     <span class="comment">//Cannot add #[inline] to the start function with #[wasm_bindgen(start)]</span>
-    <span class="comment">//because then wasm-pack build --target web returns an error: export `run` not found </span>
+    <span class="comment">//because then wasm-pack build --target web returns an error: export run not found </span>
     <span class="comment">//Why is this bad: In general, it is not. Functions can be inlined across crates when that’s profitable </span>
     <span class="comment">//as long as any form of LTO is used. When LTO is disabled, functions that are not #[inline] </span>
     <span class="comment">//cannot be inlined across crates. Certain types of crates might intend for most of the </span>
@@ -320,21 +396,27 @@
     <span class="comment">//clippy::integer_arithmetic,</span>
     <span class="comment">//Why is this bad: For some embedded systems or kernel development, it can be useful to rule out floating-point numbers.</span>
     <span class="ident">clippy</span>::<span class="ident">float_arithmetic</span>,
-    <span class="comment">//Why is this bad</span>
-    <span class="comment">//Doc is good. rustc has a MISSING_DOCS allowed-by-default lint for public members, but has no way to enforce documentation of private items. This lint fixes that.</span>
+    <span class="comment">//Why is this bad : Doc is good. rustc has a MISSING_DOCS allowed-by-default lint for public members, but has no way to enforce documentation of private items. This lint fixes that.</span>
     <span class="ident">clippy</span>::<span class="ident">doc_markdown</span>,
+    <span class="comment">//Why is this bad : Splitting the implementation of a type makes the code harder to navigate.</span>
+    <span class="ident">clippy</span>::<span class="ident">multiple_inherent_impl</span>,
 )]</span>
 <span class="comment">//endregion</span>
 
-<span class="comment">//region: mod is used only in lib file. All the rest use `use crate`</span>
-<span class="kw">mod</span> <span class="ident">cardmoniker</span>;
+<span class="comment">//region: mod is used only in lib file. All the rest use use crate</span>
+<span class="kw">mod</span> <span class="ident">divcardmoniker</span>;
+<span class="kw">mod</span> <span class="ident">divgridcontainer</span>;
+<span class="kw">mod</span> <span class="ident">divplayeractions</span>;
+<span class="kw">mod</span> <span class="ident">divplayersandscores</span>;
+<span class="kw">mod</span> <span class="ident">divrulesanddescription</span>;
 <span class="kw">mod</span> <span class="ident">gamedata</span>;
-<span class="kw">mod</span> <span class="ident">gridcontainer</span>;
-<span class="kw">mod</span> <span class="ident">playeractions</span>;
-<span class="kw">mod</span> <span class="ident">playersandscores</span>;
 <span class="kw">mod</span> <span class="ident">rootrenderingcomponent</span>;
-<span class="kw">mod</span> <span class="ident">rulesanddescription</span>;
+<span class="kw">mod</span> <span class="ident">statuswanttoplayaskbegin</span>;
+<span class="kw">mod</span> <span class="ident">statuswanttoplayasked</span>;
 <span class="kw">mod</span> <span class="ident">websocketcommunication</span>;
+<span class="kw">mod</span> <span class="ident">statusplaybefore1card</span>;
+<span class="kw">mod</span> <span class="ident">statusplaybefore2card</span>;
+<span class="kw">mod</span> <span class="ident">statusplayagain</span>;
 <span class="comment">//endregion</span>
 
 <span class="comment">//region: extern and use statements</span>
@@ -366,7 +448,7 @@
     <span class="comment">// Initialize debugging for when/if something goes wrong.</span>
     <span class="ident">console_error_panic_hook</span>::<span class="ident">set_once</span>();
 
-    <span class="comment">// Get the document&#39;s container to render the virtual dom component.</span>
+    <span class="comment">// Get the document&#39;s container to render the virtual Dom component.</span>
     <span class="kw">let</span> <span class="ident">window</span> <span class="op">=</span> <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">web_sys</span>::<span class="ident">window</span>(), <span class="string">&quot;error: web_sys::window&quot;</span>);
     <span class="kw">let</span> <span class="ident">document</span> <span class="op">=</span> <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">window</span>.<span class="ident">document</span>(), <span class="string">&quot;error: window.document&quot;</span>);
     <span class="kw">let</span> <span class="ident">div_for_virtual_dom</span> <span class="op">=</span> <span class="macro">unwrap</span><span class="macro">!</span>(
@@ -376,19 +458,19 @@
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">SmallRng</span>::<span class="ident">from_entropy</span>();
     <span class="comment">//my_ws_uid is random generated on the client and sent to</span>
-    <span class="comment">//websocket server with an url param</span>
+    <span class="comment">//WebSocket server with an url param</span>
     <span class="kw">let</span> <span class="ident">my_ws_uid</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">gen_range</span>(<span class="number">1</span>, <span class="number">9999</span>);
 
     <span class="comment">//find out URL</span>
     <span class="kw">let</span> <span class="ident">location_href</span> <span class="op">=</span> <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">window</span>.<span class="ident">location</span>().<span class="ident">href</span>(), <span class="string">&quot;href not known&quot;</span>);
 
-    <span class="comment">//websocket connection</span>
+    <span class="comment">//WebSocket connection</span>
     <span class="kw">let</span> <span class="ident">ws</span> <span class="op">=</span> <span class="ident">websocketcommunication</span>::<span class="ident">setup_ws_connection</span>(<span class="ident">location_href</span>.<span class="ident">clone</span>(), <span class="ident">my_ws_uid</span>);
-    <span class="comment">//I don&#39;t know why is needed to clone the websocket connection</span>
+    <span class="comment">//I don&#39;t know why is needed to clone the WebSocket connection</span>
     <span class="kw">let</span> <span class="ident">ws_c</span> <span class="op">=</span> <span class="ident">ws</span>.<span class="ident">clone</span>();
 
-    <span class="comment">// Construct a new `RootRenderingComponent`.</span>
-    <span class="comment">//I added ws_c so that I can send messages on websocket</span>
+    <span class="comment">// Construct a new RootRenderingComponent.</span>
+    <span class="comment">//I added ws_c so that I can send messages on WebSocket</span>
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">root_rendering_component</span> <span class="op">=</span>
         <span class="ident">rootrenderingcomponent</span>::<span class="ident">RootRenderingComponent</span>::<span class="ident">new</span>(<span class="ident">ws_c</span>, <span class="ident">my_ws_uid</span>);

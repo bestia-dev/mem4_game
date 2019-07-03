@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["GameState","the game can be in various states and that differentiate the UI and actions all players have the same game state"],["WsMessage","`WsMessage` enum for websocket"]],"struct":[["Player","data for one player"]]});
+initSidebarItems({"enum":[["GameStatus","the game can be in various statuses and that differentiate the UI and actions all players have the same game status"],["WsMessage","`WsMessage` enum for WebSocket"]],"struct":[["Player","data for one player"]]});

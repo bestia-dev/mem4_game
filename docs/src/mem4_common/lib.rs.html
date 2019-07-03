@@ -150,9 +150,22 @@
 <span id="150">150</span>
 <span id="151">151</span>
 <span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! `mem4_common` - commons for mem4 wasm and server</span>
-<span class="doccomment">//! Learning to code Rust for a http + websocket  </span>
+<span class="doccomment">//! Learning to code Rust for a http + WebSocket  </span>
 
 <span class="comment">//region: Clippy</span>
 <span class="attribute">#![<span class="ident">warn</span>(
@@ -177,7 +190,9 @@
     <span class="comment">//clippy::use_self,</span>
     <span class="comment">//Cannot add #[inline] to the start function with #[wasm_bindgen(start)]</span>
     <span class="comment">//because then wasm-pack build --target no-modules returns an error: export `run` not found </span>
-    <span class="ident">clippy</span>::<span class="ident">missing_inline_in_public_items</span>
+    <span class="ident">clippy</span>::<span class="ident">missing_inline_in_public_items</span>,
+    <span class="comment">//Why is this bad : Doc is good. rustc has a MISSING_DOCS allowed-by-default lint for public members, but has no way to enforce documentation of private items. This lint fixes that.</span>
+    <span class="ident">clippy</span>::<span class="ident">doc_markdown</span>,
 )]</span>
 <span class="comment">//endregion</span>
 
@@ -191,7 +206,7 @@
 <span class="kw">use</span> <span class="ident">strum_macros</span>::<span class="ident">AsRefStr</span>;
 <span class="comment">//endregion</span>
 
-<span class="doccomment">///`WsMessage` enum for websocket</span>
+<span class="doccomment">///`WsMessage` enum for WebSocket</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WsMessage</span> {
     <span class="doccomment">///Dummy</span>
@@ -199,14 +214,14 @@
         <span class="doccomment">///anything</span>
         <span class="ident">dummy</span>: <span class="ident">String</span>,
     },
-    <span class="doccomment">///Request websocket Uid - first message to WebSocket server</span>
+    <span class="doccomment">///Request WebSocket Uid - first message to WebSocket server</span>
     <span class="ident">RequestWsUid</span> {
         <span class="doccomment">///anything</span>
         <span class="ident">test</span>: <span class="ident">String</span>,
     },
     <span class="doccomment">///response from WebSocket server for first message</span>
     <span class="ident">ResponseWsUid</span> {
-        <span class="doccomment">///websocket Uid</span>
+        <span class="doccomment">///WebSocket Uid</span>
         <span class="ident">your_ws_uid</span>: <span class="ident">usize</span>,
     },
     <span class="doccomment">///want to play</span>
@@ -223,7 +238,7 @@
         <span class="doccomment">///json of vector of players</span>
         <span class="ident">players</span>: <span class="ident">String</span>,
     },
-    <span class="doccomment">/// player1 initialize the game data ans sends it to all players</span>
+    <span class="doccomment">/// player1 initialize the game data and sends it to all players</span>
     <span class="doccomment">/// I will send json string to not confuse the server with vectors</span>
     <span class="ident">GameDataInit</span> {
         <span class="doccomment">///act is the action to take on the receiver</span>
@@ -234,25 +249,36 @@
         <span class="ident">players</span>: <span class="ident">String</span>,
     },
     <span class="doccomment">///player click</span>
-    <span class="ident">PlayerClick</span> {
+    <span class="ident">PlayerClick1Card</span> {
         <span class="doccomment">///this identifies the smartphone, but not the player-in-turn</span>
         <span class="ident">my_ws_uid</span>: <span class="ident">usize</span>,
         <span class="doccomment">///all players</span>
         <span class="ident">players</span>: <span class="ident">String</span>,
         <span class="doccomment">///card index</span>
         <span class="ident">card_index</span>: <span class="ident">usize</span>,
-        <span class="doccomment">///game state PlayerBefore1Card or PlayerBefore2Card</span>
-        <span class="ident">game_state</span>: <span class="ident">GameState</span>,
+        <span class="doccomment">///game status PlayerBefore1Card or PlayerBefore2Card</span>
+        <span class="ident">game_status</span>: <span class="ident">GameStatus</span>,
     },
-    <span class="doccomment">///player change</span>
-    <span class="ident">PlayerChange</span> {
-        <span class="doccomment">///ws client instance unique id. To not listen the echo to yourself.</span>
+    <span class="doccomment">///player click</span>
+    <span class="ident">PlayerClick2Card</span> {
+        <span class="doccomment">///this identifies the smartphone, but not the player-in-turn</span>
+        <span class="ident">my_ws_uid</span>: <span class="ident">usize</span>,
+        <span class="doccomment">///all players</span>
+        <span class="ident">players</span>: <span class="ident">String</span>,
+        <span class="doccomment">///card index</span>
+        <span class="ident">card_index</span>: <span class="ident">usize</span>,
+        <span class="doccomment">///game status PlayerBefore1Card or PlayerBefore2Card</span>
+        <span class="ident">game_status</span>: <span class="ident">GameStatus</span>,
+    },
+    <span class="doccomment">///Play Again</span>
+    <span class="ident">PlayAgain</span> {
+        <span class="doccomment">///this identifies the smartphone, but not the player-in-turn</span>
         <span class="ident">my_ws_uid</span>: <span class="ident">usize</span>,
         <span class="doccomment">///all players</span>
         <span class="ident">players</span>: <span class="ident">String</span>,
     },
-    <span class="doccomment">///end game</span>
-    <span class="ident">EndGame</span> {
+    <span class="doccomment">///player change</span>
+    <span class="ident">PlayerChange</span> {
         <span class="doccomment">///ws client instance unique id. To not listen the echo to yourself.</span>
         <span class="ident">my_ws_uid</span>: <span class="ident">usize</span>,
         <span class="doccomment">///all players</span>
@@ -270,10 +296,10 @@
     },
 }
 
-<span class="doccomment">///the game can be in various states and that differentiate the UI and actions</span>
-<span class="doccomment">/// all players have the same game state</span>
+<span class="doccomment">///the game can be in various statuses and that differentiate the UI and actions</span>
+<span class="doccomment">/// all players have the same game status</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">AsRefStr</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GameState</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GameStatus</span> {
     <span class="doccomment">/// want to play ask begin</span>
     <span class="ident">WantToPlayAskBegin</span>,
     <span class="doccomment">///Player1 WantToPlay Asking</span>
@@ -289,7 +315,7 @@
     <span class="doccomment">///take turn (after the second card)</span>
     <span class="ident">TakeTurn</span>,
     <span class="doccomment">///end game</span>
-    <span class="ident">EndGame</span>,
+    <span class="ident">PlayAgain</span>,
     <span class="doccomment">///Reconnect after a lost connection</span>
     <span class="ident">Reconnect</span>,
 }
@@ -299,7 +325,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Player</span> {
     <span class="doccomment">///ws_uid</span>
     <span class="kw">pub</span> <span class="ident">ws_uid</span>: <span class="ident">usize</span>,
-    <span class="doccomment">///field for src attribute for HTML element imagea and filename of card image</span>
+    <span class="doccomment">///field for src attribute for HTML element image and filename of card image</span>
     <span class="kw">pub</span> <span class="ident">points</span>: <span class="ident">usize</span>,
 }
 <span class="comment">//endregion</span>

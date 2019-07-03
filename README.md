@@ -39,4 +39,5 @@ It looks that plain web sockets have often connection problems and they disconne
 - floating f64 cast to usize and vice versa with x.approx_as::<f64>() from crate conv  
 - manual reconnect for ws disconnect  
 2019-06-26 3x3 or 3x2 grids. GameConfig.  
+2019-07-03 game flow in modules  
   

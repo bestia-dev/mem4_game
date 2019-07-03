@@ -319,66 +319,23 @@
 <span id="319">319</span>
 <span id="320">320</span>
 <span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
-<span id="362">362</span>
-<span id="363">363</span>
-<span id="364">364</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! rootrenderingcomponent.rs - renders the web page</span>
 
 <span class="comment">//region: use, const</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cardmoniker</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">divcardmoniker</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">divgridcontainer</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">divplayeractions</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">divplayersandscores</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">divrulesanddescription</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gamedata</span>::{<span class="ident">CardStatusCardFace</span>, <span class="ident">GameData</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gridcontainer</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">playeractions</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">playersandscores</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">rulesanddescription</span>;
 
 <span class="kw">use</span> <span class="ident">dodrio</span>::<span class="ident">builder</span>::<span class="ident">text</span>;
 <span class="kw">use</span> <span class="ident">dodrio</span>::<span class="ident">bumpalo</span>::{<span class="self">self</span>, <span class="ident">Bump</span>};
 <span class="kw">use</span> <span class="ident">dodrio</span>::{<span class="ident">Cached</span>, <span class="ident">Node</span>, <span class="ident">Render</span>};
-<span class="kw">use</span> <span class="ident">mem4_common</span>::{<span class="ident">GameStatus</span>, <span class="ident">Player</span>, <span class="ident">WsMessage</span>};
+<span class="kw">use</span> <span class="ident">mem4_common</span>::{<span class="ident">GameStatus</span>, <span class="ident">WsMessage</span>};
 <span class="kw">use</span> <span class="ident">typed_html</span>::<span class="ident">dodrio</span>;
-<span class="kw">use</span> <span class="ident">web_sys</span>::{<span class="ident">console</span>, <span class="ident">WebSocket</span>};
+<span class="kw">use</span> <span class="ident">web_sys</span>::<span class="ident">WebSocket</span>;
 <span class="comment">//endregion</span>
 
 <span class="doccomment">///Root Render Component: the card grid struct has all the needed data for play logic and rendering</span>
@@ -386,36 +343,40 @@
     <span class="doccomment">///game data will be inside of Root, but reference for all other RenderingComponents</span>
     <span class="kw">pub</span> <span class="ident">game_data</span>: <span class="ident">GameData</span>,
     <span class="doccomment">///subComponent: score</span>
-    <span class="kw">pub</span> <span class="ident">players_and_scores</span>: <span class="ident">Cached</span><span class="op">&lt;</span><span class="ident">playersandscores</span>::<span class="ident">PlayersAndScores</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">cached_players_and_scores</span>: <span class="ident">Cached</span><span class="op">&lt;</span><span class="ident">divplayersandscores</span>::<span class="ident">PlayersAndScores</span><span class="op">&gt;</span>,
     <span class="doccomment">///subComponent: the static parts can be cached.</span>
     <span class="doccomment">/// I am not sure if a field in this struct is the best place to put it.</span>
-    <span class="kw">pub</span> <span class="ident">cached_rules_and_description</span>: <span class="ident">Cached</span><span class="op">&lt;</span><span class="ident">rulesanddescription</span>::<span class="ident">RulesAndDescription</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">cached_rules_and_description</span>: <span class="ident">Cached</span><span class="op">&lt;</span><span class="ident">divrulesanddescription</span>::<span class="ident">RulesAndDescription</span><span class="op">&gt;</span>,
 }
 
-<span class="comment">//region:RootRenderingComponent struct is the only persistant data we have in Rust Virtual Dom.dodrio</span>
+<span class="comment">//region:RootRenderingComponent struct is the only persistent data we have in Rust Virtual Dom.dodrio</span>
 <span class="comment">//in the constructor we initialize that data.</span>
-<span class="comment">//Later onclick we change this data.</span>
+<span class="comment">//Later on click we change this data.</span>
 <span class="comment">//at every animation frame we use only this data to render the virtual Dom.</span>
 <span class="comment">//It knows nothing about HTML and Virtual dom.</span>
 <span class="kw">impl</span> <span class="ident">RootRenderingComponent</span> {
-    <span class="doccomment">/// Construct a new `RootRenderingComponent` component. Only once at the begining.</span>
+    <span class="doccomment">/// Construct a new `RootRenderingComponent` component. Only once at the beginning.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ws</span>: <span class="ident">WebSocket</span>, <span class="ident">my_ws_uid</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">game_data</span> <span class="op">=</span> <span class="ident">GameData</span>::<span class="ident">new</span>(<span class="ident">ws</span>, <span class="ident">my_ws_uid</span>);
 
-        <span class="kw">let</span> <span class="ident">game_rule_01</span> <span class="op">=</span> <span class="ident">rulesanddescription</span>::<span class="ident">RulesAndDescription</span> {};
+        <span class="kw">let</span> <span class="ident">game_rule_01</span> <span class="op">=</span> <span class="ident">divrulesanddescription</span>::<span class="ident">RulesAndDescription</span> {};
         <span class="kw">let</span> <span class="ident">cached_rules_and_description</span> <span class="op">=</span> <span class="ident">Cached</span>::<span class="ident">new</span>(<span class="ident">game_rule_01</span>);
-        <span class="kw">let</span> <span class="ident">players_and_scores</span> <span class="op">=</span> <span class="ident">Cached</span>::<span class="ident">new</span>(<span class="ident">playersandscores</span>::<span class="ident">PlayersAndScores</span>::<span class="ident">new</span>(<span class="ident">my_ws_uid</span>));
+        <span class="kw">let</span> <span class="ident">cached_players_and_scores</span> <span class="op">=</span>
+            <span class="ident">Cached</span>::<span class="ident">new</span>(<span class="ident">divplayersandscores</span>::<span class="ident">PlayersAndScores</span>::<span class="ident">new</span>(<span class="ident">my_ws_uid</span>));
 
         <span class="ident">RootRenderingComponent</span> {
             <span class="ident">game_data</span>,
-            <span class="ident">players_and_scores</span>,
+            <span class="ident">cached_players_and_scores</span>,
             <span class="ident">cached_rules_and_description</span>,
         }
     }
     <span class="doccomment">///check invalidate render cache for all sub components</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_invalidate_for_all_components</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">players_and_scores</span>.<span class="ident">update_intern_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">game_data</span>) {
-            <span class="ident">Cached</span>::<span class="ident">invalidate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">players_and_scores</span>);
+        <span class="kw">if</span> <span class="self">self</span>
+            .<span class="ident">cached_players_and_scores</span>
+            .<span class="ident">update_intern_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">game_data</span>)
+        {
+            <span class="ident">Cached</span>::<span class="ident">invalidate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">cached_players_and_scores</span>);
         }
     }
     <span class="doccomment">///on first click</span>
@@ -431,9 +392,9 @@
     }
 
     <span class="doccomment">///on second click</span>
-    <span class="doccomment">///The onclick event passed by javascript executes all the logic</span>
+    <span class="doccomment">///The on click event passed by JavaScript executes all the logic</span>
     <span class="doccomment">///and changes only the fields of the Card Grid struct.</span>
-    <span class="doccomment">///That stuct is the only permanent data storage for later render the virtual dom.</span>
+    <span class="doccomment">///That struct is the only permanent data storage for later render the virtual dom.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">card_on_click_2_card</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="ident">this_click_card_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">card_index_of_second_click</span>;
         <span class="comment">//flip the card up</span>
@@ -488,20 +449,20 @@
                 <span class="ident">point_sum</span> <span class="op">+=</span> <span class="ident">x</span>.<span class="ident">points</span>;
             }
             <span class="kw">if</span> <span class="macro">unwrap</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">vec_cards</span>.<span class="ident">len</span>().<span class="ident">checked_div</span>(<span class="number">2</span>)) <span class="op">==</span> <span class="ident">point_sum</span> {
-                <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> <span class="op">=</span> <span class="ident">GameStatus</span>::<span class="ident">EndGame</span>;
+                <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> <span class="op">=</span> <span class="ident">GameStatus</span>::<span class="ident">PlayAgain</span>;
                 <span class="comment">//send message</span>
                 <span class="macro">unwrap</span><span class="macro">!</span>(
                     <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">ws</span>.<span class="ident">send_with_str</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">serde_json</span>::<span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="ident">WsMessage</span>::<span class="ident">EndGame</span> {
+                        <span class="kw-2">&amp;</span><span class="ident">serde_json</span>::<span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="ident">WsMessage</span>::<span class="ident">PlayAgain</span> {
                             <span class="ident">my_ws_uid</span>: <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">my_ws_uid</span>,
                             <span class="ident">players</span>: <span class="macro">unwrap</span><span class="macro">!</span>(
                                 <span class="ident">serde_json</span>::<span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">players</span>),
                                 <span class="string">&quot;serde_json::to_string(&amp;self.game_data.players)&quot;</span>
                             ),
                         })
-                        .<span class="ident">expect</span>(<span class="string">&quot;error sending EndGame&quot;</span>),
+                        .<span class="ident">expect</span>(<span class="string">&quot;error sending PlayAgain&quot;</span>),
                     ),
-                    <span class="string">&quot;Failed to send EndGame&quot;</span>
+                    <span class="string">&quot;Failed to send PlayAgain&quot;</span>
                 );
             }
         }
@@ -561,40 +522,14 @@
     <span class="comment">//region: all functions for receive message (like events)</span>
     <span class="comment">// I separate the code into functions to avoid looking at all that boilerplate in the big match around futures and components.</span>
     <span class="comment">// All the data changing must be encapsulated inside these functions.</span>
-    <span class="doccomment">///msg response with uid, just to check. because the websocket server</span>
+    <span class="doccomment">///msg response with uid, just to check. because the WebSocket server</span>
     <span class="doccomment">///gets the uid from the client in the url_param. The client generates a random number.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_response_ws_uid</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">your_ws_uid</span>: <span class="ident">usize</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">my_ws_uid</span> <span class="op">!=</span> <span class="ident">your_ws_uid</span> {
             <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">error_text</span> <span class="op">=</span> <span class="string">&quot;my_ws_uid is incorrect!&quot;</span>.<span class="ident">to_string</span>();
         }
     }
-    <span class="doccomment">///msg want to play</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_msg_want_to_play</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">my_ws_uid</span>: <span class="ident">usize</span>, <span class="ident">asked_folder_name</span>: <span class="ident">String</span>) {
-        <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;rcv wanttoplay&quot;</span>.<span class="ident">into</span>());
-        <span class="self">self</span>.<span class="ident">reset</span>();
-        <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> <span class="op">=</span> <span class="ident">GameStatus</span>::<span class="ident">WantToPlayAsked</span>;
-        <span class="comment">//the first player is the initiator</span>
-        <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">players</span>.<span class="ident">push</span>(<span class="ident">Player</span> {
-            <span class="ident">ws_uid</span>: <span class="ident">my_ws_uid</span>,
-            <span class="ident">points</span>: <span class="number">0</span>,
-        });
-        <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">players</span>.<span class="ident">push</span>(<span class="ident">Player</span> {
-            <span class="ident">ws_uid</span>: <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">my_ws_uid</span>,
-            <span class="ident">points</span>: <span class="number">0</span>,
-        });
-        <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">my_player_number</span> <span class="op">=</span> <span class="number">2</span>; <span class="comment">//temporary number</span>
-        <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">asked_folder_name</span> <span class="op">=</span> <span class="ident">asked_folder_name</span>;
-    }
-    <span class="doccomment">///msg accept play</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_msg_play_accept</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">my_ws_uid</span>: <span class="ident">usize</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">my_player_number</span> <span class="op">==</span> <span class="number">1</span> {
-            <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">players</span>.<span class="ident">push</span>(<span class="ident">Player</span> {
-                <span class="ident">ws_uid</span>: <span class="ident">my_ws_uid</span>,
-                <span class="ident">points</span>: <span class="number">0</span>,
-            });
-            <span class="self">self</span>.<span class="ident">check_invalidate_for_all_components</span>();
-        }
-    }
+
     <span class="doccomment">///on game data init</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_msg_game_data_init</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
@@ -634,10 +569,6 @@
         }
         <span class="self">self</span>.<span class="ident">check_invalidate_for_all_components</span>();
     }
-    <span class="doccomment">///msg end game</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_end_game</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> <span class="op">=</span> <span class="ident">GameStatus</span>::<span class="ident">EndGame</span>;
-    }
     <span class="doccomment">///msg response game_config json</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_response_game_config_json</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">json</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">game_config</span> <span class="op">=</span> <span class="macro">unwrap</span><span class="macro">!</span>(
@@ -649,24 +580,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_player_change</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">take_turn</span>();
     }
-    <span class="doccomment">///msg player click</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_player_click</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">game_status</span>: <span class="ident">GameStatus</span>, <span class="ident">card_index</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> <span class="op">=</span> <span class="ident">game_status</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore1Card</span>.<span class="ident">as_ref</span>() {
-            <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">card_index_of_first_click</span> <span class="op">=</span> <span class="ident">card_index</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore2Card</span>.<span class="ident">as_ref</span>() {
-            <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">card_index_of_second_click</span> <span class="op">=</span> <span class="ident">card_index</span>;
-        } <span class="kw">else</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;this else must never be reached!&quot;</span>);
-        }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore1Card</span>.<span class="ident">as_ref</span>() {
-            <span class="self">self</span>.<span class="ident">card_on_click_1_card</span>();
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore2Card</span>.<span class="ident">as_ref</span>() {
-            <span class="self">self</span>.<span class="ident">card_on_click_2_card</span>();
-        } <span class="kw">else</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;this else should never be reached&quot;</span>);
-        }
-    }
+
     <span class="comment">//endregion</span>
 }
 <span class="comment">//endregion</span>
@@ -687,7 +601,7 @@
 
         <span class="comment">//region: private helper fn for Render()</span>
         <span class="comment">//here I use private functions for readability only, to avoid deep code nesting.</span>
-        <span class="comment">//I don&#39;t understand closures enought to use them properly.</span>
+        <span class="comment">//I don&#39;t understand closures enough to use them properly.</span>
         <span class="comment">//These private functions are not in the &quot;impl Render forRootRenderingComponent&quot; because of the error</span>
         <span class="comment">//method `from_card_number_to_img_src` is not a member of trait `Render`</span>
         <span class="comment">//there is not possible to write private and public methods in one impl block there are only pub methods.</span>
@@ -697,21 +611,21 @@
         <span class="comment">//region: create the whole virtual dom. The verbose stuff is in private functions</span>
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">game_data</span>.<span class="ident">error_text</span> <span class="op">==</span> <span class="string">&quot;&quot;</span> {
-            <span class="kw">let</span> <span class="ident">xmax_grid_size</span> <span class="op">=</span> <span class="ident">gridcontainer</span>::<span class="ident">max_grid_size</span>(<span class="self">self</span>);
+            <span class="kw">let</span> <span class="ident">xmax_grid_size</span> <span class="op">=</span> <span class="ident">divgridcontainer</span>::<span class="ident">max_grid_size</span>(<span class="self">self</span>);
             <span class="kw">let</span> <span class="ident">xstyle2</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;width:{}px;&quot;</span>, <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">xmax_grid_size</span>.<span class="ident">hor</span>.<span class="ident">checked_add</span>(<span class="number">2</span>)));
 
             <span class="macro">dodrio</span><span class="macro">!</span>(<span class="ident">bump</span>,
             <span class="op">&lt;</span><span class="ident">div</span> <span class="ident">class</span><span class="op">=</span> <span class="string">&quot;m_container&quot;</span> <span class="ident">style</span><span class="op">=</span>{<span class="ident">xstyle2</span>}<span class="op">&gt;</span>
-                {<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">cardmoniker</span>::<span class="ident">div_grid_card_moniker</span>(<span class="self">self</span>, <span class="ident">bump</span>)]}
-                {<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">gridcontainer</span>::<span class="ident">div_grid_container</span>(<span class="self">self</span>,<span class="ident">bump</span>,<span class="kw-2">&amp;</span><span class="ident">xmax_grid_size</span>)]}
-                {<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">playeractions</span>::<span class="ident">div_player_actions_from_game_status</span>(<span class="self">self</span>, <span class="ident">bump</span>)]}
-                {<span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">players_and_scores</span>.<span class="ident">render</span>(<span class="ident">bump</span>)]}
+                {<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">divcardmoniker</span>::<span class="ident">div_grid_card_moniker</span>(<span class="self">self</span>, <span class="ident">bump</span>)]}
+                {<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">divgridcontainer</span>::<span class="ident">div_grid_container</span>(<span class="self">self</span>,<span class="ident">bump</span>,<span class="kw-2">&amp;</span><span class="ident">xmax_grid_size</span>)]}
+                {<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">divplayeractions</span>::<span class="ident">div_player_actions_from_game_status</span>(<span class="self">self</span>, <span class="ident">bump</span>)]}
+                {<span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">cached_players_and_scores</span>.<span class="ident">render</span>(<span class="ident">bump</span>)]}
                 {<span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">cached_rules_and_description</span>.<span class="ident">render</span>(<span class="ident">bump</span>)]}
             <span class="op">&lt;</span><span class="op">/</span><span class="ident">div</span><span class="op">&gt;</span>
             )
         } <span class="kw">else</span> {
             <span class="comment">//render only the error text to the screen.</span>
-            <span class="comment">//because I want to debug the websocket lost connection</span>
+            <span class="comment">//because I want to debug the WebSocket lost connection</span>
             <span class="macro">dodrio</span><span class="macro">!</span>(<span class="ident">bump</span>,
                 <span class="op">&lt;</span><span class="ident">div</span><span class="op">&gt;</span>
                     <span class="op">&lt;</span><span class="ident">h1</span> <span class="ident">style</span><span class="op">=</span> <span class="string">&quot;color:red;&quot;</span> <span class="op">&gt;</span>

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["div_want_to_play_ask_begin","render want to play ask begin, ask to play for multiple contents/folders"],["div_want_to_play_ask_begin_on_click","on click updates some data and sends msgs msgs will be asynchronously received and processed"],["on_msg_want_to_play","msg want to play"]]});
