@@ -1,4 +1,4 @@
-//! rulesanddescription.rs - renders the div that shows rules and descriptions
+//! divrulesanddescription.rs - renders the div that shows rules and descriptions
 //! All is a static content. Great for implementing dodrio cache.
 
 use dodrio::builder::{br, text};

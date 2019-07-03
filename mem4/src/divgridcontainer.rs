@@ -1,5 +1,5 @@
-//! gridcontainer.rs - renders the grid container with the images
-//! and most important the onclick event
+//! divgridcontainer.rs - renders the grid container with the images
+//! and most important the on click event
 //!
 //region: use, const
 use crate::gamedata::{CardStatusCardFace, Size2d};
@@ -257,10 +257,10 @@ fn div_grid_item_on_click(rrc: &mut RootRenderingComponent, this_click_card_inde
     if game_status.as_ref() == GameStatus::PlayBefore1Card.as_ref() {
         rrc.game_data.card_index_of_first_click = this_click_card_index;
 
-        //region: send WsMessage over websocket
+        //region: send WsMessage over WebSocket
         websocketcommunication::ws_send_msg(
             &rrc.game_data.ws,
-            &WsMessage::PlayerClick {
+            &WsMessage::PlayerClick1Card {
                 my_ws_uid: rrc.game_data.my_ws_uid,
                 players: unwrap!(
                     serde_json::to_string(&rrc.game_data.players),
@@ -274,10 +274,10 @@ fn div_grid_item_on_click(rrc: &mut RootRenderingComponent, this_click_card_inde
         rrc.card_on_click_1_card();
     } else if game_status.as_ref() == GameStatus::PlayBefore2Card.as_ref() {
         rrc.game_data.card_index_of_second_click = this_click_card_index;
-        //region: send WsMessage over websocket
+        //region: send WsMessage over WebSocket
         websocketcommunication::ws_send_msg(
             &rrc.game_data.ws,
-            &WsMessage::PlayerClick {
+            &WsMessage::PlayerClick2Card {
                 my_ws_uid: rrc.game_data.my_ws_uid,
                 players: unwrap!(
                     serde_json::to_string(&rrc.game_data.players),

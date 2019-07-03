@@ -1,9 +1,9 @@
-//! `mem4_server` - html and websocket server for the mem4 game
-//! Primarily made for learning to code Rust for a http + websocket server on the same port  
+//! `mem4_server` - html and WebSocket server for the mem4 game
+//! Primarily made for learning to code Rust for a http + WebSocket server on the same port  
 //! using Warp for a simple memory game for kids - mem4.
-//! On the local public IP address on port 80 listens to http and websocket.
+//! On the local public IP address on port 80 listens to http and WebSocket.
 //! Route for http `/` serves static files from folder `/mem4/`
-//! Route `/mem4ws/` broadcast all websocket msg to all connected clients except sender
+//! Route `/mem4ws/` broadcast all WebSocket msg to all connected clients except sender
 
 //region: Clippy
 #![warn(
@@ -29,6 +29,8 @@
     //Cannot add #[inline] to the start function with #[wasm_bindgen(start)]
     //because then wasm-pack build --target no-modules returns an error: export `run` not found 
     //clippy::missing_inline_in_public_items
+    //Why is this bad : Doc is good. rustc has a MISSING_DOCS allowed-by-default lint for public members, but has no way to enforce documentation of private items. This lint fixes that.
+    clippy::doc_markdown,
 )]
 //endregion
 
@@ -109,7 +111,7 @@ fn main() {
     let matches = App::new("mem4_server")
         .version("1.0.0")
         .author("Luciano Bestia")
-        .about("server http and websocket for mem4 game")
+        .about("server http and WebSocket for mem4 game")
         .arg(
             Arg::with_name("prm_ip")
                 .value_name("ip")
@@ -150,17 +152,17 @@ fn main() {
     let local_addr = SocketAddr::new(local_ip, local_port);
 
     info!(
-        "mem4 http server listening on {} and websocket on /mem4ws/",
+        "mem4 http server listening on {} and WebSocket on /mem4ws/",
         ansi_term::Colour::Red.paint(local_addr.to_string())
     );
     //endregion
 
     // Keep track of all connected users, key is usize, value
-    // is a websocket sender.
+    // is a WebSocket sender.
     let users = Arc::new(Mutex::new(HashMap::new()));
     // Turn our "state" into a new Filter...
     //let users = warp::any().map(move || users.clone());
-    //Clippy recommands this crazyness instead of just users.clone()
+    //Clippy recommends this craziness instead of just users.clone()
     let users = warp::any().map(move || {
         Arc::<
             std::sync::Mutex<
@@ -172,10 +174,10 @@ fn main() {
         >::clone(&users)
     });
 
-    //websocket server
-    // GET from route /mem4ws/ -> websocket upgrade
+    //WebSocket server
+    // GET from route /mem4ws/ -> WebSocket upgrade
     let websocket = warp::path("mem4ws")
-        // The `ws2()` filter will prepare Websocket handshake...
+        // The `ws2()` filter will prepare WebSocket handshake...
         .and(warp::ws2())
         .and(users)
         // Match `/mem4ws/url_param` it can be any string.
@@ -195,7 +197,7 @@ fn main() {
 
 //the url_param is not consumed in this function and Clippy wants a reference instead a value
 #[allow(clippy::needless_pass_by_value)]
-//region: websocket callbacks: connect, msg, disconnect
+//region: WebSocket callbacks: connect, msg, disconnect
 ///new user connects
 fn user_connected(
     ws: WebSocket,
@@ -205,7 +207,7 @@ fn user_connected(
     //the client sends his ws_uid in url_param. it is a random number.
     info!("user_connect() url_param: {}", url_param);
     //convert string to usize
-    //hahahhaha syntax 'turbofish' ::<>
+    //hahahahaha syntax 'turbofish' ::<>
     let my_id = unwrap!(url_param.parse::<usize>());
     //if uid already exists, it is an error
     for (&uid, ..) in users.lock().expect("error users.lock()").iter() {
@@ -220,13 +222,13 @@ fn user_connected(
     let (user_ws_tx, user_ws_rx) = ws.split();
 
     // Use an unbounded channel to handle buffering and flushing of messages
-    // to the websocket...
+    // to the WebSocket...
     let (tx, rx) = mpsc::unbounded();
     warp::spawn(
         rx.map_err(|()| -> warp::Error { unreachable!("unbounded rx never errors") })
             .forward(user_ws_tx)
             .map(|_tx_rx| ())
-            .map_err(|ws_err| info!("websocket send error: {}", ws_err)),
+            .map_err(|ws_err| info!("WebSocket send error: {}", ws_err)),
     );
 
     // Save the sender in our list of connected users.
@@ -237,7 +239,7 @@ fn user_connected(
     // this specific user's connection.
     // Make an extra clone to give to our disconnection handler...
     //let users2 = users.clone();
-    //Clippy reccomands this crazyness insted of users.clone()
+    //Clippy recommends this craziness instead of users.clone()
     let users2 = Arc::<
         std::sync::Mutex<
             std::collections::HashMap<
@@ -259,13 +261,13 @@ fn user_connected(
             user_disconnected(my_id, &users2);
             result
         })
-        // If at any time, there was a websocket error, log here...
+        // If at any time, there was a WebSocket error, log here...
         .map_err(move |e| {
-            info!("websocket error(uid={}): {}", my_id, e);
+            info!("WebSocket error(uid={}): {}", my_id, e);
         })
 }
 
-///on receive websocket message
+///on receive WebSocket message
 fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
     // Skip any non-Text messages...
     let msg = if let Ok(s) = messg.to_str() {
@@ -338,10 +340,11 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
         WsMessage::ResponseWsUid { .. } => info!("ResponseWsUid: {}", ""),
         WsMessage::ResponseGameConfigJson { .. } => info!("ResponseGameConfigJson: {}", ""),
         WsMessage::PlayAccept { players, .. }
-        | WsMessage::PlayerClick { players, .. }
+        | WsMessage::PlayerClick1Card { players, .. }
+        | WsMessage::PlayerClick2Card { players, .. }
         | WsMessage::GameDataInit { players, .. }
         | WsMessage::PlayerChange { players, .. }
-        | WsMessage::EndGame { players, .. } => {
+        | WsMessage::PlayAgain { players, .. } => {
             send_to_other_players(users, ws_uid_of_message, &new_msg, &players)
         }
     }
@@ -409,9 +412,9 @@ fn user_disconnected(my_id: usize, users: &Users) {
 }
 //endregion
 
-//region: local ip (linux and windows distict versions)
+//region: local ip (Linux and windows distinct versions)
 #[cfg(target_family = "unix")]
-///get local ip for unix with ifconfig
+///get local ip for Unix with ifconfig
 pub fn local_ip_get() -> Option<IpAddr> {
     info!("local_ip_get for unix{}", "");
     let output = Command::new("ifconfig")

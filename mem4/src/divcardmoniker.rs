@@ -1,4 +1,4 @@
-//! cardmoniker.rs - renders the card moniker (card name/title)
+//! divcardmoniker.rs - renders the card moniker (card name/title)
 
 //region: use, const
 use crate::rootrenderingcomponent::RootRenderingComponent;

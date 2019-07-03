@@ -1,4 +1,4 @@
-//! playersandscores.rs - renders the div that shows players and scores
+//! divplayersandscores.rs - renders the div that shows players and scores
 
 //region: use
 use crate::gamedata::GameData;

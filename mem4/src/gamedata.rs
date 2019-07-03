@@ -248,7 +248,7 @@ impl GameData {
             GameStatus::PlayBefore1Card
             | GameStatus::PlayBefore2Card
             | GameStatus::TakeTurn
-            | GameStatus::EndGame => true,
+            | GameStatus::PlayAgain => true,
             _ => false,
         }
     }

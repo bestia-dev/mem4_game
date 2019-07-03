@@ -1,7 +1,12 @@
-//! websocketcommunication.rs  - module that cares about websocket communication
+//! WebSocketcommunication.rs  - module that cares about WebSocket communication
 
 //region: use
 use crate::rootrenderingcomponent::RootRenderingComponent;
+use crate::statuswanttoplayasked;
+use crate::statuswanttoplayaskbegin;
+use crate::statusplaybefore1card;
+use crate::statusplaybefore2card;
+
 use futures::Future;
 use js_sys::Reflect;
 use mem4_common::GameStatus;
@@ -14,9 +19,9 @@ use web_sys::{console, ErrorEvent, WebSocket};
 //the location_href is not consumed in this function and Clippy wants a reference instead a value
 //but I don't want references, because they have the lifetime problem.
 #[allow(clippy::needless_pass_by_value)]
-///setup websocket connection
+///setup WebSocket connection
 pub fn setup_ws_connection(location_href: String, client_ws_id: usize) -> WebSocket {
-    //web-sys has websocket for Rust exactly like javascript has¸
+    //web-sys has WebSocket for Rust exactly like JavaScript has¸
     //location_href comes in this format  http://localhost:4000/
     let mut loc_href = location_href.replace("http://", "ws://");
     //Only for debugging in the development environment
@@ -38,7 +43,7 @@ pub fn setup_ws_connection(location_href: String, client_ws_id: usize) -> WebSoc
     //I don't know why is clone needed
     let ws_c = ws.clone();
     //It looks that the first send is in some way a handshake and is part of the connection
-    //it will be execute onopen as a closure
+    //it will be execute on open as a closure
     let open_handler = Box::new(move || {
         console::log_1(&"Connection opened, sending RequestWsUid to server".into());
         unwrap!(
@@ -60,7 +65,7 @@ pub fn setup_ws_connection(location_href: String, client_ws_id: usize) -> WebSoc
     ws
 }
 
-/// receive websocket msg callback. I don't understand this much. Too much future and promises.
+/// receive WebSocket msg callback. I don't understand this much. Too much future and promises.
 pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
     //Player1 on machine1 have a button Ask player to play! before he starts to play.
     //Click and it sends the WsMessage want_to_play. Player1 waits for the reply and cannot play.
@@ -74,7 +79,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
     let msg_recv_handler = Box::new(move |msg: JsValue| {
         let data: JsValue = unwrap!(
             Reflect::get(&msg, &"data".into()),
-            "No 'data' field in websocket message!"
+            "No 'data' field in WebSocket message!"
         );
 
         //serde_json can find out the variant of WsMessage
@@ -121,13 +126,12 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
 
-                            if let GameStatus::EndGame
+                            if let GameStatus::PlayAgain
                             | GameStatus::WantToPlayAskBegin
                             | GameStatus::WantToPlayAsked =
                                 root_rendering_component.game_data.game_status
                             {
-                                root_rendering_component
-                                    .on_msg_want_to_play(my_ws_uid, asked_folder_name);
+                                statuswanttoplayaskbegin::on_msg_want_to_play(root_rendering_component,my_ws_uid, asked_folder_name);
                                 v2.schedule_render();
                             }
                         }
@@ -143,7 +147,10 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             console::log_1(&"rcv PlayAccept".into());
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
-                            root_rendering_component.on_msg_play_accept(my_ws_uid);
+                            statuswanttoplayasked::on_msg_play_accept(
+                                root_rendering_component,
+                                my_ws_uid,
+                            );
                             v2.schedule_render();
                         }
                     })
@@ -177,7 +184,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                     .map_err(|_| ()),
                 );
             }
-            WsMessage::PlayerClick {
+            WsMessage::PlayerClick1Card {
                 card_index,
                 game_status,
                 ..
@@ -190,7 +197,45 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             console::log_1(&"players".into());
-                            root_rendering_component.on_player_click(game_status, card_index);
+                            statusplaybefore1card::on_msg_player_click_1_card(root_rendering_component,game_status, card_index);
+                            v2.schedule_render();
+                        }
+                    })
+                    .map_err(|_| ()),
+                );
+            }
+            WsMessage::PlayerClick2Card {
+                card_index,
+                game_status,
+                ..
+            } => {
+                wasm_bindgen_futures::spawn_local(
+                    weak.with_component({
+                        let v2 = weak.clone();
+                        console::log_1(&"player_click".into());
+                        move |root| {
+                            let root_rendering_component =
+                                root.unwrap_mut::<RootRenderingComponent>();
+                            console::log_1(&"players".into());
+                            statusplaybefore2card::on_msg_player_click_2_card(root_rendering_component,game_status, card_index);
+                            v2.schedule_render();
+                        }
+                    })
+                    .map_err(|_| ()),
+                );
+            }
+            WsMessage::PlayAgain {
+                ..
+            } => {
+                wasm_bindgen_futures::spawn_local(
+                    weak.with_component({
+                        let v2 = weak.clone();
+                        console::log_1(&"play again".into());
+                        move |root| {
+                            let root_rendering_component =
+                                root.unwrap_mut::<RootRenderingComponent>();
+                            console::log_1(&"players".into());
+                            statusplaybefore2card::on_msg_play_again(root_rendering_component);
                             v2.schedule_render();
                         }
                     })
@@ -227,19 +272,6 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                     .map_err(|_| ()),
                 );
             }
-            WsMessage::EndGame { .. } => {
-                wasm_bindgen_futures::spawn_local(
-                    weak.with_component({
-                        move |root| {
-                            console::log_1(&"EndGame".into());
-                            let root_rendering_component =
-                                root.unwrap_mut::<RootRenderingComponent>();
-                            root_rendering_component.on_end_game();
-                        }
-                    })
-                    .map_err(|_| ()),
-                );
-            }
         }
     });
 
@@ -247,10 +279,10 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
     let cb_mrh: Closure<Fn(JsValue)> = Closure::wrap(msg_recv_handler);
     ws.set_onmessage(Some(cb_mrh.as_ref().unchecked_ref()));
 
-    //don't drop the eventlistener from memory
+    //don't drop the event listener from memory
     cb_mrh.forget();
 }
-/// on error write it on the screen for debuggng
+/// on error write it on the screen for debugging
 pub fn setup_ws_onerror(ws: &WebSocket, weak: dodrio::VdomWeak) {
     let onerror_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
         let err_text = format!("error event {:?}", e);
@@ -273,7 +305,7 @@ pub fn setup_ws_onerror(ws: &WebSocket, weak: dodrio::VdomWeak) {
     ws.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
     onerror_callback.forget();
 }
-/// on close websocket connection
+/// on close WebSocket connection
 pub fn setup_ws_onclose(ws: &WebSocket, weak: dodrio::VdomWeak) {
     let onclose_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
         let err_text = format!("ws_onclose {:?}", e);
@@ -299,13 +331,13 @@ pub fn setup_ws_onclose(ws: &WebSocket, weak: dodrio::VdomWeak) {
 }
 ///setup all ws events
 pub fn setup_all_ws_events(ws: &WebSocket, weak: dodrio::VdomWeak) {
-    //websocket on receive message callback
+    //WebSocket on receive message callback
     setup_ws_msg_recv(ws, weak.clone());
 
-    //websocket on error message callback
+    //WebSocket on error message callback
     setup_ws_onerror(ws, weak.clone());
 
-    //websocket on close message callback
+    //WebSocket on close message callback
     setup_ws_onclose(ws, weak);
 }
 

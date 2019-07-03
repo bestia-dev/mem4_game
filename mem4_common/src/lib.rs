@@ -1,5 +1,5 @@
 //! `mem4_common` - commons for mem4 wasm and server
-//! Learning to code Rust for a http + websocket  
+//! Learning to code Rust for a http + WebSocket  
 
 //region: Clippy
 #![warn(
@@ -24,7 +24,9 @@
     //clippy::use_self,
     //Cannot add #[inline] to the start function with #[wasm_bindgen(start)]
     //because then wasm-pack build --target no-modules returns an error: export `run` not found 
-    clippy::missing_inline_in_public_items
+    clippy::missing_inline_in_public_items,
+    //Why is this bad : Doc is good. rustc has a MISSING_DOCS allowed-by-default lint for public members, but has no way to enforce documentation of private items. This lint fixes that.
+    clippy::doc_markdown,
 )]
 //endregion
 
@@ -38,7 +40,7 @@ extern crate strum_macros;
 use strum_macros::AsRefStr;
 //endregion
 
-///`WsMessage` enum for websocket
+///`WsMessage` enum for WebSocket
 #[derive(Serialize, Deserialize)]
 pub enum WsMessage {
     ///Dummy
@@ -46,14 +48,14 @@ pub enum WsMessage {
         ///anything
         dummy: String,
     },
-    ///Request websocket Uid - first message to WebSocket server
+    ///Request WebSocket Uid - first message to WebSocket server
     RequestWsUid {
         ///anything
         test: String,
     },
     ///response from WebSocket server for first message
     ResponseWsUid {
-        ///websocket Uid
+        ///WebSocket Uid
         your_ws_uid: usize,
     },
     ///want to play
@@ -70,7 +72,7 @@ pub enum WsMessage {
         ///json of vector of players
         players: String,
     },
-    /// player1 initialize the game data ans sends it to all players
+    /// player1 initialize the game data and sends it to all players
     /// I will send json string to not confuse the server with vectors
     GameDataInit {
         ///act is the action to take on the receiver
@@ -81,7 +83,7 @@ pub enum WsMessage {
         players: String,
     },
     ///player click
-    PlayerClick {
+    PlayerClick1Card {
         ///this identifies the smartphone, but not the player-in-turn
         my_ws_uid: usize,
         ///all players
@@ -91,15 +93,26 @@ pub enum WsMessage {
         ///game status PlayerBefore1Card or PlayerBefore2Card
         game_status: GameStatus,
     },
-    ///player change
-    PlayerChange {
-        ///ws client instance unique id. To not listen the echo to yourself.
+    ///player click
+    PlayerClick2Card {
+        ///this identifies the smartphone, but not the player-in-turn
+        my_ws_uid: usize,
+        ///all players
+        players: String,
+        ///card index
+        card_index: usize,
+        ///game status PlayerBefore1Card or PlayerBefore2Card
+        game_status: GameStatus,
+    },
+    ///Play Again
+    PlayAgain {
+        ///this identifies the smartphone, but not the player-in-turn
         my_ws_uid: usize,
         ///all players
         players: String,
     },
-    ///end game
-    EndGame {
+    ///player change
+    PlayerChange {
         ///ws client instance unique id. To not listen the echo to yourself.
         my_ws_uid: usize,
         ///all players
@@ -117,7 +130,7 @@ pub enum WsMessage {
     },
 }
 
-///the game can be in various statuss and that differentiate the UI and actions
+///the game can be in various statuses and that differentiate the UI and actions
 /// all players have the same game status
 #[derive(AsRefStr, Serialize, Deserialize, Clone)]
 pub enum GameStatus {
@@ -136,7 +149,7 @@ pub enum GameStatus {
     ///take turn (after the second card)
     TakeTurn,
     ///end game
-    EndGame,
+    PlayAgain,
     ///Reconnect after a lost connection
     Reconnect,
 }
@@ -146,7 +159,7 @@ pub enum GameStatus {
 pub struct Player {
     ///ws_uid
     pub ws_uid: usize,
-    ///field for src attribute for HTML element imagea and filename of card image
+    ///field for src attribute for HTML element image and filename of card image
     pub points: usize,
 }
 //endregion
