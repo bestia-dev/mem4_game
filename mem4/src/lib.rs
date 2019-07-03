@@ -15,7 +15,8 @@
 //! This enables asynchronous changing of data and rendering. They cannot happen theoretically in the same exact moment. So, no data race here.  
 //! When `GameData` change and we now it will affect the DOM, then rendering must be scheduled.  
 //! The root_rendering_component is splitted easily into sub-components.  
-//! [[https://github.com/LucianoBestia/mem4_game/blob/master/docsimgs/subcomponents.png|alt=subcomponents]]  
+//! ![](https://github.com/LucianoBestia/mem4_game/raw/master/docsimgs/subcomponents.png)
+//!
 //!
 //! ## WebSocket communication
 //! TODO: description
