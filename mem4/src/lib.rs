@@ -1,22 +1,26 @@
-//! **mem4 - Learning Rust and Wasm/WebAssembly with Virtual Dom Dodrio and Websocket communication**  
+//! **mem4 - Learning Rust and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication**  
 //region: documentation
 //! mem4 is a simple memory game made primarily for learning the Rust programming language.  
 //! ## Rust and Wasm/WebAssembly
 //! TODO: description
 //! ## Virtual DOM
-//! Constructing a HTML page with Virtual DOM (vdom) is simple because it is rendered completely on every tick (animation frame).  
+//! Constructing a HTML page with Virtual DOM (vdom) is easier  
+//! because it is rendered completely on every tick (animation frame).  
 //! Sometimes is hard for the developer to think what should change in the UI when some data changes.  
-//! The data can change from many different events and very chaotically (asyncronously).  
+//! The data can change from many different events and very chaotically (asynchronously).  
 //! It is easier to think how to render the complete DOM for the given data.  
 //! The dodrio library has ticks, time intervals when it do something.  
 //! If a rendering is scheduled, it will be done on the next tick.  
 //! If a rendering is not scheduled I believe nothing happens.  
-//! This enables asyncronous changing of data and rendering. They cannot happen in the same moment.  
+//! This enables asynchronous changing of data and rendering. They cannot happen theoretically in the same exact moment. So, no data race here.  
 //! When `GameData` change and we now it will affect the DOM, then rendering must be scheduled.  
-//! ## Websocket communication
+//! The root_rendering_component is splitted easily into sub-components.  
+//! [[https://github.com/LucianoBestia/mem4_game/blob/master/docsimgs/subcomponents.png|alt=subcomponents]]  
+//!
+//! ## WebSocket communication
 //! TODO: description
 //! ## Status1 - User action - Status2, Status1 - WsMessage - Status2
-//! In one moment the game is in a cetrain Game Status. The user then makes an action. This action changes the `GameData`.  
+//! In one moment the game is in a certain Game Status. The user then makes an action. This action changes the `GameData`.  
 //! Then a message is sent to other players so they can also change their local `GameData`.  
 //! The rendering is scheduled and it will happen shortly (async). The result is a new `GameStatus`.  
 //!  
@@ -40,15 +44,15 @@
 //! 4. in this table I ignore msgs for the server like GetConfig  
 //!  
 //! ## Futures and promises, Rust and JavaScript
-//! Javascript is all asyncronous. Wasm is nothing else then a shortcut to the javascript engine.  
+//! JavaScript is all asynchronous. Wasm is nothing else then a shortcut to the JavaScript engine.  
 //! So everything is asynchronous. This is pretty hard to grasp. Everything is Promises and futures.  
 //! Still better then `CallBacks`, but very hard to understand. And there is a constant
 //! jumping from thinking in Rust to thinking is JavaScript and back that is pretty confusing.  
-//! Javascript does not have a good idea of Rust datatypes. All there is is a `JSValue` type.  
+//! JavaScript does not have a good idea of Rust datatypes. All there is is a `JSValue` type.  
 //! The library wasm-bindgen has made a fantastic job of giving to Rust the ability to call
-//! anything JavaScript can call, but the wayof doing it is sometimes very hard to understand.  
+//! anything JavaScript can call, but the way of doing it is sometimes very hard to understand.  
 //! ## Browser console
-//! At least in modern browsers (Firefox and Chrome) we have the developer tools F12 and ther is a
+//! At least in modern browsers (Firefox and Chrome) we have the developer tools F12 and there is a
 //! console we can output to. So we can debug what is going on with our program.  
 //! ## Modules
 //! ## Clippy
