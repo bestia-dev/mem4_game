@@ -170,37 +170,104 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! **mem4 game - Learning Rust and Wasm/WebAssembly with Virtual Dom Dodrio and `WebSocket` communication**  </span>
-
+<span class="doccomment">//! **mem4 - Learning Rust and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication**  </span>
+<span class="comment">//region: documentation</span>
 <span class="doccomment">//! mem4 is a simple memory game made primarily for learning the Rust programming language.  </span>
+<span class="doccomment">//! ## Rust and Wasm/WebAssembly</span>
+<span class="doccomment">//! TODO: description</span>
 <span class="doccomment">//! ## Virtual DOM</span>
-<span class="doccomment">//! Constructing a HTML page with Virtual DOM (vdom) is simple because it is rendered completely on every tick (animation frame).  </span>
+<span class="doccomment">//! Constructing a HTML page with Virtual DOM (vdom) is easier  </span>
+<span class="doccomment">//! because it is rendered completely on every tick (animation frame).  </span>
 <span class="doccomment">//! Sometimes is hard for the developer to think what should change in the UI when some data changes.  </span>
-<span class="doccomment">//! The data can change from many different events and very chaotically (asyncronously).  </span>
+<span class="doccomment">//! The data can change from many different events and very chaotically (asynchronously).  </span>
 <span class="doccomment">//! It is easier to think how to render the complete DOM for the given data.  </span>
 <span class="doccomment">//! The dodrio library has ticks, time intervals when it do something.  </span>
 <span class="doccomment">//! If a rendering is scheduled, it will be done on the next tick.  </span>
 <span class="doccomment">//! If a rendering is not scheduled I believe nothing happens.  </span>
-<span class="doccomment">//! This enables asyncronous changing of data and rendering. They cannot happen in the same moment.  </span>
+<span class="doccomment">//! This enables asynchronous changing of data and rendering. They cannot happen theoretically in the same exact moment. So, no data race here.  </span>
 <span class="doccomment">//! When `GameData` change and we now it will affect the DOM, then rendering must be scheduled.  </span>
-<span class="doccomment">//! ## State - action - message - state</span>
-<span class="doccomment">//! In one moment the game is in a cetrain `GameState`. The user then makes an action. This action changes the GameData.  </span>
-<span class="doccomment">//! Then a message is sent to other players so they can also chenge their local `GameData`.  </span>
-<span class="doccomment">//! The rendering is scheduled and it will happen eventually. The result is a new `GameState`.  </span>
+<span class="doccomment">//! The root_rendering_component is splitted easily into sub-components.  </span>
+<span class="doccomment">//! ![](https://github.com/LucianoBestia/mem4_game/raw/master/docsimgs/subcomponents.png)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## WebSocket communication</span>
+<span class="doccomment">//! TODO: description</span>
+<span class="doccomment">//! ## Status1 - User action - Status2, Status1 - WsMessage - Status2</span>
+<span class="doccomment">//! In one moment the game is in a certain Game Status. The user then makes an action. This action changes the `GameData`.  </span>
+<span class="doccomment">//! Then a message is sent to other players so they can also change their local `GameData`.  </span>
+<span class="doccomment">//! The rendering is scheduled and it will happen shortly (async). The result is a new `GameStatus`.  </span>
+<span class="doccomment">//!  </span>
+<span class="doccomment">//! | Game Status1        | Render                     | User action                                 | Condition                           | GameStatus2 t.p.  | Sends Msg        | On rcv Msg o.p.            | GameStatus2 o.p.                  |</span>
+<span class="doccomment">//! | ------------------ | -------------------------- | ------------------------------------------- | ----------------------------------- | ---------------- | ---------------- | -------------------------- | -------------------------------- |</span>
+<span class="doccomment">//! | WantToPlayAskBegin | div_want_to_play_ask_begin | div_want_to_play_ask_begin_on_click         | -                                   | WantToPlayAsking | WantToPlay       | on_msg_want_to_play        | WantToPlayAsked                  |</span>
+<span class="doccomment">//! | WantToPlayAsked    | div_want_to_play_asked     | div_want_to_play_asked_on_click             | -                                   | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |</span>
+<span class="doccomment">//! | WantToPlayAsking   | div_want_to_play_asking    | game_data_init                              | -                                   | PlayBefore1Card  | GameDataInit     | on_msg_game_data_init      | PlayBefore1Card                  |</span>
+<span class="doccomment">//! | PlayBefore1Card    | div_grid_container | div_grid_item_on_click, rrc.card_on_click_1_card(); | -                                   | PlayBefore2Card  | PlayerClick1Card | on_msg_player_click_1_card | PlayBefore2Card                  |</span>
+<span class="doccomment">//! | PlayBefore2Card    | div_grid_container | div_grid_item_on_click, rrc.card_on_click_2_Card(); | If card match and points&lt;allpoint   | PlayBefore1Card  | PlayerClick2Card | on_msg player_click_2_card | PlayBefore1Card                  |</span>
+<span class="doccomment">//! | II                 | II                         | II                                          | If card match and points=&gt;allpoints | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |</span>
+<span class="doccomment">//! | II                 | II                         | II                                          | else                                | TakeTurnBegin    | TakeTurnBegin    | on_msg_take_turn           | TakeTurnBegin                    |</span>
+<span class="doccomment">//! | TakeTurnBegin      | div_take_turn_begin (div_grid_container) | div_take_turn_begin_on_click  | -                                   | PlayBefore1Card  | TakeTurnEnd      | on_take_turn_end           | PlayBefore1Card, the next player |</span>
+<span class="doccomment">//! | PlayAgain          | div_play_again (div_grid_container) | window.location().reload()         | -                                   | -                | -                | -                          | -                                |</span>
+<span class="doccomment">//! |  |  |  |  |  |  |  |  |</span>
+<span class="doccomment">//!  </span>
+<span class="doccomment">//! t.p. = this player,   o.p. = other players,  rrc = root_rendering_component, rcv = receive</span>
+<span class="doccomment">//! 1. Some actions can have different results. For example the condition card match or card don’t match.  </span>
+<span class="doccomment">//! 2. one action must be only for one status1. This action changes Status for this player and sends Msg to other players.  </span>
+<span class="doccomment">//! 3. on receive msg can produce only one status2.  </span>
+<span class="doccomment">//! 4. in this table I ignore msgs for the server like GetConfig  </span>
+<span class="doccomment">//!  </span>
 <span class="doccomment">//! ## Futures and promises, Rust and JavaScript</span>
-<span class="doccomment">//! Javascript is all asyncronous. Wasm is nothing else then a shortcut to the javascript engine.  </span>
+<span class="doccomment">//! JavaScript is all asynchronous. Wasm is nothing else then a shortcut to the JavaScript engine.  </span>
 <span class="doccomment">//! So everything is asynchronous. This is pretty hard to grasp. Everything is Promises and futures.  </span>
 <span class="doccomment">//! Still better then `CallBacks`, but very hard to understand. And there is a constant</span>
 <span class="doccomment">//! jumping from thinking in Rust to thinking is JavaScript and back that is pretty confusing.  </span>
-<span class="doccomment">//! Javascript does not have a good idea of Rust datatypes. All there is is a `JSValue` type.  </span>
+<span class="doccomment">//! JavaScript does not have a good idea of Rust datatypes. All there is is a `JSValue` type.  </span>
 <span class="doccomment">//! The library wasm-bindgen has made a fantastic job of giving to Rust the ability to call</span>
-<span class="doccomment">//! anything JavaScript can call, but the wayof doing it is sometimes very hard to understand.  </span>
+<span class="doccomment">//! anything JavaScript can call, but the way of doing it is sometimes very hard to understand.  </span>
 <span class="doccomment">//! ## Browser console</span>
-<span class="doccomment">//! At least in modern browsers (FireFox and Chrome) we have the developer tools F12 and ther is a</span>
+<span class="doccomment">//! At least in modern browsers (Firefox and Chrome) we have the developer tools F12 and there is a</span>
 <span class="doccomment">//! console we can output to. So we can debug what is going on with our program.  </span>
+<span class="doccomment">//! ## Modules</span>
+<span class="doccomment">//! ## Clippy</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!</span>
+<span class="comment">//endregion</span>
 
 <span class="comment">//needed for dodrio! macro (typed-html)</span>
 <span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;512&quot;</span>]</span>
@@ -253,6 +320,9 @@
     <span class="comment">//clippy::integer_arithmetic,</span>
     <span class="comment">//Why is this bad: For some embedded systems or kernel development, it can be useful to rule out floating-point numbers.</span>
     <span class="ident">clippy</span>::<span class="ident">float_arithmetic</span>,
+    <span class="comment">//Why is this bad</span>
+    <span class="comment">//Doc is good. rustc has a MISSING_DOCS allowed-by-default lint for public members, but has no way to enforce documentation of private items. This lint fixes that.</span>
+    <span class="ident">clippy</span>::<span class="ident">doc_markdown</span>,
 )]</span>
 <span class="comment">//endregion</span>
 

@@ -151,7 +151,7 @@
 <span id="151">151</span>
 <span id="152">152</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! mem4_common - commons for mem4 wasm and server</span>
+<span class="doccomment">//! `mem4_common` - commons for mem4 wasm and server</span>
 <span class="doccomment">//! Learning to code Rust for a http + websocket  </span>
 
 <span class="comment">//region: Clippy</span>
@@ -217,7 +217,7 @@
         <span class="ident">asked_folder_name</span>: <span class="ident">String</span>,
     },
     <span class="doccomment">/// accept play</span>
-    <span class="ident">AcceptPlay</span> {
+    <span class="ident">PlayAccept</span> {
         <span class="doccomment">///ws client instance unique id. To not listen the echo to yourself.</span>
         <span class="ident">my_ws_uid</span>: <span class="ident">usize</span>,
         <span class="doccomment">///json of vector of players</span>
@@ -274,14 +274,14 @@
 <span class="doccomment">/// all players have the same game state</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">AsRefStr</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GameState</span> {
-    <span class="doccomment">///the start of the game</span>
-    <span class="ident">Start</span>,
-    <span class="doccomment">///Player1 Asking WantToPlay</span>
-    <span class="ident">Asking</span>,
-    <span class="doccomment">///Player2 is asked WantToPlay</span>
-    <span class="ident">Asked</span>,
-    <span class="doccomment">///Accepted</span>
-    <span class="ident">Accepted</span>,
+    <span class="doccomment">/// want to play ask begin</span>
+    <span class="ident">WantToPlayAskBegin</span>,
+    <span class="doccomment">///Player1 WantToPlay Asking</span>
+    <span class="ident">WantToPlayAsking</span>,
+    <span class="doccomment">///Player2 WantToPlay Asked</span>
+    <span class="ident">WantToPlayAsked</span>,
+    <span class="doccomment">///PlayAccepted</span>
+    <span class="ident">PlayAccepted</span>,
     <span class="doccomment">///Play before first card</span>
     <span class="ident">PlayBefore1Card</span>,
     <span class="doccomment">///Play before second card</span>

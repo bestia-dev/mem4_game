@@ -259,7 +259,7 @@
 <span class="comment">//region: extern, use,</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">mem4_common</span>;
 
-<span class="kw">use</span> <span class="ident">mem4_common</span>::{<span class="ident">GameState</span>, <span class="ident">Player</span>};
+<span class="kw">use</span> <span class="ident">mem4_common</span>::{<span class="ident">GameStatus</span>, <span class="ident">Player</span>};
 <span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">rngs</span>::<span class="ident">SmallRng</span>;
 <span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">seq</span>::<span class="ident">SliceRandom</span>;
 <span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">FromEntropy</span>;
@@ -295,7 +295,7 @@
     <span class="kw">pub</span> <span class="ident">grid_items_ver</span>: <span class="ident">usize</span>,
 }
 
-<span class="doccomment">///the 3 possible states of one card</span>
+<span class="doccomment">///the 3 possible statuss of one card</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">AsRefStr</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CardStatusCardFace</span> {
     <span class="doccomment">///card face down</span>
@@ -317,8 +317,8 @@
 }
 <span class="doccomment">///game data</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GameData</span> {
-    <span class="doccomment">///game state: Start,Asking,Asked,Player1,Player2</span>
-    <span class="kw">pub</span> <span class="ident">game_state</span>: <span class="ident">GameState</span>,
+    <span class="doccomment">///game status: WantToPlayAskBegin,WantToPlayAsking,WantToPlayAsked,Player1,Player2</span>
+    <span class="kw">pub</span> <span class="ident">game_status</span>: <span class="ident">GameStatus</span>,
     <span class="doccomment">///vector of cards</span>
     <span class="kw">pub</span> <span class="ident">vec_cards</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Card</span><span class="op">&gt;</span>,
     <span class="doccomment">///card index of first click</span>
@@ -444,7 +444,7 @@
     }
     <span class="doccomment">///asociated function: before Accept, there are not random numbers, just default cards.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prepare_for_empty</span>() <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Card</span><span class="op">&gt;</span> {
-        <span class="comment">//prepare 32 empty cards. The random is calculated only on AcceptPlay.</span>
+        <span class="comment">//prepare 32 empty cards. The random is calculated only on PlayAccept.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec_cards</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
         <span class="comment">//I must prepare the 0 index, but then I don&#39;t use it ever.</span>
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..=<span class="number">32</span> {
@@ -472,7 +472,7 @@
             <span class="ident">ws</span>,
             <span class="ident">my_ws_uid</span>,
             <span class="ident">players</span>,
-            <span class="ident">game_state</span>: <span class="ident">GameState</span>::<span class="ident">Start</span>,
+            <span class="ident">game_status</span>: <span class="ident">GameStatus</span>::<span class="ident">WantToPlayAskBegin</span>,
             <span class="ident">content_folder_name</span>: <span class="string">&quot;alphabet&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">asked_folder_name</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">my_player_number</span>: <span class="number">1</span>,
@@ -489,22 +489,22 @@
             <span class="ident">is_reconnect</span>: <span class="bool-val">false</span>,
         }
     }
-    <span class="doccomment">///check only if state Start</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_state_start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="doccomment">///check only if status WantToPlayAskBegin</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_status_want_to_play_ask_begin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">wildcard_enum_match_arm</span>)]</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">game_state</span> {
-            <span class="ident">GameState</span>::<span class="ident">Start</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">game_status</span> {
+            <span class="ident">GameStatus</span>::<span class="ident">WantToPlayAskBegin</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
         }
     }
-    <span class="doccomment">///the only states for rendering the grid container</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_state_for_grid_container</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="doccomment">///the only statuss for rendering the grid container</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_status_for_grid_container</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">wildcard_enum_match_arm</span>)]</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">game_state</span> {
-            <span class="ident">GameState</span>::<span class="ident">PlayBefore1Card</span>
-            <span class="op">|</span> <span class="ident">GameState</span>::<span class="ident">PlayBefore2Card</span>
-            <span class="op">|</span> <span class="ident">GameState</span>::<span class="ident">TakeTurn</span>
-            <span class="op">|</span> <span class="ident">GameState</span>::<span class="ident">EndGame</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">game_status</span> {
+            <span class="ident">GameStatus</span>::<span class="ident">PlayBefore1Card</span>
+            <span class="op">|</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore2Card</span>
+            <span class="op">|</span> <span class="ident">GameStatus</span>::<span class="ident">TakeTurn</span>
+            <span class="op">|</span> <span class="ident">GameStatus</span>::<span class="ident">EndGame</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
         }
     }
