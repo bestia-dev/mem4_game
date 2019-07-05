@@ -1,15 +1,16 @@
 Things are changing fast. This is the situation on 2019-06-25. LucianoBestia
 # mem4_game
 Learning Rust Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication - part four.
+## Documentation
+Documentation generated from source code:  
+https://lucianobestia.github.io/mem4_game/mem4/index.html
+## Info and working game
 Read the `Last project`:  
 https://github.com/LucianoBestia/mem3_game  
 You can play the game here (hosted on google cloud platform):  
 http://34.87.17.103/mem4  
 For exercise I made a Docker image/container for mem4 on the google VM:  
 http://34.87.17.103/memdock4  
-## Documentation
-Documentation generated from source code:  
-https://lucianobestia.github.io/mem4_game/mem4/index.html
 # Idea
 Playing the memory game alone is boring.  
 Playing it with one friend is better.  
@@ -26,8 +27,13 @@ It has also a macro `dodrio!` created exclusively for the dodrio vdom.
 Everything is done in compile time, so the runtime is nothing slower.
 ## WS reconnect
 It looks that plain web sockets have often connection problems and they disconnect here and there. Creating a good reconnect it pretty challenging. 
+## Cargo make
+I prepared some flows and tasks for Cargo make.  
+`cargo make` - lists the possible available/public flows/tasks  
+`cargo make dev` - builds the development version and runs the server and the browser  
+`cargo make release` - builds the release version and runs the server and the browser  
+`cargo make doc` - build the `/target/docs` folder. Copying to the `/docs` folder must be manually performed for now.  
 ## TODO:
-- better documentation. Do I really have to write very long doc-comments in the code ? It looks terrible. But it is useful when reading the code. Maybe I can hide it in a region block. Dodrio has beautiful docs. How did he do it?  
 - sync data from player1 to others after reconnect.
 - sometimes the grid is bigger after every click, but sometimes not
 ## Changelog
@@ -40,4 +46,5 @@ It looks that plain web sockets have often connection problems and they disconne
 - manual reconnect for ws disconnect  
 2019-06-26 3x3 or 3x2 grids. GameConfig.  
 2019-07-03 game flow in modules  
+2019-07-05 refactoring, refactoring,...  
   
