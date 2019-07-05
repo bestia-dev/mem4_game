@@ -11,7 +11,7 @@ use crate::gamedata::{CardStatusCardFace, GameData};
 use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Cached, Node, Render};
-use mem4_common::{GameStatus, WsMessage};
+use mem4_common::GameStatus;
 use typed_html::dodrio;
 use web_sys::WebSocket;
 //endregion
@@ -57,97 +57,7 @@ impl RootRenderingComponent {
             Cached::invalidate(&mut self.cached_players_and_scores);
         }
     }
-    ///on first click
-    pub fn card_on_click_1_card(&mut self) {
-        let this_click_card_index = self.game_data.card_index_of_first_click;
-        //flip the card up
-        unwrap!(
-            self.game_data.vec_cards.get_mut(this_click_card_index),
-            "error this_click_card_index"
-        )
-        .status = CardStatusCardFace::UpTemporary;
-        self.check_invalidate_for_all_components();
-    }
 
-    ///on second click
-    ///The on click event passed by JavaScript executes all the logic
-    ///and changes only the fields of the Card Grid struct.
-    ///That struct is the only permanent data storage for later render the virtual dom.
-    pub fn card_on_click_2_card(&mut self) {
-        let this_click_card_index = self.game_data.card_index_of_second_click;
-        //flip the card up
-        unwrap!(
-            self.game_data.vec_cards.get_mut(this_click_card_index),
-            "error this_click_card_index"
-        )
-        .status = CardStatusCardFace::UpTemporary;
-
-        //if the cards match, player get one point and continues another turn
-        if unwrap!(
-            self.game_data
-                .vec_cards
-                .get(self.game_data.card_index_of_first_click),
-            "error game_data.card_index_of_first_click"
-        )
-        .card_number_and_img_src
-            == unwrap!(
-                self.game_data
-                    .vec_cards
-                    .get(self.game_data.card_index_of_second_click),
-                "error game_data.card_index_of_second_click"
-            )
-            .card_number_and_img_src
-        {
-            //give points
-            unwrap!(
-                self.game_data
-                    .players
-                    .get_mut(unwrap!(self.game_data.player_turn.checked_sub(1))),
-                "self.game_data.players.get_mu(self.game_data.player_turn - 1)"
-            )
-            .points += 1;
-
-            // the two cards matches. make them permanent FaceUp
-            let x1 = self.game_data.card_index_of_first_click;
-            let x2 = self.game_data.card_index_of_second_click;
-            unwrap!(
-                self.game_data.vec_cards.get_mut(x1),
-                "error game_data.card_index_of_first_click"
-            )
-            .status = CardStatusCardFace::UpPermanently;
-            unwrap!(
-                self.game_data.vec_cards.get_mut(x2),
-                "error game_data.card_index_of_second_click"
-            )
-            .status = CardStatusCardFace::UpPermanently;
-            self.game_data.game_status = GameStatus::PlayBefore1Card;
-            //if the sum of points is number of card/2, the game is over
-            let mut point_sum = 0;
-            for x in &self.game_data.players {
-                point_sum += x.points;
-            }
-            if unwrap!(self.game_data.vec_cards.len().checked_div(2)) == point_sum {
-                self.game_data.game_status = GameStatus::PlayAgain;
-                //send message
-                unwrap!(
-                    self.game_data.ws.send_with_str(
-                        &serde_json::to_string(&WsMessage::PlayAgain {
-                            my_ws_uid: self.game_data.my_ws_uid,
-                            players: unwrap!(
-                                serde_json::to_string(&self.game_data.players),
-                                "serde_json::to_string(&self.game_data.players)"
-                            ),
-                        })
-                        .expect("error sending PlayAgain"),
-                    ),
-                    "Failed to send PlayAgain"
-                );
-            }
-        }
-        //TODO: where is if cards don't match???
-        self.check_invalidate_for_all_components();
-
-    }
     ///fn on change for both click and we msg.
     pub fn take_turn(&mut self) {
         self.game_data.player_turn = if self.game_data.player_turn < self.game_data.players.len() {

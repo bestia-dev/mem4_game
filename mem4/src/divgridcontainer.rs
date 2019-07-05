@@ -4,12 +4,13 @@
 //region: use, const
 use crate::gamedata::{CardStatusCardFace, Size2d};
 use crate::rootrenderingcomponent::RootRenderingComponent;
-use crate::websocketcommunication;
+use crate::statusplaybefore1card;
+use crate::statusplaybefore2card;
 
 use conv::*;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
-use mem4_common::{GameStatus, WsMessage};
+use mem4_common::GameStatus;
 use typed_html::dodrio;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -183,7 +184,7 @@ pub fn div_grid_item<'a, 'bump>(
     <div class= "grid_item">
     <img src={img_src} id={img_id} style={opacity} onclick={move |root, vdom, event| {
         //on click needs a code Closure in Rust. Dodrio and wasm-bindgen
-        //generate the javascript code to call it properly.
+        //generate the JavaScript code to call it properly.
         //we need our Struct RootRenderingComponent for Rust to write any data.
         //It comes in the parameter root.
         //All we can change is inside the struct RootRenderingComponent fields.
@@ -253,42 +254,10 @@ fn div_grid_item_on_click(rrc: &mut RootRenderingComponent, this_click_card_inde
 
     let game_status = rrc.game_data.game_status.clone();
 
-
     if game_status.as_ref() == GameStatus::PlayBefore1Card.as_ref() {
-        rrc.game_data.card_index_of_first_click = this_click_card_index;
-
-        //region: send WsMessage over WebSocket
-        websocketcommunication::ws_send_msg(
-            &rrc.game_data.ws,
-            &WsMessage::PlayerClick1Card {
-                my_ws_uid: rrc.game_data.my_ws_uid,
-                players: unwrap!(
-                    serde_json::to_string(&rrc.game_data.players),
-                    "serde_json::to_string(&game_data.players)",
-                ),
-                card_index: this_click_card_index,
-                game_status,
-            },
-        );
-        //endregion
-        rrc.card_on_click_1_card();
+        statusplaybefore1card::card_on_click_1_card(rrc, this_click_card_index)
     } else if game_status.as_ref() == GameStatus::PlayBefore2Card.as_ref() {
-        rrc.game_data.card_index_of_second_click = this_click_card_index;
-        //region: send WsMessage over WebSocket
-        websocketcommunication::ws_send_msg(
-            &rrc.game_data.ws,
-            &WsMessage::PlayerClick2Card {
-                my_ws_uid: rrc.game_data.my_ws_uid,
-                players: unwrap!(
-                    serde_json::to_string(&rrc.game_data.players),
-                    "serde_json::to_string(&game_data.players)",
-                ),
-                card_index: this_click_card_index,
-                game_status,
-            },
-        );
-        //endregion
-        rrc.card_on_click_2_card();
+        statusplaybefore2card::card_on_click_2_card(rrc, this_click_card_index)
     } else {
         panic!("this else must never be reached!");
     }
