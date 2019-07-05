@@ -1,4 +1,4 @@
-//! statuswanttoplayasking.rs - code flow from this status
+//! statusinviteasking.rs - code flow from this status
 
 //region: use
 use crate::rootrenderingcomponent::RootRenderingComponent;
@@ -6,12 +6,12 @@ use crate::rootrenderingcomponent::RootRenderingComponent;
 use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
-use mem4_common::{ WsMessage};
+use mem4_common::WsMessage;
 use typed_html::dodrio;
 //endregion
 
 ///render
-pub fn div_want_to_play_asking<'a, 'bump>(
+pub fn div_invite_asking<'a, 'bump>(
     rrc: &'a RootRenderingComponent,
     bump: &'bump Bump,
 ) -> Node<'bump>
@@ -38,9 +38,9 @@ where
         game_config: unwrap!(serde_json::to_string(&rrc.game_data.game_config)
                     ,"serde_json::to_string(&self.game_data.game_config)"),
                 })
-                .expect("error sending WantToPlay"),
+                .expect("error sending Invite"),
             )
-            ,"Failed to send WantToPlay");
+            ,"Failed to send Invite");
 
         //endregion
         vdom.schedule_render();

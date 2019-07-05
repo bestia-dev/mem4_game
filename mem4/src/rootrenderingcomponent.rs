@@ -71,7 +71,7 @@ impl RootRenderingComponent {
         self.game_data.card_index_of_first_click = 0;
         self.game_data.card_index_of_second_click = 0;
         self.game_data.players.clear();
-        self.game_data.game_status = GameStatus::WantToPlayAskBegin;
+        self.game_data.game_status = GameStatus::InviteAskBegin;
         self.game_data.content_folder_name = "alphabet".to_string();
         self.game_data.asked_folder_name = "".to_string();
         self.game_data.my_player_number = 1;

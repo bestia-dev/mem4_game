@@ -2,8 +2,8 @@
 
 //region: use
 use crate::rootrenderingcomponent::RootRenderingComponent;
-use crate::statuswanttoplayasked;
-use crate::statuswanttoplayaskbegin;
+use crate::statusinviteasked;
+use crate::statusinviteaskbegin;
 use crate::statusplaybefore1card;
 use crate::statusplaybefore2card;
 use crate::statustaketurnbegin;
@@ -69,7 +69,7 @@ pub fn setup_ws_connection(location_href: String, client_ws_id: usize) -> WebSoc
 /// receive WebSocket msg callback. I don't understand this much. Too much future and promises.
 pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
     //Player1 on machine1 have a button Ask player to play! before he starts to play.
-    //Click and it sends the WsMessage want_to_play. Player1 waits for the reply and cannot play.
+    //Click and it sends the WsMessage invite. Player1 waits for the reply and cannot play.
     //Player2 on machine2 see the WsMessage and Accepts it.
     //It sends a WsMessage with the vector of cards. Both will need the same vector.
     //The vector of cards is copied.
@@ -116,7 +116,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                 );
             }
 
-            WsMessage::WantToPlay {
+            WsMessage::Invite {
                 my_ws_uid,
                 asked_folder_name,
             } => {
@@ -128,11 +128,11 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                                 root.unwrap_mut::<RootRenderingComponent>();
 
                             if let GameStatus::PlayAgain
-                            | GameStatus::WantToPlayAskBegin
-                            | GameStatus::WantToPlayAsked =
+                            | GameStatus::InviteAskBegin
+                            | GameStatus::InviteAsked =
                                 root_rendering_component.game_data.game_status
                             {
-                                statuswanttoplayaskbegin::on_msg_want_to_play(root_rendering_component,my_ws_uid, asked_folder_name);
+                                statusinviteaskbegin::on_msg_invite(root_rendering_component,my_ws_uid, asked_folder_name);
                                 v2.schedule_render();
                             }
                         }
@@ -148,7 +148,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             console::log_1(&"rcv PlayAccept".into());
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
-                            statuswanttoplayasked::on_msg_play_accept(
+                            statusinviteasked::on_msg_play_accept(
                                 root_rendering_component,
                                 my_ws_uid,
                             );

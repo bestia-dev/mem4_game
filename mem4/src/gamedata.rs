@@ -61,7 +61,7 @@ pub struct Card {
 }
 ///game data
 pub struct GameData {
-    ///game status: WantToPlayAskBegin,WantToPlayAsking,WantToPlayAsked,Player1,Player2
+    ///game status: InviteAskBegin,InviteAsking,InviteAsked,Player1,Player2
     pub game_status: GameStatus,
     ///vector of cards
     pub vec_cards: Vec<Card>,
@@ -77,7 +77,7 @@ pub struct GameData {
     pub players: Vec<Player>,
     ///content folder name
     pub content_folder_name: String,
-    ///want to play asks for a specific game
+    ///invite asks for a specific game
     pub asked_folder_name: String,
     ///What player am I
     pub my_player_number: usize,
@@ -216,7 +216,7 @@ impl GameData {
             ws,
             my_ws_uid,
             players,
-            game_status: GameStatus::WantToPlayAskBegin,
+            game_status: GameStatus::InviteAskBegin,
             content_folder_name: "alphabet".to_string(),
             asked_folder_name: "".to_string(),
             my_player_number: 1,
@@ -233,11 +233,11 @@ impl GameData {
             is_reconnect: false,
         }
     }
-    ///check only if status WantToPlayAskBegin
-    pub fn is_status_want_to_play_ask_begin(&self) -> bool {
+    ///check only if status InviteAskBegin
+    pub fn is_status_invite_ask_begin(&self) -> bool {
         #[allow(clippy::wildcard_enum_match_arm)]
         match self.game_status {
-            GameStatus::WantToPlayAskBegin => true,
+            GameStatus::InviteAskBegin => true,
             _ => false,
         }
     }

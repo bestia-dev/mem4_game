@@ -7,9 +7,9 @@ use crate::statusplayagain;
 use crate::statusplaybefore1card;
 use crate::statusplaybefore2card;
 use crate::statustaketurnbegin;
-use crate::statuswanttoplayaskbegin;
-use crate::statuswanttoplayasked;
-use crate::statuswanttoplayasking;
+use crate::statusinviteaskbegin;
+use crate::statusinviteasked;
+use crate::statusinviteasking;
 use crate::websocketreconnect;
 
 use dodrio::builder::text;
@@ -27,19 +27,19 @@ pub fn div_player_actions_from_game_status<'a, 'bump>(
 where
     'a: 'bump,
 {
-    if !rrc.game_data.is_status_want_to_play_ask_begin()
+    if !rrc.game_data.is_status_invite_ask_begin()
         && (rrc.game_data.is_reconnect || rrc.game_data.ws.ready_state() != 1)
     {
         //ready_state: 0	CONNECTING, 1	OPEN, 2	CLOSING, 3	CLOSED
         websocketreconnect::div_reconnect(rrc, bump)
-    } else if let GameStatus::WantToPlayAskBegin = rrc.game_data.game_status {
-        statuswanttoplayaskbegin::div_want_to_play_ask_begin(rrc, bump)
-    } else if let GameStatus::WantToPlayAsked = rrc.game_data.game_status {
-        statuswanttoplayasked::div_want_to_play_asked(rrc, bump)
-    } else if let GameStatus::WantToPlayAsking = rrc.game_data.game_status {
-        statuswanttoplayasking::div_want_to_play_asking(rrc, bump)
+    } else if let GameStatus::InviteAskBegin = rrc.game_data.game_status {
+        statusinviteaskbegin::div_invite_ask_begin(rrc, bump)
+    } else if let GameStatus::InviteAsked = rrc.game_data.game_status {
+        statusinviteasked::div_invite_asked(rrc, bump)
+    } else if let GameStatus::InviteAsking = rrc.game_data.game_status {
+        statusinviteasking::div_invite_asking(rrc, bump)
     } else if let GameStatus::PlayAccepted = rrc.game_data.game_status {
-        statuswanttoplayasked::div_play_accepted(rrc, bump)
+        statusinviteasked::div_play_accepted(rrc, bump)
     } else if let GameStatus::PlayBefore1Card = rrc.game_data.game_status {
         statusplaybefore1card::div_click_1_card(rrc, bump)
     } else if let GameStatus::PlayBefore2Card = rrc.game_data.game_status {

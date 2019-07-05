@@ -58,8 +58,8 @@ pub enum WsMessage {
         ///WebSocket Uid
         your_ws_uid: usize,
     },
-    ///want to play
-    WantToPlay {
+    ///invite
+    Invite {
         ///ws client instance unique id. To not listen the echo to yourself.
         my_ws_uid: usize,
         ///content folder name
@@ -134,12 +134,12 @@ pub enum WsMessage {
 /// all players have the same game status
 #[derive(AsRefStr, Serialize, Deserialize, Clone)]
 pub enum GameStatus {
-    /// want to play ask begin
-    WantToPlayAskBegin,
-    ///Player1 WantToPlay Asking
-    WantToPlayAsking,
-    ///Player2 WantToPlay Asked
-    WantToPlayAsked,
+    /// invite ask begin
+    InviteAskBegin,
+    ///Player1 Invite Asking
+    InviteAsking,
+    ///Player2 Invite Asked
+    InviteAsked,
     ///PlayAccepted
     PlayAccepted,
     ///Play before first card

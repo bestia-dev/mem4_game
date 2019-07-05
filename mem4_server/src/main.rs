@@ -280,7 +280,7 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
     //info!("msg: {}", new_msg);
 
     //There are different messages coming from the mem4 wasm app
-    //WantToPlay must be broadcasted to all users
+    //Invite must be broadcasted to all users
     //RequestGameConfig must return a message ResponseGameConfigJson to the same user
     //all others must be forwarded to exactly the other player.
 
@@ -336,7 +336,7 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
                 Err(_disconnected) => {}
             }
         }
-        WsMessage::WantToPlay { .. } => broadcast(users, ws_uid_of_message, &new_msg),
+        WsMessage::Invite { .. } => broadcast(users, ws_uid_of_message, &new_msg),
         WsMessage::ResponseWsUid { .. } => info!("ResponseWsUid: {}", ""),
         WsMessage::ResponseGameConfigJson { .. } => info!("ResponseGameConfigJson: {}", ""),
         WsMessage::PlayAccept { players, .. }

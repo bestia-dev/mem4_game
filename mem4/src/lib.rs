@@ -57,9 +57,9 @@
 //!  
 //! | Game Status1       | Render                     | User action                                 | Condition                            | GameStatus2 t.p.  | Sends Msg       | On rcv Msg o.p.            | GameStatus2 o.p.                 |
 //! | ------------------ | -------------------------- | ------------------------------------------- | ------------------------------------ | ---------------- | ---------------- | -------------------------- | -------------------------------- |
-//! | WantToPlayAskBegin | div_want_to_play_ask_begin | div_want_to_play_ask_begin_on_click         | -                                    | WantToPlayAsking | WantToPlay       | on_msg_want_to_play        | WantToPlayAsked                  |
-//! | WantToPlayAsked    | div_want_to_play_asked, div_play_accepted     | div_want_to_play_asked_on_click             | -                                    | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |
-//! | WantToPlayAsking   | div_want_to_play_asking    | game_data_init                              | -                                    | PlayBefore1Card  | GameDataInit     | on_msg_game_data_init      | PlayBefore1Card                  |
+//! | InviteAskBegin | div_invite_ask_begin | div_invite_ask_begin_on_click         | -                                    | InviteAsking | Invite       | on_msg_invite        | InviteAsked                  |
+//! | InviteAsked    | div_invite_asked, div_play_accepted     | div_invite_asked_on_click             | -                                    | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |
+//! | InviteAsking   | div_invite_asking    | game_data_init                              | -                                    | PlayBefore1Card  | GameDataInit     | on_msg_game_data_init      | PlayBefore1Card                  |
 //! | PlayBefore1Card    | div_grid_container         | div_grid_item_on_click, on_click_1_card();  | -                                    | PlayBefore2Card  | PlayerClick1Card | on_msg_player_click_1_card | PlayBefore2Card                  |
 //! | PlayBefore2Card    | div_grid_container         | div_grid_item_on_click, on_click_2_card();  | If card match and points<all point   | PlayBefore1Card  | PlayerClick2Card | on_msg_player_click_2_card | PlayBefore1Card                  |
 //! | II                 | II                         | II                                          | If card match and points=>all points | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |
@@ -171,9 +171,9 @@ mod statusplayagain;
 mod statusplaybefore1card;
 mod statusplaybefore2card;
 mod statustaketurnbegin;
-mod statuswanttoplayaskbegin;
-mod statuswanttoplayasked;
-mod statuswanttoplayasking;
+mod statusinviteaskbegin;
+mod statusinviteasked;
+mod statusinviteasking;
 mod websocketcommunication;
 mod websocketreconnect;
 //endregion
