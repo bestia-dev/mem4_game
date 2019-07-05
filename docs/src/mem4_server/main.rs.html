@@ -830,7 +830,7 @@
         <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayerClick1Card</span> { <span class="ident">players</span>, .. }
         <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayerClick2Card</span> { <span class="ident">players</span>, .. }
         <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">GameDataInit</span> { <span class="ident">players</span>, .. }
-        <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayerChange</span> { <span class="ident">players</span>, .. }
+        <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">TakeTurnEnd</span> { <span class="ident">players</span>, .. }
         <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayAgain</span> { <span class="ident">players</span>, .. } <span class="op">=&gt;</span> {
             <span class="ident">send_to_other_players</span>(<span class="ident">users</span>, <span class="ident">ws_uid_of_message</span>, <span class="kw-2">&amp;</span><span class="ident">new_msg</span>, <span class="kw-2">&amp;</span><span class="ident">players</span>)
         }

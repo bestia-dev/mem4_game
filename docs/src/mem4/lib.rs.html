@@ -246,6 +246,14 @@
 <span id="246">246</span>
 <span id="247">247</span>
 <span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! **mem4 - Learning Rust and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication**  </span>
 <span class="comment">//region: documentation</span>
@@ -307,14 +315,14 @@
 <span class="doccomment">//! | Game Status1       | Render                     | User action                                 | Condition                            | GameStatus2 t.p.  | Sends Msg       | On rcv Msg o.p.            | GameStatus2 o.p.                 |</span>
 <span class="doccomment">//! | ------------------ | -------------------------- | ------------------------------------------- | ------------------------------------ | ---------------- | ---------------- | -------------------------- | -------------------------------- |</span>
 <span class="doccomment">//! | WantToPlayAskBegin | div_want_to_play_ask_begin | div_want_to_play_ask_begin_on_click         | -                                    | WantToPlayAsking | WantToPlay       | on_msg_want_to_play        | WantToPlayAsked                  |</span>
-<span class="doccomment">//! | WantToPlayAsked    | div_want_to_play_asked     | div_want_to_play_asked_on_click             | -                                    | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |</span>
+<span class="doccomment">//! | WantToPlayAsked    | div_want_to_play_asked, div_play_accepted     | div_want_to_play_asked_on_click             | -                                    | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |</span>
 <span class="doccomment">//! | WantToPlayAsking   | div_want_to_play_asking    | game_data_init                              | -                                    | PlayBefore1Card  | GameDataInit     | on_msg_game_data_init      | PlayBefore1Card                  |</span>
-<span class="doccomment">//! | PlayBefore1Card    | div_grid_container | div_grid_item_on_click, rrc.card_on_click_1_card(); | -                                    | PlayBefore2Card  | PlayerClick1Card | on_msg_player_click_1_card | PlayBefore2Card                  |</span>
-<span class="doccomment">//! | PlayBefore2Card    | div_grid_container | div_grid_item_on_click, rrc.card_on_click_2_Card(); | If card match and points&lt;all point   | PlayBefore1Card  | PlayerClick2Card | on_msg_player_click_2_card | PlayBefore1Card                  |</span>
+<span class="doccomment">//! | PlayBefore1Card    | div_grid_container         | div_grid_item_on_click, on_click_1_card();  | -                                    | PlayBefore2Card  | PlayerClick1Card | on_msg_player_click_1_card | PlayBefore2Card                  |</span>
+<span class="doccomment">//! | PlayBefore2Card    | div_grid_container         | div_grid_item_on_click, on_click_2_card();  | If card match and points&lt;all point   | PlayBefore1Card  | PlayerClick2Card | on_msg_player_click_2_card | PlayBefore1Card                  |</span>
 <span class="doccomment">//! | II                 | II                         | II                                          | If card match and points=&gt;all points | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |</span>
 <span class="doccomment">//! | II                 | II                         | II                                          | else                                 | TakeTurnBegin    | TakeTurnBegin    | on_msg_take_turn           | TakeTurnBegin                    |</span>
-<span class="doccomment">//! | TakeTurnBegin      | div_take_turn_begin (div_grid_container) | div_take_turn_begin_on_click  | -                                    | PlayBefore1Card  | TakeTurnEnd      | on_take_turn_end           | PlayBefore1Card, the next player |</span>
-<span class="doccomment">//! | PlayAgain          | div_play_again (div_grid_container) | window.location().reload()         | -                                    | -                | -                | -                          | -                                |</span>
+<span class="doccomment">//! | TakeTurnBegin      | div_take_turn_begin        | div_take_turn_begin_on_click                | -                                    | PlayBefore1Card  | TakeTurnEnd      | on_msg_take_turn_end       | PlayBefore1Card, the next player |</span>
+<span class="doccomment">//! | PlayAgain          | div_play_again             | window.location().reload()         | -                                    | -                | -                | -                          | -                                |</span>
 <span class="doccomment">//! |  |  |  |  |  |  |  |  |</span>
 <span class="doccomment">//!  </span>
 <span class="doccomment">//! t.p. = this player,   o.p. = other players,  rrc = root_rendering_component, rcv = receive</span>
@@ -342,7 +350,12 @@
 <span class="doccomment">//! Clippy is very useful to teach us how to program in a better way.  </span>
 <span class="doccomment">//! These are not syntax errors, but hints how to do it in a more Rusty way (idiomatic).  </span>
 <span class="doccomment">//! Some lints are problematic and they are explicitly allowed here.</span>
-<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Cargo make</span>
+<span class="doccomment">//! I prepared some flows and tasks for Cargo make.  </span>
+<span class="doccomment">//! `cargo make` - lists the possible available/public flows/tasks  </span>
+<span class="doccomment">//! `cargo make dev` - builds the development version and runs the server and the browser  </span>
+<span class="doccomment">//! `cargo make release` - builds the release version and runs the server and the browser  </span>
+<span class="doccomment">//! `cargo make doc` - build the `/target/doc` folder. Copying to the `/docs` folder must be manually performed for now.  </span>
 <span class="comment">//endregion</span>
 
 <span class="comment">//needed for dodrio! macro (typed-html)</span>
@@ -411,12 +424,15 @@
 <span class="kw">mod</span> <span class="ident">divrulesanddescription</span>;
 <span class="kw">mod</span> <span class="ident">gamedata</span>;
 <span class="kw">mod</span> <span class="ident">rootrenderingcomponent</span>;
-<span class="kw">mod</span> <span class="ident">statuswanttoplayaskbegin</span>;
-<span class="kw">mod</span> <span class="ident">statuswanttoplayasked</span>;
-<span class="kw">mod</span> <span class="ident">websocketcommunication</span>;
+<span class="kw">mod</span> <span class="ident">statusplayagain</span>;
 <span class="kw">mod</span> <span class="ident">statusplaybefore1card</span>;
 <span class="kw">mod</span> <span class="ident">statusplaybefore2card</span>;
-<span class="kw">mod</span> <span class="ident">statusplayagain</span>;
+<span class="kw">mod</span> <span class="ident">statustaketurnbegin</span>;
+<span class="kw">mod</span> <span class="ident">statuswanttoplayaskbegin</span>;
+<span class="kw">mod</span> <span class="ident">statuswanttoplayasked</span>;
+<span class="kw">mod</span> <span class="ident">statuswanttoplayasking</span>;
+<span class="kw">mod</span> <span class="ident">websocketcommunication</span>;
+<span class="kw">mod</span> <span class="ident">websocketreconnect</span>;
 <span class="comment">//endregion</span>
 
 <span class="comment">//region: extern and use statements</span>

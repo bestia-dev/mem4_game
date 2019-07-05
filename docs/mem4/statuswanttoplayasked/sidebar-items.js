@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["div_want_to_play_asked","render asked"],["div_want_to_play_asked_on_click","on click"],["on_msg_play_accept","msg accept play"]]});
+initSidebarItems({"fn":[["div_play_accepted","render play accepted"],["div_want_to_play_asked","render asked"],["div_want_to_play_asked_on_click","on click"],["on_msg_play_accept","msg accept play"]]});

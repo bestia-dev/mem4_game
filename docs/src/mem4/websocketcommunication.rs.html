@@ -351,6 +351,7 @@
 <span id="351">351</span>
 <span id="352">352</span>
 <span id="353">353</span>
+<span id="354">354</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! WebSocketcommunication.rs  - module that cares about WebSocket communication</span>
 
@@ -360,6 +361,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statuswanttoplayaskbegin</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusplaybefore1card</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusplaybefore2card</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statustaketurnbegin</span>;
 
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">Future</span>;
 <span class="kw">use</span> <span class="ident">js_sys</span>::<span class="ident">Reflect</span>;
@@ -596,15 +598,15 @@
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()),
                 );
             }
-            <span class="ident">WsMessage</span>::<span class="ident">PlayerChange</span> { .. } <span class="op">=&gt;</span> {
+            <span class="ident">WsMessage</span>::<span class="ident">TakeTurnEnd</span> { .. } <span class="op">=&gt;</span> {
                 <span class="ident">wasm_bindgen_futures</span>::<span class="ident">spawn_local</span>(
                     <span class="ident">weak</span>.<span class="ident">with_component</span>({
                         <span class="kw">let</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">weak</span>.<span class="ident">clone</span>();
                         <span class="kw">move</span> <span class="op">|</span><span class="ident">root</span><span class="op">|</span> {
                             <span class="kw">let</span> <span class="ident">root_rendering_component</span> <span class="op">=</span>
                                 <span class="ident">root</span>.<span class="ident">unwrap_mut</span>::<span class="op">&lt;</span><span class="ident">RootRenderingComponent</span><span class="op">&gt;</span>();
-                            <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;PlayerChange&quot;</span>.<span class="ident">into</span>());
-                            <span class="ident">root_rendering_component</span>.<span class="ident">on_player_change</span>();
+                            <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;TakeTurnEnd&quot;</span>.<span class="ident">into</span>());
+                            <span class="ident">statustaketurnbegin</span>::<span class="ident">on_msg_take_turn_end</span>(<span class="ident">root_rendering_component</span>);
                             <span class="ident">v2</span>.<span class="ident">schedule_render</span>();
                         }
                     })
