@@ -1,4 +1,4 @@
-//! reconnect.rs 
+//! websocketreconnect.rs - reconnection for websocket must be part of the application.
 
 //region: use
 use crate::rootrenderingcomponent::RootRenderingComponent;
@@ -8,15 +8,12 @@ use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
 use typed_html::dodrio;
-use web_sys::console;
+
 use wasm_bindgen::prelude::*;
-//endregion
+use web_sys::console;
 
 ///render reconnect
-pub fn div_reconnect<'a, 'bump>(
-    _rrc: &'a RootRenderingComponent,
-    bump: &'bump Bump,
-) -> Node<'bump>
+pub fn div_reconnect<'a, 'bump>(_rrc: &'a RootRenderingComponent, bump: &'bump Bump) -> Node<'bump>
 where
     'a: 'bump,
 {

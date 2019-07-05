@@ -93,7 +93,12 @@
 //! Clippy is very useful to teach us how to program in a better way.  
 //! These are not syntax errors, but hints how to do it in a more Rusty way (idiomatic).  
 //! Some lints are problematic and they are explicitly allowed here.
-//!
+//! ## Cargo make
+//! I prepared some flows and tasks for Cargo make.  
+//! `cargo make` - lists the possible available/public flows/tasks  
+//! `cargo make dev` - builds the development version and runs the server and the browser  
+//! `cargo make release` - builds the release version and runs the server and the browser  
+//! `cargo make doc` - build the `/target/doc` folder. Copying to the `/docs` folder must be manually performed for now.  
 //endregion
 
 //needed for dodrio! macro (typed-html)
