@@ -72,6 +72,7 @@ pub fn card_click_1st_card(rrc: &mut RootRenderingComponent) {
         "error this_click_card_index"
     )
     .status = CardStatusCardFace::UpTemporary;
+    rrc.game_data.game_status = GameStatus::PlayBefore2ndCard;
     rrc.check_invalidate_for_all_components();
 }
 
