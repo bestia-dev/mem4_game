@@ -502,8 +502,8 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_status_for_grid_container</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">wildcard_enum_match_arm</span>)]</span>
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">game_status</span> {
-            <span class="ident">GameStatus</span>::<span class="ident">PlayBefore1Card</span>
-            <span class="op">|</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore2Card</span>
+            <span class="ident">GameStatus</span>::<span class="ident">PlayBefore1stCard</span>
+            <span class="op">|</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore2ndCard</span>
             <span class="op">|</span> <span class="ident">GameStatus</span>::<span class="ident">TakeTurnBegin</span>
             <span class="op">|</span> <span class="ident">GameStatus</span>::<span class="ident">TakeTurnEnd</span>
             <span class="op">|</span> <span class="ident">GameStatus</span>::<span class="ident">PlayAgain</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,

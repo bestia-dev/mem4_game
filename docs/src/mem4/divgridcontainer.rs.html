@@ -384,8 +384,8 @@
 <span class="comment">//region: use, const</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gamedata</span>::{<span class="ident">CardStatusCardFace</span>, <span class="ident">Size2d</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">rootrenderingcomponent</span>::<span class="ident">RootRenderingComponent</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusplaybefore1card</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusplaybefore2card</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusplaybefore1stcard</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusplaybefore2ndcard</span>;
 
 <span class="kw">use</span> <span class="ident">conv</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">dodrio</span>::<span class="ident">bumpalo</span>::{<span class="self">self</span>, <span class="ident">Bump</span>};
@@ -571,8 +571,8 @@
         <span class="comment">//The method render will later use that for rendering the new html.</span>
         <span class="kw">let</span> <span class="ident">rrc</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">unwrap_mut</span>::<span class="op">&lt;</span><span class="ident">RootRenderingComponent</span><span class="op">&gt;</span>();
         <span class="comment">//only if the gamestatus is play (1 or 2)</span>
-        <span class="kw">if</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore1Card</span>.<span class="ident">as_ref</span>()
-        <span class="op">||</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore2Card</span>.<span class="ident">as_ref</span>() {
+        <span class="kw">if</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore1stCard</span>.<span class="ident">as_ref</span>()
+        <span class="op">||</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore2ndCard</span>.<span class="ident">as_ref</span>() {
             <span class="comment">// If the event&#39;s target is our image...</span>
             <span class="kw">let</span> <span class="ident">img</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">event</span>
                 .<span class="ident">target</span>()
@@ -634,10 +634,10 @@
 
     <span class="kw">let</span> <span class="ident">game_status</span> <span class="op">=</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span>.<span class="ident">clone</span>();
 
-    <span class="kw">if</span> <span class="ident">game_status</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore1Card</span>.<span class="ident">as_ref</span>() {
-        <span class="ident">statusplaybefore1card</span>::<span class="ident">on_click_1_card</span>(<span class="ident">rrc</span>, <span class="ident">this_click_card_index</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">game_status</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore2Card</span>.<span class="ident">as_ref</span>() {
-        <span class="ident">statusplaybefore2card</span>::<span class="ident">on_click_2_card</span>(<span class="ident">rrc</span>, <span class="ident">this_click_card_index</span>)
+    <span class="kw">if</span> <span class="ident">game_status</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore1stCard</span>.<span class="ident">as_ref</span>() {
+        <span class="ident">statusplaybefore1stcard</span>::<span class="ident">on_click_1st_card</span>(<span class="ident">rrc</span>, <span class="ident">this_click_card_index</span>)
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">game_status</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore2ndCard</span>.<span class="ident">as_ref</span>() {
+        <span class="ident">statusplaybefore2ndcard</span>::<span class="ident">on_click_2nd_card</span>(<span class="ident">rrc</span>, <span class="ident">this_click_card_index</span>)
     } <span class="kw">else</span> {
         <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;this else must never be reached!&quot;</span>);
     }

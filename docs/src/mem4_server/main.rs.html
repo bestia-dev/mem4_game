@@ -484,6 +484,7 @@
 <span id="484">484</span>
 <span id="485">485</span>
 <span id="486">486</span>
+<span id="487">487</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! `mem4_server` - html and WebSocket server for the mem4 game</span>
 <span class="doccomment">//! Primarily made for learning to code Rust for a http + WebSocket server on the same port  </span>
@@ -767,7 +768,7 @@
     <span class="comment">//info!(&quot;msg: {}&quot;, new_msg);</span>
 
     <span class="comment">//There are different messages coming from the mem4 wasm app</span>
-    <span class="comment">//WantToPlay must be broadcasted to all users</span>
+    <span class="comment">//Invite must be broadcasted to all users</span>
     <span class="comment">//RequestGameConfig must return a message ResponseGameConfigJson to the same user</span>
     <span class="comment">//all others must be forwarded to exactly the other player.</span>
 
@@ -823,13 +824,14 @@
                 <span class="prelude-val">Err</span>(<span class="ident">_disconnected</span>) <span class="op">=&gt;</span> {}
             }
         }
-        <span class="ident">WsMessage</span>::<span class="ident">WantToPlay</span> { .. } <span class="op">=&gt;</span> <span class="ident">broadcast</span>(<span class="ident">users</span>, <span class="ident">ws_uid_of_message</span>, <span class="kw-2">&amp;</span><span class="ident">new_msg</span>),
+        <span class="ident">WsMessage</span>::<span class="ident">Invite</span> { .. } <span class="op">=&gt;</span> <span class="ident">broadcast</span>(<span class="ident">users</span>, <span class="ident">ws_uid_of_message</span>, <span class="kw-2">&amp;</span><span class="ident">new_msg</span>),
         <span class="ident">WsMessage</span>::<span class="ident">ResponseWsUid</span> { .. } <span class="op">=&gt;</span> <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;ResponseWsUid: {}&quot;</span>, <span class="string">&quot;&quot;</span>),
         <span class="ident">WsMessage</span>::<span class="ident">ResponseGameConfigJson</span> { .. } <span class="op">=&gt;</span> <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;ResponseGameConfigJson: {}&quot;</span>, <span class="string">&quot;&quot;</span>),
         <span class="ident">WsMessage</span>::<span class="ident">PlayAccept</span> { <span class="ident">players</span>, .. }
-        <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayerClick1Card</span> { <span class="ident">players</span>, .. }
-        <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayerClick2Card</span> { <span class="ident">players</span>, .. }
+        <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayerClick1stCard</span> { <span class="ident">players</span>, .. }
+        <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayerClick2ndCard</span> { <span class="ident">players</span>, .. }
         <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">GameDataInit</span> { <span class="ident">players</span>, .. }
+        <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">TakeTurnBegin</span> { <span class="ident">players</span>, .. }
         <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">TakeTurnEnd</span> { <span class="ident">players</span>, .. }
         <span class="op">|</span> <span class="ident">WsMessage</span>::<span class="ident">PlayAgain</span> { <span class="ident">players</span>, .. } <span class="op">=&gt;</span> {
             <span class="ident">send_to_other_players</span>(<span class="ident">users</span>, <span class="ident">ws_uid_of_message</span>, <span class="kw-2">&amp;</span><span class="ident">new_msg</span>, <span class="kw-2">&amp;</span><span class="ident">players</span>)

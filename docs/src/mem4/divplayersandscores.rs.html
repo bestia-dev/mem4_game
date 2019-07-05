@@ -106,19 +106,13 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! divplayersandscores.rs - renders the div that shows players and scores</span>
 
 <span class="comment">//region: use</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gamedata</span>::<span class="ident">GameData</span>;
 
-<span class="kw">use</span> <span class="ident">dodrio</span>::<span class="ident">builder</span>::{<span class="ident">br</span>, <span class="ident">text</span>};
+<span class="kw">use</span> <span class="ident">dodrio</span>::<span class="ident">builder</span>::{<span class="ident">text</span>};
 <span class="kw">use</span> <span class="ident">dodrio</span>::<span class="ident">bumpalo</span>::{<span class="self">self</span>, <span class="ident">Bump</span>};
 <span class="kw">use</span> <span class="ident">dodrio</span>::{<span class="ident">Node</span>, <span class="ident">Render</span>};
 <span class="kw">use</span> <span class="ident">typed_html</span>::<span class="ident">dodrio</span>;
@@ -209,18 +203,12 @@
         <span class="kw">let</span> <span class="ident">text1</span> <span class="op">=</span> <span class="ident">bumpalo</span>::<span class="macro">format</span><span class="macro">!</span>(<span class="kw">in</span> <span class="ident">bump</span>, <span class="string">&quot;Player{}: {} points&quot;</span>,
         <span class="self">self</span>.<span class="ident">my_player_number</span>, <span class="self">self</span>.<span class="ident">my_points</span>)
         .<span class="ident">into_bump_str</span>();
-        <span class="comment">//for debugging only</span>
-        <span class="kw">let</span> <span class="ident">text2</span> <span class="op">=</span> <span class="ident">bumpalo</span>::<span class="macro">format</span><span class="macro">!</span>(<span class="kw">in</span> <span class="ident">bump</span>, <span class="string">&quot;(ws_uid: {})&quot;</span>,
-        <span class="self">self</span>.<span class="ident">my_ws_uid</span>)
-        .<span class="ident">into_bump_str</span>();
         <span class="comment">//return</span>
         <span class="macro">dodrio</span><span class="macro">!</span>(<span class="ident">bump</span>,
         <span class="op">&lt;</span><span class="ident">div</span> <span class="ident">class</span><span class="op">=</span><span class="string">&quot;grid_container_players&quot;</span> <span class="ident">style</span><span class="op">=</span> <span class="string">&quot;grid-template-columns: auto;&quot;</span><span class="op">&gt;</span>
             <span class="op">&lt;</span><span class="ident">div</span> <span class="ident">class</span><span class="op">=</span> <span class="string">&quot;grid_item&quot;</span> <span class="ident">style</span><span class="op">=</span><span class="string">&quot;text-align: center;&quot;</span><span class="op">&gt;</span>
                 {<span class="macro">vec</span><span class="macro">!</span>[
                     <span class="ident">text</span>(<span class="ident">text1</span>),
-                    <span class="ident">br</span>(<span class="ident">bump</span>).<span class="ident">finish</span>(),
-                    <span class="ident">text</span>(<span class="ident">text2</span>)
                 ]}
             <span class="op">&lt;</span><span class="op">/</span><span class="ident">div</span><span class="op">&gt;</span>
         <span class="op">&lt;</span><span class="op">/</span><span class="ident">div</span><span class="op">&gt;</span>
