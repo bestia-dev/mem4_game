@@ -7,8 +7,10 @@ use crate::websocketcommunication;
 use mem4_common::{GameStatus, WsMessage};
 //endregion
 
+//div_grid_container() is in divgridcontainer.rs
+
 ///on click
-pub fn card_on_click_2_card(rrc: &mut RootRenderingComponent, this_click_card_index: usize) {
+pub fn on_click_2_card(rrc: &mut RootRenderingComponent, this_click_card_index: usize) {
     rrc.game_data.card_index_of_second_click = this_click_card_index;
     //region: send WsMessage over WebSocket
     websocketcommunication::ws_send_msg(
@@ -79,13 +81,13 @@ pub fn card_click_2_card(rrc: &mut RootRenderingComponent) {
             "error game_data.card_index_of_second_click"
         )
         .status = CardStatusCardFace::UpPermanently;
-        rrc.game_data.game_status = GameStatus::PlayBefore1Card;
         //if the sum of points is number of card/2, the game is over
         let mut point_sum = 0;
         for x in &rrc.game_data.players {
             point_sum += x.points;
         }
         if unwrap!(rrc.game_data.vec_cards.len().checked_div(2)) == point_sum {
+            //The game is over and the question Play again?
             rrc.game_data.game_status = GameStatus::PlayAgain;
             //send message
             unwrap!(
@@ -101,10 +103,16 @@ pub fn card_click_2_card(rrc: &mut RootRenderingComponent) {
                 ),
                 "Failed to send PlayAgain"
             );
+        }else{
+            //the same payer continue to play
+            rrc.game_data.game_status = GameStatus::PlayBefore1Card;
         }
-
+    }else{
+        //if cards don't match
+        rrc.game_data.game_status = GameStatus::TakeTurnBegin;
+        //now all the players are calculating the status of the game.
+        //This is not ok. Only the active player should calculate and send a message to all others.
     }
-    //TODO: where is if cards don't match???
     rrc.check_invalidate_for_all_components();
 }
 ///msg player click

@@ -6,6 +6,7 @@ use crate::statuswanttoplayasked;
 use crate::statuswanttoplayaskbegin;
 use crate::statusplaybefore1card;
 use crate::statusplaybefore2card;
+use crate::statustaketurnbegin;
 
 use futures::Future;
 use js_sys::Reflect;
@@ -242,15 +243,15 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                     .map_err(|_| ()),
                 );
             }
-            WsMessage::PlayerChange { .. } => {
+            WsMessage::TakeTurnEnd { .. } => {
                 wasm_bindgen_futures::spawn_local(
                     weak.with_component({
                         let v2 = weak.clone();
                         move |root| {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
-                            console::log_1(&"PlayerChange".into());
-                            root_rendering_component.on_player_change();
+                            console::log_1(&"TakeTurnEnd".into());
+                            statustaketurnbegin::on_msg_take_turn_end(root_rendering_component);
                             v2.schedule_render();
                         }
                     })

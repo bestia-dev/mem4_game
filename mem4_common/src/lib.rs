@@ -112,7 +112,7 @@ pub enum WsMessage {
         players: String,
     },
     ///player change
-    PlayerChange {
+    TakeTurnEnd {
         ///ws client instance unique id. To not listen the echo to yourself.
         my_ws_uid: usize,
         ///all players
@@ -146,8 +146,10 @@ pub enum GameStatus {
     PlayBefore1Card,
     ///Play before second card
     PlayBefore2Card,
-    ///take turn (after the second card)
-    TakeTurn,
+    ///take turn begin
+    TakeTurnBegin,
+    ///take turn end
+    TakeTurnEnd,
     ///end game
     PlayAgain,
     ///Reconnect after a lost connection

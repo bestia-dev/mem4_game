@@ -5,10 +5,11 @@ use crate::gamedata::CardStatusCardFace;
 use crate::rootrenderingcomponent::RootRenderingComponent;
 use crate::websocketcommunication;
 use mem4_common::{GameStatus, WsMessage};
-//div_grid_container is in divgridcontainer
+
+//div_grid_container() is in divgridcontainer.rs
 
 /// on click
-pub fn card_on_click_1_card(rrc: &mut RootRenderingComponent,this_click_card_index:usize) {
+pub fn on_click_1_card(rrc: &mut RootRenderingComponent, this_click_card_index: usize) {
     rrc.game_data.card_index_of_first_click = this_click_card_index;
     //region: send WsMessage over WebSocket
     websocketcommunication::ws_send_msg(

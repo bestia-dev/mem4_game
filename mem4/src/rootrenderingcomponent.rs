@@ -6,7 +6,7 @@ use crate::divgridcontainer;
 use crate::divplayeractions;
 use crate::divplayersandscores;
 use crate::divrulesanddescription;
-use crate::gamedata::{CardStatusCardFace, GameData};
+use crate::gamedata::GameData;
 
 use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
@@ -58,33 +58,6 @@ impl RootRenderingComponent {
         }
     }
 
-    ///fn on change for both click and we msg.
-    pub fn take_turn(&mut self) {
-        self.game_data.player_turn = if self.game_data.player_turn < self.game_data.players.len() {
-            unwrap!(self.game_data.player_turn.checked_add(1))
-        } else {
-            1
-        };
-
-        //click on Change button closes first and second card
-        let x1 = self.game_data.card_index_of_first_click;
-        let x2 = self.game_data.card_index_of_second_click;
-        unwrap!(
-            self.game_data.vec_cards.get_mut(x1),
-            "error game_data.card_index_of_first_click "
-        )
-        .status = CardStatusCardFace::Down;
-        unwrap!(
-            self.game_data.vec_cards.get_mut(x2),
-            "error game_data.card_index_of_second_click"
-        )
-        .status = CardStatusCardFace::Down;
-        self.game_data.card_index_of_first_click = 0;
-        self.game_data.card_index_of_second_click = 0;
-        self.game_data.game_status = GameStatus::PlayBefore1Card;
-
-        self.check_invalidate_for_all_components();
-    }
     ///prepares the game data
     pub fn game_data_init(&mut self) {
         self.game_data.content_folder_name = self.game_data.asked_folder_name.clone();
@@ -164,10 +137,7 @@ impl RootRenderingComponent {
             "error root_rendering_component.game_data.game_config = serde_json::from_str(&json)",
         );
     }
-    ///msg player change
-    pub fn on_player_change(&mut self) {
-        self.take_turn();
-    }
+
 
     //endregion
 }

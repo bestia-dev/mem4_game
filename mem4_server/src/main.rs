@@ -343,7 +343,7 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
         | WsMessage::PlayerClick1Card { players, .. }
         | WsMessage::PlayerClick2Card { players, .. }
         | WsMessage::GameDataInit { players, .. }
-        | WsMessage::PlayerChange { players, .. }
+        | WsMessage::TakeTurnEnd { players, .. }
         | WsMessage::PlayAgain { players, .. } => {
             send_to_other_players(users, ws_uid_of_message, &new_msg, &players)
         }

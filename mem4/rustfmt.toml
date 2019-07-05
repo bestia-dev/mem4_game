@@ -5,3 +5,7 @@
 
 # Forces the where clause to be laid out on a single line.
 # still unstable where_single_line = true
+
+reorder_imports = false
+reorder_modules = false
+reorder_impl_items = false

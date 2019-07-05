@@ -247,7 +247,8 @@ impl GameData {
         match self.game_status {
             GameStatus::PlayBefore1Card
             | GameStatus::PlayBefore2Card
-            | GameStatus::TakeTurn
+            | GameStatus::TakeTurnBegin
+            | GameStatus::TakeTurnEnd
             | GameStatus::PlayAgain => true,
             _ => false,
         }

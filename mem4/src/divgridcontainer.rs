@@ -255,9 +255,9 @@ fn div_grid_item_on_click(rrc: &mut RootRenderingComponent, this_click_card_inde
     let game_status = rrc.game_data.game_status.clone();
 
     if game_status.as_ref() == GameStatus::PlayBefore1Card.as_ref() {
-        statusplaybefore1card::card_on_click_1_card(rrc, this_click_card_index)
+        statusplaybefore1card::on_click_1_card(rrc, this_click_card_index)
     } else if game_status.as_ref() == GameStatus::PlayBefore2Card.as_ref() {
-        statusplaybefore2card::card_on_click_2_card(rrc, this_click_card_index)
+        statusplaybefore2card::on_click_2_card(rrc, this_click_card_index)
     } else {
         panic!("this else must never be reached!");
     }
