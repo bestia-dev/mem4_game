@@ -80,9 +80,9 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusplaybefore1card</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusplaybefore2card</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statustaketurnbegin</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statuswanttoplayaskbegin</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statuswanttoplayasked</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statuswanttoplayasking</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusinviteaskbegin</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusinviteasked</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusinviteasking</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">websocketreconnect</span>;
 
 <span class="kw">use</span> <span class="ident">dodrio</span>::<span class="ident">builder</span>::<span class="ident">text</span>;
@@ -100,19 +100,19 @@
 <span class="kw">where</span>
     <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;bump</span>,
 {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">is_status_want_to_play_ask_begin</span>()
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">is_status_invite_ask_begin</span>()
         <span class="op">&amp;&amp;</span> (<span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">is_reconnect</span> <span class="op">||</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">ws</span>.<span class="ident">ready_state</span>() <span class="op">!=</span> <span class="number">1</span>)
     {
         <span class="comment">//ready_state: 0	CONNECTING, 1	OPEN, 2	CLOSING, 3	CLOSED</span>
         <span class="ident">websocketreconnect</span>::<span class="ident">div_reconnect</span>(<span class="ident">rrc</span>, <span class="ident">bump</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GameStatus</span>::<span class="ident">WantToPlayAskBegin</span> <span class="op">=</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> {
-        <span class="ident">statuswanttoplayaskbegin</span>::<span class="ident">div_want_to_play_ask_begin</span>(<span class="ident">rrc</span>, <span class="ident">bump</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GameStatus</span>::<span class="ident">WantToPlayAsked</span> <span class="op">=</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> {
-        <span class="ident">statuswanttoplayasked</span>::<span class="ident">div_want_to_play_asked</span>(<span class="ident">rrc</span>, <span class="ident">bump</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GameStatus</span>::<span class="ident">WantToPlayAsking</span> <span class="op">=</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> {
-        <span class="ident">statuswanttoplayasking</span>::<span class="ident">div_want_to_play_asking</span>(<span class="ident">rrc</span>, <span class="ident">bump</span>)
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GameStatus</span>::<span class="ident">InviteAskBegin</span> <span class="op">=</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> {
+        <span class="ident">statusinviteaskbegin</span>::<span class="ident">div_invite_ask_begin</span>(<span class="ident">rrc</span>, <span class="ident">bump</span>)
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GameStatus</span>::<span class="ident">InviteAsked</span> <span class="op">=</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> {
+        <span class="ident">statusinviteasked</span>::<span class="ident">div_invite_asked</span>(<span class="ident">rrc</span>, <span class="ident">bump</span>)
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GameStatus</span>::<span class="ident">InviteAsking</span> <span class="op">=</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> {
+        <span class="ident">statusinviteasking</span>::<span class="ident">div_invite_asking</span>(<span class="ident">rrc</span>, <span class="ident">bump</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GameStatus</span>::<span class="ident">PlayAccepted</span> <span class="op">=</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> {
-        <span class="ident">statuswanttoplayasked</span>::<span class="ident">div_play_accepted</span>(<span class="ident">rrc</span>, <span class="ident">bump</span>)
+        <span class="ident">statusinviteasked</span>::<span class="ident">div_play_accepted</span>(<span class="ident">rrc</span>, <span class="ident">bump</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore1Card</span> <span class="op">=</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> {
         <span class="ident">statusplaybefore1card</span>::<span class="ident">div_click_1_card</span>(<span class="ident">rrc</span>, <span class="ident">bump</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GameStatus</span>::<span class="ident">PlayBefore2Card</span> <span class="op">=</span> <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">game_status</span> {

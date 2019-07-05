@@ -55,17 +55,17 @@
 //! Then a message is sent to other players so they can also change their local GameData and GameStatus.  
 //! The rendering is scheduled and it will happen shortly (async).   
 //!  
-//! | Game Status1       | Render                     | User action                                 | Condition                            | GameStatus2 t.p.  | Sends Msg       | On rcv Msg o.p.            | GameStatus2 o.p.                 |
+//! | Game Status1       | Render                     | User action                                 | Condition                            | GameStatus2 t.p. | Sends Msg        | On rcv Msg o.p.            | GameStatus2 o.p.                 |
 //! | ------------------ | -------------------------- | ------------------------------------------- | ------------------------------------ | ---------------- | ---------------- | -------------------------- | -------------------------------- |
-//! | InviteAskBegin | div_invite_ask_begin | div_invite_ask_begin_on_click         | -                                    | InviteAsking | Invite       | on_msg_invite        | InviteAsked                  |
-//! | InviteAsked    | div_invite_asked, div_play_accepted     | div_invite_asked_on_click             | -                                    | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |
-//! | InviteAsking   | div_invite_asking    | game_data_init                              | -                                    | PlayBefore1Card  | GameDataInit     | on_msg_game_data_init      | PlayBefore1Card                  |
+//! | InviteAskBegin     | div_invite_ask_begin       | div_invite_ask_begin_on_click               | -                                    | InviteAsking     | Invite           | on_msg_invite              | InviteAsked                      |
+//! | InviteAsked        | div_invite_asked, div_play_accepted | div_invite_asked_on_click          | -                                    | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |
+//! | InviteAsking       | div_invite_asking          | game_data_init                              | -                                    | PlayBefore1Card  | GameDataInit     | on_msg_game_data_init      | PlayBefore1Card                  |
 //! | PlayBefore1Card    | div_grid_container         | div_grid_item_on_click, on_click_1_card();  | -                                    | PlayBefore2Card  | PlayerClick1Card | on_msg_player_click_1_card | PlayBefore2Card                  |
 //! | PlayBefore2Card    | div_grid_container         | div_grid_item_on_click, on_click_2_card();  | If card match and points<all point   | PlayBefore1Card  | PlayerClick2Card | on_msg_player_click_2_card | PlayBefore1Card                  |
-//! | II                 | II                         | II                                          | If card match and points=>all points | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |
-//! | II                 | II                         | II                                          | else                                 | TakeTurnBegin    | TakeTurnBegin    | on_msg_take_turn           | TakeTurnBegin                    |
+//! | -II-               | -II-                       | -II-                                        | If card match and points=>all points | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |
+//! | -II-               | -II-                       | -II-                                        | else                                 | TakeTurnBegin    | TakeTurnBegin    | on_msg_take_turn           | TakeTurnBegin                    |
 //! | TakeTurnBegin      | div_take_turn_begin        | div_take_turn_begin_on_click                | -                                    | PlayBefore1Card  | TakeTurnEnd      | on_msg_take_turn_end       | PlayBefore1Card, the next player |
-//! | PlayAgain          | div_play_again             | window.location().reload()         | -                                    | -                | -                | -                          | -                                |
+//! | PlayAgain          | div_play_again             | window.location().reload()                  | -                                    | -                | -                | -                          | -                                |
 //! |  |  |  |  |  |  |  |  |
 //!  
 //! t.p. = this player,   o.p. = other players,  rrc = root_rendering_component, rcv = receive
@@ -167,13 +167,13 @@ mod divplayersandscores;
 mod divrulesanddescription;
 mod gamedata;
 mod rootrenderingcomponent;
-mod statusplayagain;
-mod statusplaybefore1card;
-mod statusplaybefore2card;
-mod statustaketurnbegin;
 mod statusinviteaskbegin;
 mod statusinviteasked;
 mod statusinviteasking;
+mod statusplaybefore1card;
+mod statusplaybefore2card;
+mod statustaketurnbegin;
+mod statusplayagain;
 mod websocketcommunication;
 mod websocketreconnect;
 //endregion

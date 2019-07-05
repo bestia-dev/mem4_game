@@ -318,7 +318,7 @@
 }
 <span class="doccomment">///game data</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GameData</span> {
-    <span class="doccomment">///game status: WantToPlayAskBegin,WantToPlayAsking,WantToPlayAsked,Player1,Player2</span>
+    <span class="doccomment">///game status: InviteAskBegin,InviteAsking,InviteAsked,Player1,Player2</span>
     <span class="kw">pub</span> <span class="ident">game_status</span>: <span class="ident">GameStatus</span>,
     <span class="doccomment">///vector of cards</span>
     <span class="kw">pub</span> <span class="ident">vec_cards</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Card</span><span class="op">&gt;</span>,
@@ -334,7 +334,7 @@
     <span class="kw">pub</span> <span class="ident">players</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Player</span><span class="op">&gt;</span>,
     <span class="doccomment">///content folder name</span>
     <span class="kw">pub</span> <span class="ident">content_folder_name</span>: <span class="ident">String</span>,
-    <span class="doccomment">///want to play asks for a specific game</span>
+    <span class="doccomment">///invite asks for a specific game</span>
     <span class="kw">pub</span> <span class="ident">asked_folder_name</span>: <span class="ident">String</span>,
     <span class="doccomment">///What player am I</span>
     <span class="kw">pub</span> <span class="ident">my_player_number</span>: <span class="ident">usize</span>,
@@ -473,7 +473,7 @@
             <span class="ident">ws</span>,
             <span class="ident">my_ws_uid</span>,
             <span class="ident">players</span>,
-            <span class="ident">game_status</span>: <span class="ident">GameStatus</span>::<span class="ident">WantToPlayAskBegin</span>,
+            <span class="ident">game_status</span>: <span class="ident">GameStatus</span>::<span class="ident">InviteAskBegin</span>,
             <span class="ident">content_folder_name</span>: <span class="string">&quot;alphabet&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">asked_folder_name</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">my_player_number</span>: <span class="number">1</span>,
@@ -490,11 +490,11 @@
             <span class="ident">is_reconnect</span>: <span class="bool-val">false</span>,
         }
     }
-    <span class="doccomment">///check only if status WantToPlayAskBegin</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_status_want_to_play_ask_begin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="doccomment">///check only if status InviteAskBegin</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_status_invite_ask_begin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">wildcard_enum_match_arm</span>)]</span>
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">game_status</span> {
-            <span class="ident">GameStatus</span>::<span class="ident">WantToPlayAskBegin</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">GameStatus</span>::<span class="ident">InviteAskBegin</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
         }
     }
