@@ -5,7 +5,40 @@ use crate::gamedata::CardStatusCardFace;
 use crate::rootrenderingcomponent::RootRenderingComponent;
 use crate::websocketcommunication;
 use mem4_common::{GameStatus, WsMessage};
+
+use dodrio::builder::text;
+use dodrio::bumpalo::{self, Bump};
+use dodrio::Node;
+use typed_html::dodrio;
 //endregion
+
+///render Play or Wait
+pub fn div_click_2_card<'a, 'bump>(
+    root_rendering_component: &'a RootRenderingComponent,
+    bump: &'bump Bump,
+) -> Node<'bump>
+where
+    'a: 'bump,
+{
+    if root_rendering_component.game_data.my_player_number
+        == root_rendering_component.game_data.player_turn
+    {
+        dodrio!(bump,
+        <div class="div_clickable">
+            <h2 id= "ws_elem" style= "color:orange;">
+                {vec![text(bumpalo::format!(in bump, "Play player{} !", root_rendering_component.game_data.player_turn).into_bump_str())]}
+            </h2>
+        </div>
+        )
+    } else {
+        //return wait for the other player
+        dodrio!(bump,
+        <h2 id="ws_elem" style= "color:red;">
+            {vec![text(bumpalo::format!(in bump, "Wait for player{} !", root_rendering_component.game_data.player_turn).into_bump_str())]}
+        </h2>
+        )
+    }
+}
 
 //div_grid_container() is in divgridcontainer.rs
 
@@ -103,11 +136,11 @@ pub fn card_click_2_card(rrc: &mut RootRenderingComponent) {
                 ),
                 "Failed to send PlayAgain"
             );
-        }else{
+        } else {
             //the same payer continue to play
             rrc.game_data.game_status = GameStatus::PlayBefore1Card;
         }
-    }else{
+    } else {
         //if cards don't match
         rrc.game_data.game_status = GameStatus::TakeTurnBegin;
         //now all the players are calculating the status of the game.

@@ -58,14 +58,14 @@
 //! | Game Status1       | Render                     | User action                                 | Condition                            | GameStatus2 t.p.  | Sends Msg       | On rcv Msg o.p.            | GameStatus2 o.p.                 |
 //! | ------------------ | -------------------------- | ------------------------------------------- | ------------------------------------ | ---------------- | ---------------- | -------------------------- | -------------------------------- |
 //! | WantToPlayAskBegin | div_want_to_play_ask_begin | div_want_to_play_ask_begin_on_click         | -                                    | WantToPlayAsking | WantToPlay       | on_msg_want_to_play        | WantToPlayAsked                  |
-//! | WantToPlayAsked    | div_want_to_play_asked     | div_want_to_play_asked_on_click             | -                                    | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |
+//! | WantToPlayAsked    | div_want_to_play_asked, div_play_accepted     | div_want_to_play_asked_on_click             | -                                    | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |
 //! | WantToPlayAsking   | div_want_to_play_asking    | game_data_init                              | -                                    | PlayBefore1Card  | GameDataInit     | on_msg_game_data_init      | PlayBefore1Card                  |
 //! | PlayBefore1Card    | div_grid_container         | div_grid_item_on_click, on_click_1_card();  | -                                    | PlayBefore2Card  | PlayerClick1Card | on_msg_player_click_1_card | PlayBefore2Card                  |
 //! | PlayBefore2Card    | div_grid_container         | div_grid_item_on_click, on_click_2_card();  | If card match and points<all point   | PlayBefore1Card  | PlayerClick2Card | on_msg_player_click_2_card | PlayBefore1Card                  |
 //! | II                 | II                         | II                                          | If card match and points=>all points | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |
 //! | II                 | II                         | II                                          | else                                 | TakeTurnBegin    | TakeTurnBegin    | on_msg_take_turn           | TakeTurnBegin                    |
 //! | TakeTurnBegin      | div_take_turn_begin        | div_take_turn_begin_on_click                | -                                    | PlayBefore1Card  | TakeTurnEnd      | on_msg_take_turn_end       | PlayBefore1Card, the next player |
-//! | PlayAgain          | div_play_again (div_grid_container) | window.location().reload()         | -                                    | -                | -                | -                          | -                                |
+//! | PlayAgain          | div_play_again             | window.location().reload()         | -                                    | -                | -                | -                          | -                                |
 //! |  |  |  |  |  |  |  |  |
 //!  
 //! t.p. = this player,   o.p. = other players,  rrc = root_rendering_component, rcv = receive
@@ -165,11 +165,13 @@ mod rootrenderingcomponent;
 mod statusplayagain;
 mod statusplaybefore1card;
 mod statusplaybefore2card;
-
 mod statustaketurnbegin;
 mod statuswanttoplayaskbegin;
 mod statuswanttoplayasked;
+mod statuswanttoplayasking;
 mod websocketcommunication;
+mod websocketreconnect;
+//endregion
 
 //region: extern and use statements
 //Strum is a set of macros and traits for working with enums and strings easier in Rust.

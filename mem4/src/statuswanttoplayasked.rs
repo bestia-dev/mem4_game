@@ -65,3 +65,20 @@ pub fn on_msg_play_accept(rrc:&mut RootRenderingComponent, my_ws_uid: usize) {
         rrc.check_invalidate_for_all_components();
     }
 }
+
+///render play accepted
+pub fn div_play_accepted<'a, 'bump>(
+    rrc: &'a RootRenderingComponent,
+    bump: &'bump Bump,
+) -> Node<'bump>
+where
+    'a: 'bump,
+{
+    console::log_1(&"GameStatus::PlayAccepted".into());
+    dodrio!(bump,
+    <h2 id= "ws_elem" style= "color:red;">
+        {vec![text(bumpalo::format!(in bump, "Game {} accepted.", rrc.game_data.asked_folder_name).into_bump_str(),)]}
+    </h2>
+    )
+}
+
