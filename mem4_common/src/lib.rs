@@ -37,7 +37,7 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate strum_macros;
 
-use strum_macros::AsRefStr;
+use strum_macros::{Display,AsRefStr};
 //endregion
 
 ///`WsMessage` enum for WebSocket
@@ -83,25 +83,36 @@ pub enum WsMessage {
         players: String,
     },
     ///player click
-    PlayerClick1Card {
+    PlayerClick1stCard {
         ///this identifies the smartphone, but not the player-in-turn
         my_ws_uid: usize,
         ///all players
         players: String,
         ///card index
         card_index: usize,
-        ///game status PlayerBefore1Card or PlayerBefore2Card
+        ///game status PlayerBefore1stCard or PlayerBefore2ndCard
         game_status: GameStatus,
     },
     ///player click
-    PlayerClick2Card {
+    PlayerClick2ndCard {
         ///this identifies the smartphone, but not the player-in-turn
         my_ws_uid: usize,
         ///all players
         players: String,
         ///card index
         card_index: usize,
-        ///game status PlayerBefore1Card or PlayerBefore2Card
+        ///game status PlayerBefore1stCard or PlayerBefore2ndCard
+        game_status: GameStatus,
+    },
+    ///take turn begin
+    TakeTurnBegin {
+        ///this identifies the smartphone, but not the player-in-turn
+        my_ws_uid: usize,
+        ///all players
+        players: String,
+        ///card index
+        card_index: usize,
+        ///game status PlayerBefore1stCard or PlayerBefore2ndCard
         game_status: GameStatus,
     },
     ///Play Again
@@ -132,7 +143,7 @@ pub enum WsMessage {
 
 ///the game can be in various statuses and that differentiate the UI and actions
 /// all players have the same game status
-#[derive(AsRefStr, Serialize, Deserialize, Clone)]
+#[derive(Display, AsRefStr, Serialize, Deserialize, Clone)]
 pub enum GameStatus {
     /// invite ask begin
     InviteAskBegin,
@@ -143,9 +154,9 @@ pub enum GameStatus {
     ///PlayAccepted
     PlayAccepted,
     ///Play before first card
-    PlayBefore1Card,
+    PlayBefore1stCard,
     ///Play before second card
-    PlayBefore2Card,
+    PlayBefore2ndCard,
     ///take turn begin
     TakeTurnBegin,
     ///take turn end

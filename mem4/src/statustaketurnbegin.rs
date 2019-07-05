@@ -30,13 +30,8 @@ where
         "player_turn {}",
         &rrc.game_data.player_turn
     )));
-    let next_player = if rrc.game_data.player_turn
-        < rrc.game_data.players.len()
-    {
-        unwrap!(rrc
-            .game_data
-            .player_turn
-            .checked_add(1))
+    let next_player = if rrc.game_data.player_turn < rrc.game_data.players.len() {
+        unwrap!(rrc.game_data.player_turn.checked_add(1))
     } else {
         1
     };
@@ -107,9 +102,19 @@ pub fn take_turn_end(rrc: &mut RootRenderingComponent) {
     .status = CardStatusCardFace::Down;
     rrc.game_data.card_index_of_first_click = 0;
     rrc.game_data.card_index_of_second_click = 0;
-    rrc.game_data.game_status = GameStatus::PlayBefore1Card;
+    rrc.game_data.game_status = GameStatus::PlayBefore1stCard;
 
     rrc.check_invalidate_for_all_components();
+}
+
+///on msg take turn begin
+pub fn on_msg_take_turn_begin(
+    rrc: &mut RootRenderingComponent,
+    game_status: GameStatus,
+    _card_index: usize,
+) {
+    //TODO: for now nothing concrete, because is all calculated by 2ndCard
+    rrc.game_data.game_status = game_status;
 }
 
 ///msg player change

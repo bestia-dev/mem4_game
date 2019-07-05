@@ -4,8 +4,8 @@
 use crate::rootrenderingcomponent::RootRenderingComponent;
 use crate::statusinviteasked;
 use crate::statusinviteaskbegin;
-use crate::statusplaybefore1card;
-use crate::statusplaybefore2card;
+use crate::statusplaybefore1stcard;
+use crate::statusplaybefore2ndcard;
 use crate::statustaketurnbegin;
 
 use futures::Future;
@@ -132,7 +132,11 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             | GameStatus::InviteAsked =
                                 root_rendering_component.game_data.game_status
                             {
-                                statusinviteaskbegin::on_msg_invite(root_rendering_component,my_ws_uid, asked_folder_name);
+                                statusinviteaskbegin::on_msg_invite(
+                                    root_rendering_component,
+                                    my_ws_uid,
+                                    asked_folder_name,
+                                );
                                 v2.schedule_render();
                             }
                         }
@@ -185,7 +189,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                     .map_err(|_| ()),
                 );
             }
-            WsMessage::PlayerClick1Card {
+            WsMessage::PlayerClick1stCard {
                 card_index,
                 game_status,
                 ..
@@ -198,14 +202,18 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             console::log_1(&"players".into());
-                            statusplaybefore1card::on_msg_player_click_1_card(root_rendering_component,game_status, card_index);
+                            statusplaybefore1stcard::on_msg_player_click_1st_card(
+                                root_rendering_component,
+                                game_status,
+                                card_index,
+                            );
                             v2.schedule_render();
                         }
                     })
                     .map_err(|_| ()),
                 );
             }
-            WsMessage::PlayerClick2Card {
+            WsMessage::PlayerClick2ndCard {
                 card_index,
                 game_status,
                 ..
@@ -218,25 +226,33 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             console::log_1(&"players".into());
-                            statusplaybefore2card::on_msg_player_click_2_card(root_rendering_component,game_status, card_index);
+                            statusplaybefore2ndcard::on_msg_player_click_2nd_card(
+                                root_rendering_component,
+                                game_status,
+                                card_index,
+                            );
                             v2.schedule_render();
                         }
                     })
                     .map_err(|_| ()),
                 );
             }
-            WsMessage::PlayAgain {
+            WsMessage::TakeTurnBegin {
+                card_index,
+                game_status,
                 ..
             } => {
                 wasm_bindgen_futures::spawn_local(
                     weak.with_component({
                         let v2 = weak.clone();
-                        console::log_1(&"play again".into());
+                        console::log_1(&"take turn begin".into());
                         move |root| {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             console::log_1(&"players".into());
-                            statusplaybefore2card::on_msg_play_again(root_rendering_component);
+                            statustaketurnbegin::on_msg_take_turn_begin(
+                                root_rendering_component, game_status, card_index
+                            );
                             v2.schedule_render();
                         }
                     })
@@ -252,6 +268,22 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                                 root.unwrap_mut::<RootRenderingComponent>();
                             console::log_1(&"TakeTurnEnd".into());
                             statustaketurnbegin::on_msg_take_turn_end(root_rendering_component);
+                            v2.schedule_render();
+                        }
+                    })
+                    .map_err(|_| ()),
+                );
+            }
+            WsMessage::PlayAgain { .. } => {
+                wasm_bindgen_futures::spawn_local(
+                    weak.with_component({
+                        let v2 = weak.clone();
+                        console::log_1(&"play again".into());
+                        move |root| {
+                            let root_rendering_component =
+                                root.unwrap_mut::<RootRenderingComponent>();
+                            console::log_1(&"players".into());
+                            statusplaybefore2ndcard::on_msg_play_again(root_rendering_component);
                             v2.schedule_render();
                         }
                     })

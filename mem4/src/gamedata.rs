@@ -245,8 +245,8 @@ impl GameData {
     pub fn is_status_for_grid_container(&self) -> bool {
         #[allow(clippy::wildcard_enum_match_arm)]
         match self.game_status {
-            GameStatus::PlayBefore1Card
-            | GameStatus::PlayBefore2Card
+            GameStatus::PlayBefore1stCard
+            | GameStatus::PlayBefore2ndCard
             | GameStatus::TakeTurnBegin
             | GameStatus::TakeTurnEnd
             | GameStatus::PlayAgain => true,

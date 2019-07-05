@@ -1,4 +1,4 @@
-//! statusplaybefore2card.rs - code flow from this status
+//! statusplaybefore2ndcard.rs - code flow from this status
 
 //region: use
 use crate::gamedata::CardStatusCardFace;
@@ -13,7 +13,7 @@ use typed_html::dodrio;
 //endregion
 
 ///render Play or Wait
-pub fn div_click_2_card<'a, 'bump>(
+pub fn div_click_2nd_card<'a, 'bump>(
     root_rendering_component: &'a RootRenderingComponent,
     bump: &'bump Bump,
 ) -> Node<'bump>
@@ -43,30 +43,33 @@ where
 //div_grid_container() is in divgridcontainer.rs
 
 ///on click
-pub fn on_click_2_card(rrc: &mut RootRenderingComponent, this_click_card_index: usize) {
+pub fn on_click_2nd_card(rrc: &mut RootRenderingComponent, this_click_card_index: usize) {
     rrc.game_data.card_index_of_second_click = this_click_card_index;
-    //region: send WsMessage over WebSocket
-    websocketcommunication::ws_send_msg(
-        &rrc.game_data.ws,
-        &WsMessage::PlayerClick2Card {
-            my_ws_uid: rrc.game_data.my_ws_uid,
-            players: unwrap!(
-                serde_json::to_string(&rrc.game_data.players),
-                "serde_json::to_string(&game_data.players)",
-            ),
-            card_index: rrc.game_data.card_index_of_second_click,
-            game_status: rrc.game_data.game_status.clone(),
-        },
-    );
-    //endregion
-    card_click_2_card(rrc);
+    card_click_2nd_card(rrc,"on_click");
 }
 
 ///on second click
 ///The on click event passed by JavaScript executes all the logic
 ///and changes only the fields of the Card Grid struct.
 ///That struct is the only permanent data storage for later render the virtual dom.
-pub fn card_click_2_card(rrc: &mut RootRenderingComponent) {
+pub fn card_click_2nd_card(rrc: &mut RootRenderingComponent,caller:&str) {
+    //region: send WsMessage over WebSocket
+    //don't send if the caller is on_msg
+    if caller=="on_click"{
+        websocketcommunication::ws_send_msg(
+            &rrc.game_data.ws,
+            &WsMessage::PlayerClick2ndCard {
+                my_ws_uid: rrc.game_data.my_ws_uid,
+                players: unwrap!(
+                    serde_json::to_string(&rrc.game_data.players),
+                    "serde_json::to_string(&game_data.players)",
+                ),
+                card_index: rrc.game_data.card_index_of_second_click,
+                game_status: rrc.game_data.game_status.clone(),
+            },
+        );
+    }
+    //endregion
     //flip the card up
     unwrap!(
         rrc.game_data
@@ -138,26 +141,43 @@ pub fn card_click_2_card(rrc: &mut RootRenderingComponent) {
             );
         } else {
             //the same payer continue to play
-            rrc.game_data.game_status = GameStatus::PlayBefore1Card;
+            rrc.game_data.game_status = GameStatus::PlayBefore1stCard;
         }
     } else {
         //if cards don't match
         rrc.game_data.game_status = GameStatus::TakeTurnBegin;
+        //region: send WsMessage over WebSocket
+        //don't send if it is called from on_msg
+        if caller == "on_click"{
+            websocketcommunication::ws_send_msg(
+                &rrc.game_data.ws,
+                &WsMessage::TakeTurnBegin {
+                    my_ws_uid: rrc.game_data.my_ws_uid,
+                    players: unwrap!(
+                        serde_json::to_string(&rrc.game_data.players),
+                        "serde_json::to_string(&game_data.players)",
+                    ),
+                    card_index: rrc.game_data.card_index_of_first_click,
+                    game_status: rrc.game_data.game_status.clone(),
+                },
+            );
+        }
+        //endregion
         //now all the players are calculating the status of the game.
         //This is not ok. Only the active player should calculate and send a message to all others.
     }
     rrc.check_invalidate_for_all_components();
 }
 ///msg player click
-pub fn on_msg_player_click_2_card(
+pub fn on_msg_player_click_2nd_card(
     rrc: &mut RootRenderingComponent,
     game_status: GameStatus,
     card_index: usize,
 ) {
     rrc.game_data.game_status = game_status;
-    if rrc.game_data.game_status.as_ref() == GameStatus::PlayBefore2Card.as_ref() {
+    if rrc.game_data.game_status.as_ref() == GameStatus::PlayBefore2ndCard.as_ref() {
         rrc.game_data.card_index_of_second_click = card_index;
-        card_click_2_card(rrc);
+        card_click_2nd_card(rrc, "on_msg");
     } else {
         panic!("this else must never be reached!");
     }

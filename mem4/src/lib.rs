@@ -27,7 +27,7 @@
 //! The main component of the Dodrio Virtual Dom is the root rendering component.  
 //! It is the component that renders the complete user interface (HTML).  
 //! The root rendering component is easily splitted  into sub-components.  
-//! ![](https://github.com/LucianoBestia/mem4_game/raw/master/docs/img/subcomponents.png)
+//! ![](https://github.com/LucianoBestia/mem4_game/raw/master/docs/img/subcomponents.png)  
 //! Some subcomponents don't need any extra data and can be coded as simple functions.  
 //! The subcomponent "players and scores" has its own data. This data is cached from the GameData.  
 //! When this data does not match, invalidation is called to cache them.
@@ -59,12 +59,12 @@
 //! | ------------------ | -------------------------- | ------------------------------------------- | ------------------------------------ | ---------------- | ---------------- | -------------------------- | -------------------------------- |
 //! | InviteAskBegin     | div_invite_ask_begin       | div_invite_ask_begin_on_click               | -                                    | InviteAsking     | Invite           | on_msg_invite              | InviteAsked                      |
 //! | InviteAsked        | div_invite_asked, div_play_accepted | div_invite_asked_on_click          | -                                    | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |
-//! | InviteAsking       | div_invite_asking          | game_data_init                              | -                                    | PlayBefore1Card  | GameDataInit     | on_msg_game_data_init      | PlayBefore1Card                  |
-//! | PlayBefore1Card    | div_grid_container         | div_grid_item_on_click, on_click_1_card();  | -                                    | PlayBefore2Card  | PlayerClick1Card | on_msg_player_click_1_card | PlayBefore2Card                  |
-//! | PlayBefore2Card    | div_grid_container         | div_grid_item_on_click, on_click_2_card();  | If card match and points<all point   | PlayBefore1Card  | PlayerClick2Card | on_msg_player_click_2_card | PlayBefore1Card                  |
+//! | InviteAsking       | div_invite_asking          | game_data_init                              | -                                    | PlayBefore1stCard  | GameDataInit     | on_msg_game_data_init      | PlayBefore1stCard                  |
+//! | PlayBefore1stCard    | div_grid_container         | div_grid_item_on_click, on_click_1st_card();  | -                                    | PlayBefore2ndCard  | PlayerClick1stCard | on_msg_player_click_1st_card | PlayBefore2ndCard                  |
+//! | PlayBefore2ndCard    | div_grid_container         | div_grid_item_on_click, on_click_2nd_card();  | If card match and points<all point   | PlayBefore1stCard  | PlayerClick2ndCard | on_msg_player_click_2nd_card | PlayBefore1stCard                  |
 //! | -II-               | -II-                       | -II-                                        | If card match and points=>all points | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |
 //! | -II-               | -II-                       | -II-                                        | else                                 | TakeTurnBegin    | TakeTurnBegin    | on_msg_take_turn           | TakeTurnBegin                    |
-//! | TakeTurnBegin      | div_take_turn_begin        | div_take_turn_begin_on_click                | -                                    | PlayBefore1Card  | TakeTurnEnd      | on_msg_take_turn_end       | PlayBefore1Card, the next player |
+//! | TakeTurnBegin      | div_take_turn_begin        | div_take_turn_begin_on_click                | -                                    | PlayBefore1stCard  | TakeTurnEnd      | on_msg_take_turn_end       | PlayBefore1stCard, the next player |
 //! | PlayAgain          | div_play_again             | window.location().reload()                  | -                                    | -                | -                | -                          | -                                |
 //! |  |  |  |  |  |  |  |  |
 //!  
@@ -161,6 +161,7 @@
 
 //region: mod is used only in lib file. All the rest use use crate
 mod divcardmoniker;
+mod divfordebugging;
 mod divgridcontainer;
 mod divplayeractions;
 mod divplayersandscores;
@@ -170,10 +171,10 @@ mod rootrenderingcomponent;
 mod statusinviteaskbegin;
 mod statusinviteasked;
 mod statusinviteasking;
-mod statusplaybefore1card;
-mod statusplaybefore2card;
-mod statustaketurnbegin;
 mod statusplayagain;
+mod statusplaybefore1stcard;
+mod statusplaybefore2ndcard;
+mod statustaketurnbegin;
 mod websocketcommunication;
 mod websocketreconnect;
 //endregion

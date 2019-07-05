@@ -2,6 +2,7 @@
 
 //region: use, const
 use crate::divcardmoniker;
+use crate::divfordebugging;
 use crate::divgridcontainer;
 use crate::divplayeractions;
 use crate::divplayersandscores;
@@ -62,7 +63,7 @@ impl RootRenderingComponent {
     pub fn game_data_init(&mut self) {
         self.game_data.content_folder_name = self.game_data.asked_folder_name.clone();
         self.game_data.prepare_random_data();
-        self.game_data.game_status = GameStatus::PlayBefore1Card;
+        self.game_data.game_status = GameStatus::PlayBefore1stCard;
         self.game_data.player_turn = 1;
     }
     ///reset the data to replay the game
@@ -99,7 +100,7 @@ impl RootRenderingComponent {
         players: &str,
     ) {
         self.game_data.content_folder_name = self.game_data.asked_folder_name.clone();
-        self.game_data.game_status = GameStatus::PlayBefore1Card;
+        self.game_data.game_status = GameStatus::PlayBefore1stCard;
         self.game_data.player_turn = 1;
         self.game_data.vec_cards = unwrap!(
             serde_json::from_str(card_grid_data),
@@ -178,6 +179,7 @@ impl Render for RootRenderingComponent {
                 {vec![divgridcontainer::div_grid_container(self,bump,&xmax_grid_size)]}
                 {vec![divplayeractions::div_player_actions_from_game_status(self, bump)]}
                 {vec![self.cached_players_and_scores.render(bump)]}
+                {vec![divfordebugging::div_for_debugging(self, bump)]}
                 {vec![self.cached_rules_and_description.render(bump)]}
             </div>
             )

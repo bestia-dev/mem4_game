@@ -340,9 +340,10 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
         WsMessage::ResponseWsUid { .. } => info!("ResponseWsUid: {}", ""),
         WsMessage::ResponseGameConfigJson { .. } => info!("ResponseGameConfigJson: {}", ""),
         WsMessage::PlayAccept { players, .. }
-        | WsMessage::PlayerClick1Card { players, .. }
-        | WsMessage::PlayerClick2Card { players, .. }
+        | WsMessage::PlayerClick1stCard { players, .. }
+        | WsMessage::PlayerClick2ndCard { players, .. }
         | WsMessage::GameDataInit { players, .. }
+        | WsMessage::TakeTurnBegin { players, .. }
         | WsMessage::TakeTurnEnd { players, .. }
         | WsMessage::PlayAgain { players, .. } => {
             send_to_other_players(users, ws_uid_of_message, &new_msg, &players)

@@ -4,8 +4,8 @@
 //region: use, const
 use crate::gamedata::{CardStatusCardFace, Size2d};
 use crate::rootrenderingcomponent::RootRenderingComponent;
-use crate::statusplaybefore1card;
-use crate::statusplaybefore2card;
+use crate::statusplaybefore1stcard;
+use crate::statusplaybefore2ndcard;
 
 use conv::*;
 use dodrio::bumpalo::{self, Bump};
@@ -191,8 +191,8 @@ pub fn div_grid_item<'a, 'bump>(
         //The method render will later use that for rendering the new html.
         let rrc = root.unwrap_mut::<RootRenderingComponent>();
         //only if the gamestatus is play (1 or 2)
-        if rrc.game_data.game_status.as_ref() == GameStatus::PlayBefore1Card.as_ref()
-        || rrc.game_data.game_status.as_ref() == GameStatus::PlayBefore2Card.as_ref() {
+        if rrc.game_data.game_status.as_ref() == GameStatus::PlayBefore1stCard.as_ref()
+        || rrc.game_data.game_status.as_ref() == GameStatus::PlayBefore2ndCard.as_ref() {
             // If the event's target is our image...
             let img = match event
                 .target()
@@ -254,10 +254,10 @@ fn div_grid_item_on_click(rrc: &mut RootRenderingComponent, this_click_card_inde
 
     let game_status = rrc.game_data.game_status.clone();
 
-    if game_status.as_ref() == GameStatus::PlayBefore1Card.as_ref() {
-        statusplaybefore1card::on_click_1_card(rrc, this_click_card_index)
-    } else if game_status.as_ref() == GameStatus::PlayBefore2Card.as_ref() {
-        statusplaybefore2card::on_click_2_card(rrc, this_click_card_index)
+    if game_status.as_ref() == GameStatus::PlayBefore1stCard.as_ref() {
+        statusplaybefore1stcard::on_click_1st_card(rrc, this_click_card_index)
+    } else if game_status.as_ref() == GameStatus::PlayBefore2ndCard.as_ref() {
+        statusplaybefore2ndcard::on_click_2nd_card(rrc, this_click_card_index)
     } else {
         panic!("this else must never be reached!");
     }

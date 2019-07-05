@@ -4,8 +4,8 @@
 //region: use
 use crate::rootrenderingcomponent::RootRenderingComponent;
 use crate::statusplayagain;
-use crate::statusplaybefore1card;
-use crate::statusplaybefore2card;
+use crate::statusplaybefore1stcard;
+use crate::statusplaybefore2ndcard;
 use crate::statustaketurnbegin;
 use crate::statusinviteaskbegin;
 use crate::statusinviteasked;
@@ -40,10 +40,10 @@ where
         statusinviteasking::div_invite_asking(rrc, bump)
     } else if let GameStatus::PlayAccepted = rrc.game_data.game_status {
         statusinviteasked::div_play_accepted(rrc, bump)
-    } else if let GameStatus::PlayBefore1Card = rrc.game_data.game_status {
-        statusplaybefore1card::div_click_1_card(rrc, bump)
-    } else if let GameStatus::PlayBefore2Card = rrc.game_data.game_status {
-        statusplaybefore2card::div_click_2_card(rrc, bump)
+    } else if let GameStatus::PlayBefore1stCard = rrc.game_data.game_status {
+        statusplaybefore1stcard::div_click_1st_card(rrc, bump)
+    } else if let GameStatus::PlayBefore2ndCard = rrc.game_data.game_status {
+        statusplaybefore2ndcard::div_click_2nd_card(rrc, bump)
     } else if let GameStatus::TakeTurnBegin = rrc.game_data.game_status {
         statustaketurnbegin::div_take_turn_begin(rrc, bump)
     } else if let GameStatus::PlayAgain = rrc.game_data.game_status {

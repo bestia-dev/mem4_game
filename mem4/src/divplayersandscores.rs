@@ -3,7 +3,7 @@
 //region: use
 use crate::gamedata::GameData;
 
-use dodrio::builder::{br, text};
+use dodrio::builder::{text};
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Node, Render};
 use typed_html::dodrio;
@@ -94,18 +94,12 @@ impl Render for PlayersAndScores {
         let text1 = bumpalo::format!(in bump, "Player{}: {} points",
         self.my_player_number, self.my_points)
         .into_bump_str();
-        //for debugging only
-        let text2 = bumpalo::format!(in bump, "(ws_uid: {})",
-        self.my_ws_uid)
-        .into_bump_str();
         //return
         dodrio!(bump,
         <div class="grid_container_players" style= "grid-template-columns: auto;">
             <div class= "grid_item" style="text-align: center;">
                 {vec![
                     text(text1),
-                    br(bump).finish(),
-                    text(text2)
                 ]}
             </div>
         </div>
