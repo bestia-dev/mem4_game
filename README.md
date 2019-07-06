@@ -8,9 +8,9 @@ https://lucianobestia.github.io/mem4_game/mem4/index.html
 Read the `Last project`:  
 https://github.com/LucianoBestia/mem3_game  
 You can play the game here (hosted on google cloud platform):  
-http://34.87.17.103/mem4  
+http://bestia.shorturl.com/mem4  
 For exercise I made a Docker image/container for mem4 on the google VM:  
-http://34.87.17.103/memdock4  
+http://bestia.shorturl.com/memdock4  
 # Idea
 Playing the memory game alone is boring.  
 Playing it with one friend is better.  
@@ -33,6 +33,10 @@ I prepared some flows and tasks for Cargo make.
 `cargo make dev` - builds the development version and runs the server and the browser  
 `cargo make release` - builds the release version and runs the server and the browser  
 `cargo make doc` - build the `/target/docs` folder. Copying to the `/docs` folder must be manually performed for now.  
+## Shorturl.com
+Google cloud platform does not give any subdomain name for free. Google is also a domain registrar and it looks like they are trying to push me to buy a domain.  
+I didn't like to have the raw IP in the url. People don't like numbers like that.  
+I created a subdomain on shorturl.com. It is not the perfect solution, but it is free or very cheap.  
 ## TODO:
 - sync data from player1 to others after reconnect.
 - sometimes the grid is bigger after every click, but sometimes not
