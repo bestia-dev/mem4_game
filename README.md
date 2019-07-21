@@ -40,6 +40,12 @@ I created a subdomain on shorturl.com. It is not the perfect solution, but it is
 ## TODO:
 - sync data from player1 to others after reconnect.
 - sometimes the grid is bigger after every click, but sometimes not
+- put the version number in the application, increase version on build release
+- put filenames is game_config.json, to have more freedom with filenames
+- different content for English learning: numbers (cardinal, ordinal), food, orientation, alphabet simple spelling, drinks, days/months, questions, colors, transportation, ... 
+- on card click only the active player calculates the new state and send the new info to others in a msg
+- fullscreen from http://robnyman.github.io/fullscreen/
+- use fetch module instead of websockets for json
 ## Changelog
 2019-05-24 completed a working version  
 2019-06-06 google cloud platform, docker, DockerHub  
@@ -51,4 +57,6 @@ I created a subdomain on shorturl.com. It is not the perfect solution, but it is
 2019-06-26 3x3 or 3x2 grids. GameConfig.  
 2019-07-03 game flow in modules  
 2019-07-05 refactoring, refactoring,...  
+2019-07-09 request_fullscreen button  
+
   

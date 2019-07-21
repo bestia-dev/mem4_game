@@ -5,6 +5,7 @@ use dodrio::builder::{br, text};
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Node, Render};
 use typed_html::dodrio;
+use wasm_bindgen::prelude::*;
 
 ///Text of game rules.
 ///Multiline string literal just works.
@@ -45,6 +46,10 @@ impl Render for RulesAndDescription {
     {
         dodrio!(bump,
         <div>
+        //call js DoFullScreen()
+            <button id="view-fullscreen" style= "margin:auto;display:block;" onclick={dd()} >"Fullscreen"
+            </button>
+
             <h4>
                 {text_with_br_newline(GAME_DESCRIPTION,bump)}
             </h4>
@@ -76,4 +81,12 @@ fn text_with_br_newline<'a>(txt: &'a str, bump: &'a Bump) -> Vec<Node<'a>> {
         vec_text_node.push(br(bump).finish());
     }
     vec_text_node
+}
+
+#[wasm_bindgen]
+extern "C" {
+    fn DoFullScreen();
+}
+pub fn dd() {
+    DoFullScreen();
 }

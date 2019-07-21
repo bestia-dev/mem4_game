@@ -7,6 +7,20 @@
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
   <title>mem4</title>
   <link rel="stylesheet" href="css/mem4.css">
+  <script>
+    function DoFullScreen() {
+      var element = document.documentElement;
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+      } else if (element.webkitRequestFullscreen) {
+        element.webkitRequestFullscreen();
+      } else if (element.msRequestFullscreen) {
+        element.msRequestFullscreen();
+      }
+    }
+  </script>
 </head>
 
 <body>

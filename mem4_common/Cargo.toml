@@ -1,6 +1,6 @@
 [package]
 name = "mem4_common"
-version = "1.1.2"
+version = "1.1.3"
 description = "commons for mem4 wasm and server"
 authors = ["Luciano Bestia"]
 license = "MIT"
