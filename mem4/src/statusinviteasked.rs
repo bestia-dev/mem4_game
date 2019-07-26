@@ -3,13 +3,13 @@
 //region: use
 use crate::rootrenderingcomponent::RootRenderingComponent;
 use crate::websocketcommunication;
+use crate::logmod;
 
 use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
 use mem4_common::{GameStatus, Player, WsMessage};
 use typed_html::dodrio;
-use web_sys::console;
 //endregion
 
 ///render asked
@@ -21,7 +21,7 @@ where
     'a: 'bump,
 {
     // 2S Click here to Accept play!
-    console::log_1(&"GameStatus::InviteAsked".into());
+    logmod::log1_str(&"GameStatus::InviteAsked");
     //return Click here to Accept play
     dodrio!(bump,
     <div class="div_clickable" onclick={move |root, vdom, _event| {
@@ -74,7 +74,7 @@ pub fn div_play_accepted<'a, 'bump>(
 where
     'a: 'bump,
 {
-    console::log_1(&"GameStatus::PlayAccepted".into());
+    logmod::log1_str(&"GameStatus::PlayAccepted");
     dodrio!(bump,
     <h2 id= "ws_elem" style= "color:red;">
         {vec![text(bumpalo::format!(in bump, "Game {} accepted.", rrc.game_data.asked_folder_name).into_bump_str(),)]}

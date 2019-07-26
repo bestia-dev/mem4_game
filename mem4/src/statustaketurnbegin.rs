@@ -5,13 +5,12 @@ use crate::rootrenderingcomponent::RootRenderingComponent;
 //use crate::websocketcommunication;
 use mem4_common::{GameStatus, WsMessage};
 use crate::gamedata::{CardStatusCardFace};
+use crate::logmod;
 
 use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
 use typed_html::dodrio;
-use wasm_bindgen::prelude::*;
-use web_sys::console;
 //endregion
 
 ///render take turn
@@ -22,14 +21,14 @@ pub fn div_take_turn_begin<'a, 'bump>(
 where
     'a: 'bump,
 {
-    console::log_1(&JsValue::from_str(&format!(
+    logmod::log1_str(&format!(
         "my_player_number {}",
         &rrc.game_data.my_player_number
-    )));
-    console::log_1(&JsValue::from_str(&format!(
+    ));
+    logmod::log1_str(&format!(
         "player_turn {}",
         &rrc.game_data.player_turn
-    )));
+    ));
     let next_player = if rrc.game_data.player_turn < rrc.game_data.players.len() {
         unwrap!(rrc.game_data.player_turn.checked_add(1))
     } else {

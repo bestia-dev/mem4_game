@@ -3,13 +3,13 @@
 //region: use
 use crate::rootrenderingcomponent::RootRenderingComponent;
 use crate::websocketcommunication;
+use crate::logmod;
 
 use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
 use mem4_common::{GameStatus, Player, WsMessage};
 use typed_html::dodrio;
-use web_sys::console;
 //endregion
 
 ///render invite ask begin, ask to play for multiple contents/folders
@@ -20,7 +20,7 @@ pub fn div_invite_ask_begin<'a, 'bump>(
 where
     'a: 'bump,
 {
-    console::log_1(&"GameStatus::InviteAskBegin".into());
+    logmod::log1_str("GameStatus::InviteAskBegin");
     let mut vec_of_nodes = Vec::new();
     //I don't know how to solve the lifetime problems. So I just clone the small data.
     let ff = root_rendering_component.game_data.content_folders.clone();
@@ -90,7 +90,7 @@ pub fn on_msg_invite(
     my_ws_uid: usize,
     asked_folder_name: String,
 ) {
-    console::log_1(&"rcv invite".into());
+    logmod::log1_str(&"rcv invite");
     rrc.reset();
     rrc.game_data.game_status = GameStatus::InviteAsked;
     //the first player is the initiator

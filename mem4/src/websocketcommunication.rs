@@ -7,6 +7,7 @@ use crate::statusinviteaskbegin;
 use crate::statusplaybefore1stcard;
 use crate::statusplaybefore2ndcard;
 use crate::statustaketurnbegin;
+use crate::logmod;
 
 use futures::Future;
 use js_sys::Reflect;
@@ -32,10 +33,10 @@ pub fn setup_ws_connection(location_href: String, client_ws_id: usize) -> WebSoc
     //send the client ws id as url_param for the first connect
     //and reconnect on lost connection
     loc_href.push_str(client_ws_id.to_string().as_str());
-    console::log_1(&JsValue::from_str(&format!(
+    logmod::log1_str(&format!(
         "location_href {}  loc_href {} client_ws_id {}",
         location_href, loc_href, client_ws_id
-    )));
+    ));
 
     //same server address and port as http server
     //for reconnect the old ws id will be an url param
@@ -103,10 +104,10 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                 wasm_bindgen_futures::spawn_local(
                     weak.with_component({
                         move |root| {
-                            console::log_1(&JsValue::from_str(&format!(
+                            logmod::log1_str(&format!(
                                 "ResponseWsUid: {}  ",
                                 your_ws_uid
-                            )));
+                            ));
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             root_rendering_component.on_response_ws_uid(your_ws_uid);
@@ -319,7 +320,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
 pub fn setup_ws_onerror(ws: &WebSocket, weak: dodrio::VdomWeak) {
     let onerror_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
         let err_text = format!("error event {:?}", e);
-        console::log_1(&JsValue::from_str(&err_text));
+        logmod::log1_str(&err_text);
         {
             wasm_bindgen_futures::spawn_local(
                 weak.with_component({
@@ -342,7 +343,7 @@ pub fn setup_ws_onerror(ws: &WebSocket, weak: dodrio::VdomWeak) {
 pub fn setup_ws_onclose(ws: &WebSocket, weak: dodrio::VdomWeak) {
     let onclose_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
         let err_text = format!("ws_onclose {:?}", e);
-        console::log_1(&JsValue::from_str(&err_text));
+        logmod::log1_str(&err_text);
         {
             wasm_bindgen_futures::spawn_local(
                 weak.with_component({

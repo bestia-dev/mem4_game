@@ -2,6 +2,7 @@
 
 //region: extern, use,
 extern crate mem4_common;
+use crate::logmod;
 
 use mem4_common::{GameStatus, Player};
 use rand::rngs::SmallRng;
@@ -9,8 +10,6 @@ use rand::seq::SliceRandom;
 use rand::FromEntropy;
 use rand::Rng;
 use strum_macros::AsRefStr;
-use wasm_bindgen::prelude::*;
-use web_sys::console;
 use web_sys::WebSocket;
 //endregion
 
@@ -117,11 +116,11 @@ impl GameData {
         let rest =
             unwrap!(random_count.checked_sub(unwrap!(item_count_minus_one.checked_mul(multiple))));
 
-        console::log_1(&JsValue::from_str(&format!(
+        logmod::log1_str(&format!(
             "item_count_minus_one {}  players_count {} cards_count {} random_count {} multiple {} rest {}",
             item_count_minus_one,players_count,cards_count,random_count,multiple,
             rest,
-        )));
+        ));
 
         //region: find random numbers between 1 and item_count
         //vec_of_random_numbers is 0 based
@@ -180,11 +179,11 @@ impl GameData {
         }
         //endregion
         self.vec_cards = vec_cards;
-        console::log_1(&JsValue::from_str(&format!(
+        logmod::log1_str(&format!(
             "vec_of_random_numbers.len {} vec_cards.len {}",
             vec_of_random_numbers.len(),
             self.vec_cards.len()
-        )));
+        ));
     }
     ///asociated function: before Accept, there are not random numbers, just default cards.
     pub fn prepare_for_empty() -> Vec<Card> {

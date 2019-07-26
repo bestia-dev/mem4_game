@@ -1,20 +1,21 @@
 //! divgridcontainer.rs - renders the grid container with the images
 //! and most important the on click event
-//!
+
 //region: use, const
 use crate::gamedata::{CardStatusCardFace, Size2d};
 use crate::rootrenderingcomponent::RootRenderingComponent;
 use crate::statusplaybefore1stcard;
 use crate::statusplaybefore2ndcard;
+use crate::logmod;
 
 use conv::*;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
 use mem4_common::GameStatus;
 use typed_html::dodrio;
-use wasm_bindgen::prelude::*;
+//use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use web_sys::console; //don't remove this. It is needed for dyn_into.
+//use web_sys::console; //don't remove this. It is needed for dyn_into.
 
 ///fixed filename for card face down
 const SRC_FOR_CARD_FACE_DOWN: &str = "img/mem_image_00_cardfacedown.png";
@@ -109,13 +110,13 @@ pub fn div_grid_items<'a, 'bump>(
             end_index -= 1;
         }
 
-        console::log_1(&JsValue::from_str(&format!(
+        logmod::log1_str(&format!(
             "div_grid_items: my_player_number {} start_index {} end_index {} vec_cards.len {}",
             &root_rendering_component.game_data.my_player_number,
             start_index,
             end_index,
             game_data.vec_cards.len()
-        )));
+        ));
 
         for x in start_index..=end_index {
             let index: usize = x;
@@ -322,10 +323,7 @@ pub fn max_grid_size(root_rendering_component: &RootRenderingComponent) -> Size2
         //grid_container width and height
         let mut max_grid_width = grid_width();
         let mut max_grid_height = grid_height();
-        console::log_1(&JsValue::from_str(&format!(
-            "inner_width {} inner_height {}",
-            max_grid_width, max_grid_height
-        )));
+        logmod::log1_str(&format!("inner_width {} inner_height {}",max_grid_width, max_grid_height));
         //default if not choosen
         let mut card_width = 115;
         let mut card_height = 115;
@@ -338,10 +336,10 @@ pub fn max_grid_size(root_rendering_component: &RootRenderingComponent) -> Size2
                     unwrap!(root_rendering_component.game_data.game_config.clone()).card_height;
             }
         }
-        console::log_1(&JsValue::from_str(&format!(
+        logmod::log1_str(&format!(
             "card_width {} card_height {}",
             card_width, card_height
-        )));
+        ));
         //ratio between width and height must stay the same
         let ratio = (unwrap!(card_height.approx_as::<f64>())
             * unwrap!(
@@ -365,10 +363,10 @@ pub fn max_grid_size(root_rendering_component: &RootRenderingComponent) -> Size2
             max_grid_height =
                 unwrap!((unwrap!(max_grid_width.approx_as::<f64>()) * ratio).approx_as::<usize>());
         }
-        console::log_1(&JsValue::from_str(&format!(
+        logmod::log1_str(&format!(
             "max_grid_width {} max_grid_height {}",
             max_grid_width, max_grid_height
-        )));
+        ));
 
         //return
         Size2d {

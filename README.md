@@ -58,5 +58,6 @@ I created a subdomain on shorturl.com. It is not the perfect solution, but it is
 2019-07-03 game flow in modules  
 2019-07-05 refactoring, refactoring,...  
 2019-07-09 request_fullscreen button  
+2019-07-26 full screen, js snippet, external C, logmod,  
 
   

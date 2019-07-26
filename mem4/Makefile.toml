@@ -39,13 +39,13 @@ skip_core_tasks = true
 clear = true
 private = true
 command = "wasm-pack"
-args = ["build", "--target", "web"]
+args = ["build", "--target", "web","--dev"]
 
 [tasks.build-release]
 clear = true
 private = true
 command = "wasm-pack"
-args = ["build","--target", "web"]
+args = ["build","--target", "web","--release"]
 
 [tasks.post-build]
 clear = true

@@ -2,13 +2,12 @@
 
 //region: use
 use crate::gamedata::GameData;
+use crate::logmod;
 
 use dodrio::builder::{text};
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Node, Render};
 use typed_html::dodrio;
-use wasm_bindgen::prelude::*;
-use web_sys::console;
 //endregion
 
 ///Render Component: player score
@@ -39,10 +38,10 @@ impl PlayersAndScores {
     ///copies the data from game data to internal cache
     /// internal fiels are used to render component
     pub fn update_intern_cache(&mut self, game_data: &GameData) -> bool {
-        console::log_1(&JsValue::from_str(&format!(
+        logmod::log1_str(&format!(
             "update_intern_cache  my_player_number {}",
             &game_data.my_player_number
-        )));
+        ));
 
         let mut is_invalidated;
         is_invalidated = false;

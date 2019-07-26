@@ -46,10 +46,11 @@ impl Render for RulesAndDescription {
     {
         dodrio!(bump,
         <div>
-        //call js DoFullScreen()
-            <button id="view-fullscreen" style= "margin:auto;display:block;" onclick={dd()} >"Fullscreen"
+            <button id="view-fullscreen" style= "margin:auto;display:block;" onclick={move |root, vdom, _event| {
+                do_fullscreen();
+                }}>
+                "Fullscreen"
             </button>
-
             <h4>
                 {text_with_br_newline(GAME_DESCRIPTION,bump)}
             </h4>
@@ -83,10 +84,16 @@ fn text_with_br_newline<'a>(txt: &'a str, bump: &'a Bump) -> Vec<Node<'a>> {
     vec_text_node
 }
 
-#[wasm_bindgen]
+//region: example how to call a javascript function
+
+///in the block extern "C" are the descriptions of imported javascript 
+#[wasm_bindgen(module = "/js/mem4utils.js")]
 extern "C" {
-    fn DoFullScreen();
+    fn dofullscreen();
+
 }
-pub fn dd() {
-    DoFullScreen();
+
+pub fn do_fullscreen() {
+    dofullscreen();
 }
+//endregion
