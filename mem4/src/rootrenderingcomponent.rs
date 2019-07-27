@@ -8,6 +8,7 @@ use crate::divplayeractions;
 use crate::divplayersandscores;
 use crate::divrulesanddescription;
 use crate::gamedata::GameData;
+use crate::logmod;
 
 use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
@@ -15,6 +16,7 @@ use dodrio::{Cached, Node, Render};
 use mem4_common::GameStatus;
 use typed_html::dodrio;
 use web_sys::WebSocket;
+use conv::{ConvAsUtil};
 //endregion
 
 ///Root Render Component: the card grid struct has all the needed data for play logic and rendering
@@ -171,8 +173,11 @@ impl Render for RootRenderingComponent {
 
         if self.game_data.error_text == "" {
             let xmax_grid_size = divgridcontainer::max_grid_size(self);
-            let xstyle2 = format!("width:{}px;", unwrap!(xmax_grid_size.hor.checked_add(2)));
+            let xmax_grid_size_add_two = unwrap!(xmax_grid_size.hor.checked_add(2));
+            let xstyle2 = format!("width:{}px;", xmax_grid_size_add_two);
+            logmod::log1_str(&format!("width m_container {}", xmax_grid_size_add_two));
 
+            //the main HTML render
             dodrio!(bump,
             <div class= "m_container" style={xstyle2}>
                 {vec![divcardmoniker::div_grid_card_moniker(self, bump)]}
@@ -201,3 +206,48 @@ impl Render for RootRenderingComponent {
     }
 }
 //endregion
+
+/// return window inner height
+/// the size of  the visible part of the window
+pub fn usize_window_inner_height() -> usize {
+    let window = unwrap!(web_sys::window(), "error: web_sys::window");
+    let jsvalue_inner_height = unwrap!(window.inner_height(), "window.inner_height");
+
+    let f64_inner_height = unwrap!(
+        jsvalue_inner_height.as_f64(),
+        "jsValue_inner_height.as_f64()"
+    );
+    let usize_inner_height: usize = unwrap!(f64_inner_height.approx());
+    //return
+    usize_inner_height
+}
+
+/// return window inner width
+/// the size of  the visible part of the window
+pub fn usize_window_inner_width() -> usize {
+    let window = unwrap!(web_sys::window(), "error: web_sys::window");
+
+    let jsvalue_inner_width = unwrap!(window.inner_width(), "window.inner_width");
+
+    let f64_inner_width = unwrap!(
+        jsvalue_inner_width.as_f64(),
+        "jsValue_inner_width.as_string()"
+    );
+    let usize_inner_width: usize = unwrap!(f64_inner_width.approx());
+    //return
+    usize_inner_width
+}
+
+
+/// return window inner width, but maximum 600px
+/// the size of  the visible part of the window
+pub fn usize_window_inner_width_but_max_600() -> usize {
+    let x = usize_window_inner_width();
+    if x > 600 {
+        //return
+        600
+    } else {
+        //return
+        x
+    }
+}

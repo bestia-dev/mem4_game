@@ -7,8 +7,9 @@ use crate::rootrenderingcomponent::RootRenderingComponent;
 use crate::statusplaybefore1stcard;
 use crate::statusplaybefore2ndcard;
 use crate::logmod;
+use crate::rootrenderingcomponent;
 
-use conv::*;
+use conv::{ ConvUtil};
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
 use mem4_common::GameStatus;
@@ -267,15 +268,7 @@ fn div_grid_item_on_click(rrc: &mut RootRenderingComponent, this_click_card_inde
 ///grid width in pixels
 pub fn grid_width() -> usize {
     //the size of  the visible part of the window
-    let window = unwrap!(web_sys::window(), "error: web_sys::window");
-
-    let jsvalue_inner_width = unwrap!(window.inner_width(), "window.inner_width");
-
-    let f64_inner_width = unwrap!(
-        jsvalue_inner_width.as_f64(),
-        "jsValue_inner_width.as_string()"
-    );
-    let usize_inner_width: usize = unwrap!(f64_inner_width.approx());
+    let usize_inner_width = rootrenderingcomponent::usize_window_inner_width();
     //width min: 300px, max: 600 px in between width=visible width
     //3 columnsdelimiter 5px wide
     let grid_width: usize;
@@ -288,17 +281,12 @@ pub fn grid_width() -> usize {
     }
     grid_width
 }
+
+
 ///grid height in pixels
 pub fn grid_height() -> usize {
     //the size of  the visible part of the window
-    let window = unwrap!(web_sys::window(), "error: web_sys::window");
-    let jsvalue_inner_height = unwrap!(window.inner_height(), "window.inner_height");
-
-    let f64_inner_height = unwrap!(
-        jsvalue_inner_height.as_f64(),
-        "jsValue_inner_height.as_f64()"
-    );
-    let usize_inner_height: usize = unwrap!(f64_inner_height.approx());
+    let usize_inner_height = rootrenderingcomponent::usize_window_inner_height();
 
     //height minimum 300, max 1000, else 0.8*visible height
     //3 row separetors 5px wide
@@ -316,14 +304,17 @@ pub fn grid_height() -> usize {
 
 ///calculate max with and height for a grid in pixels
 pub fn max_grid_size(root_rendering_component: &RootRenderingComponent) -> Size2d {
-    //if the game_config is None, then return default
+    //if the game_config is None, then return full screen
     if root_rendering_component.game_data.game_config.is_none() {
-        Size2d { hor: 500, ver: 500 }
+        Size2d { hor: rootrenderingcomponent::usize_window_inner_width_but_max_600(), ver: rootrenderingcomponent::usize_window_inner_height() }
     } else {
         //grid_container width and height
         let mut max_grid_width = grid_width();
         let mut max_grid_height = grid_height();
-        logmod::log1_str(&format!("inner_width {} inner_height {}",max_grid_width, max_grid_height));
+        logmod::log1_str(&format!(
+            "inner_width {} inner_height {}",
+            max_grid_width, max_grid_height
+        ));
         //default if not choosen
         let mut card_width = 115;
         let mut card_height = 115;

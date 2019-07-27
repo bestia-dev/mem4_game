@@ -1,11 +1,12 @@
 //! divrulesanddescription.rs - renders the div that shows rules and descriptions
 //! All is a static content. Great for implementing dodrio cache.
 
+//region: use
 use dodrio::builder::{br, text};
 use dodrio::bumpalo::{self, Bump};
 use dodrio::{Node, Render};
 use typed_html::dodrio;
-use wasm_bindgen::prelude::*;
+//endregion
 
 ///Text of game rules.
 ///Multiline string literal just works.
@@ -46,11 +47,6 @@ impl Render for RulesAndDescription {
     {
         dodrio!(bump,
         <div>
-            <button id="view-fullscreen" style= "margin:auto;display:block;" onclick={move |root, vdom, _event| {
-                do_fullscreen();
-                }}>
-                "Fullscreen"
-            </button>
             <h4>
                 {text_with_br_newline(GAME_DESCRIPTION,bump)}
             </h4>
@@ -84,16 +80,3 @@ fn text_with_br_newline<'a>(txt: &'a str, bump: &'a Bump) -> Vec<Node<'a>> {
     vec_text_node
 }
 
-//region: example how to call a javascript function
-
-///in the block extern "C" are the descriptions of imported javascript 
-#[wasm_bindgen(module = "/js/mem4utils.js")]
-extern "C" {
-    fn dofullscreen();
-
-}
-
-pub fn do_fullscreen() {
-    dofullscreen();
-}
-//endregion

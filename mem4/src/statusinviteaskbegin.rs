@@ -90,7 +90,7 @@ pub fn on_msg_invite(
     my_ws_uid: usize,
     asked_folder_name: String,
 ) {
-    logmod::log1_str(&"rcv invite");
+    logmod::log1_str("rcv invite");
     rrc.reset();
     rrc.game_data.game_status = GameStatus::InviteAsked;
     //the first player is the initiator

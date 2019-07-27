@@ -64,5 +64,5 @@ script = [
 clear = true
 private = true
 script = [
-    "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\mem4\\pkg\\*.* c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\mem4\\pkg\\ /y ",
+    "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\mem4\\pkg\\*.* c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\mem4\\pkg\\ /e /i /y /s ",
 ]

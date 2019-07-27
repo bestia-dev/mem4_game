@@ -37,6 +37,14 @@ I prepared some flows and tasks for Cargo make.
 Google cloud platform does not give any subdomain name for free. Google is also a domain registrar and it looks like they are trying to push me to buy a domain.  
 I didn't like to have the raw IP in the url. People don't like numbers like that.  
 I created a subdomain on shorturl.com. It is not the perfect solution, but it is free or very cheap.  
+## Safari on iOS and FullScreen
+Apple is very restrictive and does not allow easily fullscreen on iPhones.  
+The workaround is to make a shortcut for the webapp on the homescreen.  
+In safari the share icon (a square with arrow up) has "Add to home screen".
+https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html  
+## mem4 as webapp on HomeScreen
+On both android and iPhone is possible to "Add to homescreen" the webapp.  
+Then it will open in fullscreen and be beautiful.  
 ## TODO:
 - sync data from player1 to others after reconnect.
 - sometimes the grid is bigger after every click, but sometimes not
@@ -45,7 +53,8 @@ I created a subdomain on shorturl.com. It is not the perfect solution, but it is
 - different content for English learning: numbers (cardinal, ordinal), food, orientation, alphabet simple spelling, drinks, days/months, questions, colors, transportation, ... 
 - on card click only the active player calculates the new state and send the new info to others in a msg
 - fullscreen from http://robnyman.github.io/fullscreen/
-- use fetch module instead of websockets for json
+- onfullscreen vdom schedule render
+- use fetch module instead of WebSockets for json
 ## Changelog
 2019-05-24 completed a working version  
 2019-06-06 google cloud platform, docker, DockerHub  
