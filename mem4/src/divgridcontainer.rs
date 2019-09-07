@@ -9,7 +9,7 @@ use crate::statusplaybefore2ndcard;
 use crate::logmod;
 use crate::rootrenderingcomponent;
 
-use conv::{ ConvUtil};
+use conv::{ConvUtil};
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
 use mem4_common::GameStatus;
@@ -19,7 +19,7 @@ use wasm_bindgen::JsCast;
 //use web_sys::console; //don't remove this. It is needed for dyn_into.
 
 ///fixed filename for card face down
-const SRC_FOR_CARD_FACE_DOWN: &str = "img/mem_image_00_cardfacedown.png";
+const SRC_FOR_CARD_FACE_DOWN: &str = "img/mem_cardfacedown.png";
 //endregion
 
 ///prepare the grid container
@@ -137,13 +137,14 @@ pub fn div_grid_items<'a, 'bump>(
                                         SRC_FOR_CARD_FACE_DOWN)
                 .into_bump_str(),
                 CardStatusCardFace::UpTemporary | CardStatusCardFace::UpPermanently => {
-                    bumpalo::format!(in bump, "content/{}/img/mem_image_{:02}.png",
+                    bumpalo::format!(in bump, "content/{}/img/{}",
                     game_data.content_folder_name,
-                            unwrap!(game_data
-                                .vec_cards
-                                .get(index)
-                                ,"error index")
-                                .card_number_and_img_src
+                    unwrap!(
+                        unwrap!(game_data.game_config.as_ref())
+                        .img_filename.get(
+                            unwrap!(game_data.vec_cards.get(index))
+                            .card_number_and_img_src
+                        ))
                     )
                     .into_bump_str()
                 }
@@ -231,18 +232,21 @@ pub fn div_grid_item<'a, 'bump>(
 
 /// on click
 fn div_grid_item_on_click(rrc: &mut RootRenderingComponent, this_click_card_index: usize) {
-
     //region: audio play
     //prepare the audio element with src filename of mp3
     let audio_element = web_sys::HtmlAudioElement::new_with_src(
         format!(
-            "content/{}/sound/mem_sound_{:02}.mp3",
+            "content/{}/sound/{}",
             rrc.game_data.content_folder_name,
-            unwrap!(
-                rrc.game_data.vec_cards.get(this_click_card_index),
-                "error this_click_card_index"
-            )
-            .card_number_and_img_src
+            unwrap!(unwrap!(rrc.game_data.game_config.as_ref())
+                .sound_filename
+                .get(
+                    unwrap!(
+                        rrc.game_data.vec_cards.get(this_click_card_index),
+                        "error this_click_card_index"
+                    )
+                    .card_number_and_img_src
+                ))
         )
         .as_str(),
     );
@@ -282,7 +286,6 @@ pub fn grid_width() -> usize {
     grid_width
 }
 
-
 ///grid height in pixels
 pub fn grid_height() -> usize {
     //the size of  the visible part of the window
@@ -306,7 +309,10 @@ pub fn grid_height() -> usize {
 pub fn max_grid_size(root_rendering_component: &RootRenderingComponent) -> Size2d {
     //if the game_config is None, then return full screen
     if root_rendering_component.game_data.game_config.is_none() {
-        Size2d { hor: rootrenderingcomponent::usize_window_inner_width_but_max_600(), ver: rootrenderingcomponent::usize_window_inner_height() }
+        Size2d {
+            hor: rootrenderingcomponent::usize_window_inner_width_but_max_600(),
+            ver: rootrenderingcomponent::usize_window_inner_height(),
+        }
     } else {
         //grid_container width and height
         let mut max_grid_width = grid_width();

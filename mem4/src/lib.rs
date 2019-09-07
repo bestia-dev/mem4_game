@@ -83,7 +83,8 @@
 //! anything JavaScript can call, but the way of doing it is sometimes very hard to understand.  
 //! ## Browser console
 //! At least in modern browsers (Firefox and Chrome) we have the developer tools F12 and there is a
-//! console we can output to. So we can debug what is going on with our Wasm program.  
+//! console we can output to. So we can debug what is going on with our Wasm program.
+//! But not on smartphones that are the only target for this app.  
 //! ## Modules
 //! Rust code is splitted into modules. They are not exactly like classes, but can be similar.  
 //! Rust has much more freedom to group code in different ways. So that is best suits the problem.  
@@ -168,6 +169,7 @@ mod divplayersandscores;
 mod divrulesanddescription;
 mod fetchmod;
 mod gamedata;
+mod javascriptimportmod;
 mod logmod;
 mod rootrenderingcomponent;
 mod statusinviteaskbegin;

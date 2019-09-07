@@ -1,11 +1,24 @@
 {
     "card_moniker": [
-        "", "♣1", "♣2", "♣3", "♣4", "♣5", "♣6", "♣7", "♣8", "♣9",
-        "♣10", "♣11", "♣12", "♣13", "♦1", "♦2", "♦3", "♦4", "♦5", "♦6",
-        "♦7", "♦8", "♦9", "♦10", "♦11", "♦12", "♦13",
-        "♥1", "♥2", "♥3", "♥4", "♥5", "♥6", "♥7", "♥8", "♥9",
-        "♥10", "♥11", "♥12", "♥13", "♠1", "♠2", "♠3", "♠4", "♠5", "♠6",
-        "♠7", "♠8", "♠9", "♠10", "♠11", "♠12", "♠13"
+        "",
+        "♣1", "♣2", "♣3", "♣4", "♣5", "♣6", "♣7", "♣8", "♣9", "♣10", "♣11", "♣12", "♣13",
+        "♦1", "♦2", "♦3", "♦4", "♦5", "♦6", "♦7", "♦8", "♦9", "♦10", "♦11", "♦12", "♦13",
+        "♥1", "♥2", "♥3", "♥4", "♥5", "♥6", "♥7", "♥8", "♥9", "♥10", "♥11", "♥12", "♥13",
+        "♠1", "♠2", "♠3", "♠4", "♠5", "♠6", "♠7", "♠8", "♠9", "♠10", "♠11", "♠12", "♠13"
+    ],
+    "img_filename": [
+        "",
+        "tref01", "tref02", "tref03", "tref04", "tref05", "tref06", "tref07", "tref08", "tref09", "tref10", "tref11", "tref12", "tref13",
+        "diamond01", "diamond02", "diamond03", "diamond04", "diamond05", "diamond06", "diamond07", "diamond08", "diamond09", "diamond10", "diamond11", "diamond12", "diamond13",
+        "heart01", "heart02", "heart03", "heart04", "heart05", "heart06", "heart07", "heart08", "heart09", "heart10", "heart11", "heart12", "heart13",
+        "spade01", "spade02", "spade03", "spade04", "spade05", "spade06", "spade07", "spade08", "spade09", "spade10", "spade11", "spade12", "spade13"
+    ],
+    "sound_filename": [
+        "",
+        "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3",
+        "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3",
+        "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3",
+        "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3"
     ],
     "card_width": 74,
     "card_height": 115,

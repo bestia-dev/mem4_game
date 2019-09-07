@@ -1,10 +1,24 @@
 {
     "card_moniker": [
-        "", "S1", "S2", "S3", "S4", "S5", "S6", "S7",
-        "S11", "S12", "S13", "C1", "C2", "C3", "C4", "C5", "C6",
-        "C7", "C11", "C12", "C13",
-        "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B11", "B12", "B13", "D1", "D2", "D3", "D4", "D5", "D6",
-        "D7", "D11", "D12", "D13"
+        "",
+        "spade 1", "spade 2", "spade 3", "spade 4", "spade 5", "spade 6", "spade 7", "spade 11", "spade 12", "spade 13",
+        "coppe 1", "coppe 2", "coppe 3", "coppe 4", "coppe 5", "coppe 6", "coppe 7", "coppe 11", "coppe 12", "coppe 13",
+        "bastoni 1", "bastoni 2", "bastoni 3", "bastoni 4", "bastoni 5", "bastoni 6", "bastoni 7", "bastoni 11", "bastoni 12", "bastoni 13",
+        "denari 1", "denari 2", "denari 3", "denari 4", "denari 5", "denari 6", "denari 7", "denari 11", "denari 12", "denari 13"
+    ],
+    "img_filename": [
+        "",
+        "spade01", "spade02", "spade03", "spade04", "spade05", "spade06", "spade07", "spade11", "spade12", "spade13",
+        "coppe01", "coppe02", "coppe03", "coppe04", "coppe05", "coppe06", "coppe07", "coppe11", "coppe12", "coppe13",
+        "bastoni01", "bastoni02", "bastoni03", "bastoni04", "bastoni05", "bastoni06", "bastoni07", "bastoni11", "bastoni12", "bastoni13",
+        "denari01", "denari02", "denari03", "denari04", "denari05", "denari06", "denari07", "denari11", "denari12", "denari13"
+    ],
+    "sound_filename": [
+        "",
+        "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3",
+        "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3",
+        "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3",
+        "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3", "card_shuffle.mp3"
     ],
     "card_width": 81,
     "card_height": 147,

@@ -59,7 +59,7 @@ pub fn setup_ws_connection(location_href: String, client_ws_id: usize) -> WebSoc
         );
     });
 
-    let cb_oh: Closure<Fn()> = Closure::wrap(open_handler);
+    let cb_oh: Closure<dyn Fn()> = Closure::wrap(open_handler);
     ws.set_onopen(Some(cb_oh.as_ref().unchecked_ref()));
     //don't drop the open_handler memory
     cb_oh.forget();
@@ -104,10 +104,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                 wasm_bindgen_futures::spawn_local(
                     weak.with_component({
                         move |root| {
-                            logmod::log1_str(&format!(
-                                "ResponseWsUid: {}  ",
-                                your_ws_uid
-                            ));
+                            logmod::log1_str(&format!("ResponseWsUid: {}  ", your_ws_uid));
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             root_rendering_component.on_response_ws_uid(your_ws_uid);
@@ -252,7 +249,9 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                                 root.unwrap_mut::<RootRenderingComponent>();
                             console::log_1(&"players".into());
                             statustaketurnbegin::on_msg_take_turn_begin(
-                                root_rendering_component, game_status, card_index
+                                root_rendering_component,
+                                game_status,
+                                card_index,
                             );
                             v2.schedule_render();
                         }
@@ -310,7 +309,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
     });
 
     //magic ??
-    let cb_mrh: Closure<Fn(JsValue)> = Closure::wrap(msg_recv_handler);
+    let cb_mrh: Closure<dyn Fn(JsValue)> = Closure::wrap(msg_recv_handler);
     ws.set_onmessage(Some(cb_mrh.as_ref().unchecked_ref()));
 
     //don't drop the event listener from memory

@@ -29,4 +29,10 @@ workspace = true
 command="cargo"
 args=["make", "doc"]
 
+[tasks.publish]
+description = "TODO: copy the content of /mem4_game/webfolder/mem4/ to google vm. How?? ssh ?"
+workspace = true
+command="cargo"
+args=["make", "publish"]
+
 #endregion

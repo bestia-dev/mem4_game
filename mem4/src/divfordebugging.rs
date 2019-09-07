@@ -2,12 +2,13 @@
 
 //region: use, const
 use crate::rootrenderingcomponent::RootRenderingComponent;
+use crate::javascriptimportmod;
 
 use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
 use typed_html::dodrio;
-use wasm_bindgen::prelude::*;
+
 use web_sys;
 use conv::*;
 //endregion
@@ -36,7 +37,7 @@ fn is_iphone() -> bool {
     user_agent.to_ascii_lowercase().contains("iphone")
 }
 
-///render a button on android, but not for iphone
+///render a fullscreen button on android, but not for iphone
 fn button_for_fullscreen(bump: &Bump) -> Vec<Node> {
 
     //check the height if is fullscreen (not working now)
@@ -124,7 +125,7 @@ fn button_for_fullscreen(bump: &Bump) -> Vec<Node> {
             ret_val.push(
             dodrio!(bump,
                 <button id="view-fullscreen" style= "margin:auto;display:block;" onclick={move |root, vdom, _event| {
-                    do_fullscreen();
+                    javascriptimportmod::do_fullscreen();
                     vdom.schedule_render();
                     }}>
                     "Fullscreen"
@@ -135,17 +136,3 @@ fn button_for_fullscreen(bump: &Bump) -> Vec<Node> {
     //return
     ret_val
 }
-
-//region: example how to call a javascript function
-
-///in the block extern "C" are the descriptions of imported javascript
-#[wasm_bindgen(module = "/js/mem4utils.js")]
-extern "C" {
-    fn dofullscreen();
-
-}
-///do full screen function imported from javascript
-pub fn do_fullscreen() {
-    dofullscreen();
-}
-//endregion

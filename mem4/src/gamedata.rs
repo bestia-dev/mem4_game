@@ -28,6 +28,10 @@ pub struct GameConfig {
     ///card moniker - the text/name of the card
     ///the zero element is card face down or empty, example alphabet begins with index 01 : A
     pub card_moniker: Vec<String>,
+    ///img filenames
+    pub img_filename: Vec<String>,
+    ///sound filenames
+    pub sound_filename: Vec<String>,
     ///card image width
     pub card_width: usize,
     ///card image height

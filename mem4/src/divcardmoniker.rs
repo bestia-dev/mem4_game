@@ -27,22 +27,17 @@ pub fn div_grid_card_moniker<'a>(
         <div class= "grid_container_header" style={bumpalo::format!(in bump, "grid-template-columns: auto auto;{}","").into_bump_str()}>
             <div class= "grid_item" style= "text-align: left;">
                 {vec![text(
-                bumpalo::format!(in bump, "{}",
-                unwrap!(unwrap!(root_rendering_component.game_data.game_config.clone(),"root_rendering_component.game_data.game_config.clone()")
-                .card_moniker.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_first_click),"game_data.vec_cards.get(game_data.card_index_of_first_click")
-                                        .card_number_and_img_src),".card_number_and_img_src")
-                                        )
-                .into_bump_str(),
+                    bumpalo::format!(in bump, "{}",
+                    unwrap!(unwrap!(root_rendering_component.game_data.game_config.clone(),"root_rendering_component.game_data.game_config.clone()")
+                    .card_moniker.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_first_click)).card_number_and_img_src)))
+                    .into_bump_str(),
                 )]}
                 </div>
                 <div class= "grid_item" style= "text-align: right;">
                     {vec![text(
                     bumpalo::format!(in bump, "{}",
                     unwrap!(unwrap!(root_rendering_component.game_data.game_config.clone(),"root_rendering_component.game_data.game_config.clone()")
-                    .card_moniker.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_second_click)
-                    ,"game_data.card_index_of_second_click)")
-                        .card_number_and_img_src),".card_number_and_img_src)")
-                        )
+                    .card_moniker.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_second_click)).card_number_and_img_src)))
                 .into_bump_str(),
                 )]}
                 </div>
