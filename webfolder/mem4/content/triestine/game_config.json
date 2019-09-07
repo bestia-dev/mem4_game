@@ -8,10 +8,10 @@
     ],
     "img_filename": [
         "",
-        "spade01", "spade02", "spade03", "spade04", "spade05", "spade06", "spade07", "spade11", "spade12", "spade13",
-        "coppe01", "coppe02", "coppe03", "coppe04", "coppe05", "coppe06", "coppe07", "coppe11", "coppe12", "coppe13",
-        "bastoni01", "bastoni02", "bastoni03", "bastoni04", "bastoni05", "bastoni06", "bastoni07", "bastoni11", "bastoni12", "bastoni13",
-        "denari01", "denari02", "denari03", "denari04", "denari05", "denari06", "denari07", "denari11", "denari12", "denari13"
+        "spade01.png", "spade02.png", "spade03.png", "spade04.png", "spade05.png", "spade06.png", "spade07.png", "spade11.png", "spade12.png", "spade13.png",
+        "coppe01.png", "coppe02.png", "coppe03.png", "coppe04.png", "coppe05.png", "coppe06.png", "coppe07.png", "coppe11.png", "coppe12.png", "coppe13.png",
+        "bastoni01.png", "bastoni02.png", "bastoni03.png", "bastoni04.png", "bastoni05.png", "bastoni06.png", "bastoni07.png", "bastoni11.png", "bastoni12.png", "bastoni13.png",
+        "denari01.png", "denari02.png", "denari03.png", "denari04.png", "denari05.png", "denari06.png", "denari07.png", "denari11.png", "denari12.png", "denari13.png"
     ],
     "sound_filename": [
         "",
