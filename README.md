@@ -52,7 +52,6 @@ https://developer.apple.com/library/archive/documentation/AppleApplications/Refe
 - on card click only the active player calculates the new state and send the new info to others in a msg  
 - fullscreen from http://robnyman.github.io/fullscreen/  
 - onfullscreen vdom schedule render  
-- use fetch module instead of WebSockets for json  
 - iPhone/android webapp manifest file  
 - why/how to reset/reload the webapp in "add to homescreen" on iPhone?  
 
@@ -69,5 +68,5 @@ https://developer.apple.com/library/archive/documentation/AppleApplications/Refe
 2019-07-05 refactoring, refactoring,...  
 2019-07-09 request_fullscreen button  
 2019-07-26 full screen, js snippet, external C, logmod,  
-2019-09-09 content filenames in config.json
+2019-09-09 content filenames in config.json, async fetch game_config.json
   

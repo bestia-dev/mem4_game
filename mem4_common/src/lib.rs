@@ -129,16 +129,6 @@ pub enum WsMessage {
         ///all players
         players: String,
     },
-    ///Request the game_config from the WebSocket server
-    RequestGameConfig {
-        ///the file with the game_config
-        filename: String,
-    },
-    ///Receive the game_config from the WebSocket server
-    ResponseGameConfigJson {
-        ///the game_config from the server
-        json: String,
-    },
 }
 
 ///the game can be in various statuses and that differentiate the UI and actions

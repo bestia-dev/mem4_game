@@ -281,7 +281,6 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
 
     //There are different messages coming from the mem4 wasm app
     //Invite must be broadcasted to all users
-    //RequestGameConfig must return a message ResponseGameConfigJson to the same user
     //all others must be forwarded to exactly the other player.
 
     let msg: WsMessage = serde_json::from_str(&new_msg).unwrap_or_else(|_x| WsMessage::Dummy {
@@ -306,6 +305,7 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
                 Err(_disconnected) => {}
             }
         }
+        /* obsolete, but keep it as an example how to return a text file over websocket
         WsMessage::RequestGameConfig { filename } => {
             info!("RequestGameConfig: {}", filename);
             // read the file
@@ -336,9 +336,9 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
                 Err(_disconnected) => {}
             }
         }
+        */
         WsMessage::Invite { .. } => broadcast(users, ws_uid_of_message, &new_msg),
         WsMessage::ResponseWsUid { .. } => info!("ResponseWsUid: {}", ""),
-        WsMessage::ResponseGameConfigJson { .. } => info!("ResponseGameConfigJson: {}", ""),
         WsMessage::PlayAccept { players, .. }
         | WsMessage::PlayerClick1stCard { players, .. }
         | WsMessage::PlayerClick2ndCard { players, .. }

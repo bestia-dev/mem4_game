@@ -290,21 +290,6 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                     .map_err(|_| ()),
                 );
             }
-            //this message is for the WebSocket server
-            WsMessage::RequestGameConfig { filename } => console::log_1(&filename.into()),
-            WsMessage::ResponseGameConfigJson { json } => {
-                wasm_bindgen_futures::spawn_local(
-                    weak.with_component({
-                        move |root| {
-                            console::log_1(&"ResponseGameConfigJson".into());
-                            let root_rendering_component =
-                                root.unwrap_mut::<RootRenderingComponent>();
-                            root_rendering_component.on_response_game_config_json(&json)
-                        }
-                    })
-                    .map_err(|_| ()),
-                );
-            }
         }
     });
 

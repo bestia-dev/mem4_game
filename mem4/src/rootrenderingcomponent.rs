@@ -133,15 +133,6 @@ impl RootRenderingComponent {
         }
         self.check_invalidate_for_all_components();
     }
-    ///msg response game_config json
-    pub fn on_response_game_config_json(&mut self, json: &str) {
-        self.game_data.game_config = unwrap!(
-            serde_json::from_str(json),
-            "error root_rendering_component.game_data.game_config = serde_json::from_str(&json)",
-        );
-    }
-
-
     //endregion
 }
 //endregion
@@ -237,7 +228,6 @@ pub fn usize_window_inner_width() -> usize {
     //return
     usize_inner_width
 }
-
 
 /// return window inner width, but maximum 600px
 /// the size of  the visible part of the window
