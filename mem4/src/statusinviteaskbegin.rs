@@ -4,14 +4,13 @@
 use crate::rootrenderingcomponent::RootRenderingComponent;
 use crate::websocketcommunication;
 use crate::logmod;
-use crate::fetchmod;
+use crate::fetchgameconfig;
 
 use dodrio::builder::text;
 use dodrio::bumpalo::{self, Bump};
 use dodrio::Node;
 use mem4_common::{GameStatus, Player, WsMessage};
 use typed_html::dodrio;
-use web_sys::{Request, RequestInit};
 //endregion
 
 ///render invite ask begin, ask to play for multiple contents/folders
@@ -70,14 +69,7 @@ pub fn div_invite_ask_begin_on_click(
     rrc.game_data.asked_folder_name = folder_name.to_string();
 
     //async fetch_response() for gameconfig.json
-    let url_config = format!(
-        "{}/content/{}/game_config.json",
-        rrc.game_data.href, rrc.game_data.asked_folder_name
-    );
-    logmod::log1_str(url_config.as_str());
-    let webrequest = create_webrequest(url_config.as_str());
-    fetchmod::fetch_response(vdom_weak, &webrequest, &set_config_json);
-
+    fetchgameconfig::fetch_game_config_request(rrc, vdom_weak);
     //send the msg Invite
     websocketcommunication::ws_send_msg(
         &rrc.game_data.ws,
@@ -86,26 +78,6 @@ pub fn div_invite_ask_begin_on_click(
             asked_folder_name: folder_name.to_string(),
         },
     );
-}
-
-///create web request from string
-pub fn create_webrequest(url: &str) -> web_sys::Request {
-    let mut opts = RequestInit::new();
-    opts.method("GET");
-
-    let w_webrequest = unwrap!(Request::new_with_str_and_init(url, &opts));
-
-    logmod::log1_str("let w_webrequest =");
-    //return
-    w_webrequest
-}
-
-#[allow(clippy::needless_pass_by_value)]
-/// update a field in the struct
-pub fn set_config_json(rrc: &mut RootRenderingComponent, respbody: String) {
-    //respbody is json.
-    logmod::log1_str(format!("respbody {}", respbody).as_str());
-    rrc.game_data.game_config = unwrap!(serde_json::from_str(respbody.as_str()));
 }
 
 ///msg invite

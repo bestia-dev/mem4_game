@@ -168,6 +168,7 @@ mod divplayeractions;
 mod divplayersandscores;
 mod divrulesanddescription;
 mod fetchmod;
+mod fetchgameconfig;
 mod gamedata;
 mod javascriptimportmod;
 mod logmod;
