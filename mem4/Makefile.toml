@@ -30,8 +30,11 @@ skip_core_tasks = true
 
     [tasks.doc]
     description = "call cargo doc"
-    command="cargo"
-    args=["doc","--no-deps","--document-private-items","--open"]
+    clear=true
+    dependencies = [
+        "insert-readme",
+        "cargo-doc",
+    ]
 
 # endregion
 
@@ -66,3 +69,17 @@ private = true
 script = [
     "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\mem4\\pkg\\*.* c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\mem4\\pkg\\ /e /i /y /s ",
 ]
+
+
+[tasks.insert-readme]
+clear = true
+private = true
+description = "copy the content of readme.md into *.rs comments (for the docs)"
+script= ["..\\..\\utils\\lmake_readme.exe"]
+
+[tasks.cargo-doc]
+clear = true
+private = true
+description = "call cargo doc"
+command="cargo"
+args=["doc","--no-deps","--document-private-items","--open"]

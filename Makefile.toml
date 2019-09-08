@@ -20,6 +20,7 @@ args = ["make","dev"]
 [tasks.release]
 description = "cargo make release for every workspace member"
 workspace = true
+clear=true
 command = "cargo"
 args = ["make","release"]
 
@@ -27,28 +28,14 @@ args = ["make","release"]
 description = "cargo make doc for every workspace member"
 workspace = true
 clear=true
-dependencies = [
-    "insert-readme",
-    "cargo-doc",
-]
+command = "cargo"
+args = ["make","doc"]
 
 [tasks.publish]
 description = "TODO: copy the content of /mem4_game/webfolder/mem4/ to google vm. How?? ssh ?"
 workspace = true
+clear=true
 command="cargo"
 args=["make", "publish"]
 
 #endregion
-
-[tasks.insert-readme]
-clear = true
-private = true
-description = "copy the content of readme.md into *.rs comments (for the docs)"
-script= ["..\\..\\utils\\lmake_readme.exe"]
-
-[tasks.cargo-doc]
-clear = true
-private = true
-description = "call cargo doc"
-command="cargo"
-args=["doc","--no-deps","--document-private-items","--open"]
