@@ -1,7 +1,7 @@
 //region: lmake_readme insert "readme.md"
 //! **mem4 is a simple memory game made primarily for learning the Rust programming language and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication**  
 //! 
-//! [comment]: # (lmake_readme version)
+//! version: 19.9.9  
 //! Look also at the workspace readme on https://github.com/LucianoBestia/mem4_game  
 //! 
 //! # Idea

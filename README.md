@@ -27,7 +27,7 @@ I prepared some flows and tasks for Cargo make for the workspace.
 `cargo make doc` - build the `/target/docs` folder and copy to the `/docs` folder.  
 
 ## TODO:
-- put the version number in the application, increase version on build release
+- increase version automatically on build release
 - sync data from player1 to others after reconnect.
 - different content for English learning: numbers (cardinal, ordinal), food, orientation, alphabet simple spelling, drinks, days/months, questions, colors, transportation, ... 
 - on card click only the active player calculates the new state and send the new info to others in a msg  
@@ -50,5 +50,5 @@ I prepared some flows and tasks for Cargo make for the workspace.
 2019-07-09 request_fullscreen button  
 2019-07-26 full screen, js snippet, external C, logmod,  
 2019-09-08 content filenames in config.json, async fetch game_config.json, separate module for that  
-2019-09-09 version 19.9.9 no need for semver if it is not a public library  
+2019-09-09 version 19.9.9 no need for semver if it is not a public library, version in docs  
 

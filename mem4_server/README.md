@@ -1,6 +1,6 @@
 **mem4_server - html and WebSocket server for the mem4 game**
 
-[comment]: # (lmake_readme version)
+[comment]: # (lmake_readme version)  
 Look also at the workspace readme https://github.com/LucianoBestia/mem4_game  
 
 ## mem4_server

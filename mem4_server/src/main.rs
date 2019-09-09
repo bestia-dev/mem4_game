@@ -1,7 +1,7 @@
 //region: lmake_readme insert "readme.md"
 //! **mem4_server - html and WebSocket server for the mem4 game**
 //! 
-//! [comment]: # (lmake_readme version)
+//! version: 19.9.9  
 //! Look also at the workspace readme https://github.com/LucianoBestia/mem4_game  
 //! 
 //! ## mem4_server
