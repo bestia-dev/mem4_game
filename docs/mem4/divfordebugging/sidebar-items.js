@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["div_for_debugging","information for debugging"]]});
+initSidebarItems({"fn":[["button_for_fullscreen","render a fullscreen button on android, but not for iphone"],["div_for_debugging","information for debugging"],["is_iphone","detect iphone"]]});

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `mem4\src\websocketcommunication.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>websocketcommunication.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../mem4/index.html'><img src='../../rust-logo.png' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `mem4\src\websocketcommunication.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>websocketcommunication.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../mem4/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -369,21 +369,6 @@
 <span id="369">369</span>
 <span id="370">370</span>
 <span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! WebSocketcommunication.rs  - module that cares about WebSocket communication</span>
 
@@ -394,6 +379,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusplaybefore1stcard</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statusplaybefore2ndcard</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">statustaketurnbegin</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">logmod</span>;
 
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">Future</span>;
 <span class="kw">use</span> <span class="ident">js_sys</span>::<span class="ident">Reflect</span>;
@@ -419,10 +405,10 @@
     <span class="comment">//send the client ws id as url_param for the first connect</span>
     <span class="comment">//and reconnect on lost connection</span>
     <span class="ident">loc_href</span>.<span class="ident">push_str</span>(<span class="ident">client_ws_id</span>.<span class="ident">to_string</span>().<span class="ident">as_str</span>());
-    <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="ident">JsValue</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
+    <span class="ident">logmod</span>::<span class="ident">log1_str</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
         <span class="string">&quot;location_href {}  loc_href {} client_ws_id {}&quot;</span>,
         <span class="ident">location_href</span>, <span class="ident">loc_href</span>, <span class="ident">client_ws_id</span>
-    )));
+    ));
 
     <span class="comment">//same server address and port as http server</span>
     <span class="comment">//for reconnect the old ws id will be an url param</span>
@@ -445,7 +431,7 @@
         );
     });
 
-    <span class="kw">let</span> <span class="ident">cb_oh</span>: <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">Fn</span>()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Closure</span>::<span class="ident">wrap</span>(<span class="ident">open_handler</span>);
+    <span class="kw">let</span> <span class="ident">cb_oh</span>: <span class="ident">Closure</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Closure</span>::<span class="ident">wrap</span>(<span class="ident">open_handler</span>);
     <span class="ident">ws</span>.<span class="ident">set_onopen</span>(<span class="prelude-val">Some</span>(<span class="ident">cb_oh</span>.<span class="ident">as_ref</span>().<span class="ident">unchecked_ref</span>()));
     <span class="comment">//don&#39;t drop the open_handler memory</span>
     <span class="ident">cb_oh</span>.<span class="ident">forget</span>();
@@ -490,10 +476,7 @@
                 <span class="ident">wasm_bindgen_futures</span>::<span class="ident">spawn_local</span>(
                     <span class="ident">weak</span>.<span class="ident">with_component</span>({
                         <span class="kw">move</span> <span class="op">|</span><span class="ident">root</span><span class="op">|</span> {
-                            <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="ident">JsValue</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
-                                <span class="string">&quot;ResponseWsUid: {}  &quot;</span>,
-                                <span class="ident">your_ws_uid</span>
-                            )));
+                            <span class="ident">logmod</span>::<span class="ident">log1_str</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;ResponseWsUid: {}  &quot;</span>, <span class="ident">your_ws_uid</span>));
                             <span class="kw">let</span> <span class="ident">root_rendering_component</span> <span class="op">=</span>
                                 <span class="ident">root</span>.<span class="ident">unwrap_mut</span>::<span class="op">&lt;</span><span class="ident">RootRenderingComponent</span><span class="op">&gt;</span>();
                             <span class="ident">root_rendering_component</span>.<span class="ident">on_response_ws_uid</span>(<span class="ident">your_ws_uid</span>);
@@ -638,7 +621,9 @@
                                 <span class="ident">root</span>.<span class="ident">unwrap_mut</span>::<span class="op">&lt;</span><span class="ident">RootRenderingComponent</span><span class="op">&gt;</span>();
                             <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;players&quot;</span>.<span class="ident">into</span>());
                             <span class="ident">statustaketurnbegin</span>::<span class="ident">on_msg_take_turn_begin</span>(
-                                <span class="ident">root_rendering_component</span>, <span class="ident">game_status</span>, <span class="ident">card_index</span>
+                                <span class="ident">root_rendering_component</span>,
+                                <span class="ident">game_status</span>,
+                                <span class="ident">card_index</span>,
                             );
                             <span class="ident">v2</span>.<span class="ident">schedule_render</span>();
                         }
@@ -677,26 +662,11 @@
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()),
                 );
             }
-            <span class="comment">//this message is for the WebSocket server</span>
-            <span class="ident">WsMessage</span>::<span class="ident">RequestGameConfig</span> { <span class="ident">filename</span> } <span class="op">=&gt;</span> <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="ident">filename</span>.<span class="ident">into</span>()),
-            <span class="ident">WsMessage</span>::<span class="ident">ResponseGameConfigJson</span> { <span class="ident">json</span> } <span class="op">=&gt;</span> {
-                <span class="ident">wasm_bindgen_futures</span>::<span class="ident">spawn_local</span>(
-                    <span class="ident">weak</span>.<span class="ident">with_component</span>({
-                        <span class="kw">move</span> <span class="op">|</span><span class="ident">root</span><span class="op">|</span> {
-                            <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="string">&quot;ResponseGameConfigJson&quot;</span>.<span class="ident">into</span>());
-                            <span class="kw">let</span> <span class="ident">root_rendering_component</span> <span class="op">=</span>
-                                <span class="ident">root</span>.<span class="ident">unwrap_mut</span>::<span class="op">&lt;</span><span class="ident">RootRenderingComponent</span><span class="op">&gt;</span>();
-                            <span class="ident">root_rendering_component</span>.<span class="ident">on_response_game_config_json</span>(<span class="kw-2">&amp;</span><span class="ident">json</span>)
-                        }
-                    })
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()),
-                );
-            }
         }
     });
 
     <span class="comment">//magic ??</span>
-    <span class="kw">let</span> <span class="ident">cb_mrh</span>: <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">Fn</span>(<span class="ident">JsValue</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Closure</span>::<span class="ident">wrap</span>(<span class="ident">msg_recv_handler</span>);
+    <span class="kw">let</span> <span class="ident">cb_mrh</span>: <span class="ident">Closure</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">JsValue</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Closure</span>::<span class="ident">wrap</span>(<span class="ident">msg_recv_handler</span>);
     <span class="ident">ws</span>.<span class="ident">set_onmessage</span>(<span class="prelude-val">Some</span>(<span class="ident">cb_mrh</span>.<span class="ident">as_ref</span>().<span class="ident">unchecked_ref</span>()));
 
     <span class="comment">//don&#39;t drop the event listener from memory</span>
@@ -706,7 +676,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_ws_onerror</span>(<span class="ident">ws</span>: <span class="kw-2">&amp;</span><span class="ident">WebSocket</span>, <span class="ident">weak</span>: <span class="ident">dodrio</span>::<span class="ident">VdomWeak</span>) {
     <span class="kw">let</span> <span class="ident">onerror_callback</span> <span class="op">=</span> <span class="ident">Closure</span>::<span class="ident">wrap</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">e</span>: <span class="ident">ErrorEvent</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">err_text</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;error event {:?}&quot;</span>, <span class="ident">e</span>);
-        <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="ident">JsValue</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">err_text</span>));
+        <span class="ident">logmod</span>::<span class="ident">log1_str</span>(<span class="kw-2">&amp;</span><span class="ident">err_text</span>);
         {
             <span class="ident">wasm_bindgen_futures</span>::<span class="ident">spawn_local</span>(
                 <span class="ident">weak</span>.<span class="ident">with_component</span>({
@@ -729,7 +699,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_ws_onclose</span>(<span class="ident">ws</span>: <span class="kw-2">&amp;</span><span class="ident">WebSocket</span>, <span class="ident">weak</span>: <span class="ident">dodrio</span>::<span class="ident">VdomWeak</span>) {
     <span class="kw">let</span> <span class="ident">onclose_callback</span> <span class="op">=</span> <span class="ident">Closure</span>::<span class="ident">wrap</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">e</span>: <span class="ident">ErrorEvent</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">err_text</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;ws_onclose {:?}&quot;</span>, <span class="ident">e</span>);
-        <span class="ident">console</span>::<span class="ident">log_1</span>(<span class="kw-2">&amp;</span><span class="ident">JsValue</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">err_text</span>));
+        <span class="ident">logmod</span>::<span class="ident">log1_str</span>(<span class="kw-2">&amp;</span><span class="ident">err_text</span>);
         {
             <span class="ident">wasm_bindgen_futures</span>::<span class="ident">spawn_local</span>(
                 <span class="ident">weak</span>.<span class="ident">with_component</span>({
@@ -770,5 +740,6 @@
         ),),
         <span class="string">&quot;Failed to send&quot;</span>
     );
-}</pre></div>
+}
+</pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "mem4";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

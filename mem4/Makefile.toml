@@ -34,6 +34,7 @@ skip_core_tasks = true
     dependencies = [
         "insert-readme",
         "cargo-doc",
+        "cargo-docs-copy"
     ]
 
 # endregion
@@ -83,3 +84,12 @@ private = true
 description = "call cargo doc"
 command="cargo"
 args=["doc","--no-deps","--document-private-items","--open"]
+
+[tasks.cargo-docs-copy]
+clear = true
+private = true
+script = [
+    "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\target\\doc\\*.* c:\\Users\\Luciano\\rustprojects\\mem4_game\\docs\\ /e /i /y /s ",
+]
+
+

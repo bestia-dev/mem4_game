@@ -1,9 +1,18 @@
-[comment]: # (lmake_readme remove start)
-# mem4
-Look at the workspace ../mem4_game/readme.md.  
-[comment]: # (lmake_readme remove end)
+**mem4 is a simple memory game made primarily for learning the Rust programming language and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication**  
 
-mem4 is a simple memory game made primarily for learning the Rust programming language.  
+[comment]: # (lmake_readme version)
+Look also at the workspace readme on https://github.com/LucianoBestia/mem4_game  
+
+# Idea
+Playing the memory game alone is boring.  
+Playing it with friends is better.  
+But if all friends just stare in their smartphones, it is still boring.  
+What makes memory games (and other board games) entertaining is the company of friends.  
+There must be many friends around the table watching one another and stealing moves and laughing and screaming at each other.  
+Today I assume everybody has a decent smartphone. If all friends open the mem4 game and put their smartphones on the center of the table one near the other so that everybody can see them and touch them, this is the closest it gets to a classic board game.  
+All the phones will have a small card grid (ex. 3x3). But the combined card grid from all these phones together is not so small anymore. It is now much more interesting to play for the players.  
+It can be played with as many friends as there are: 3,4,5,...  
+More friends - more fun.  
 ## Rust and Wasm/WebAssembly
 Rust is a pretty new language created by Mozilla for really low level programming.  
 It is a step forward from the C language with functionality and features that are best practice today.  
@@ -50,7 +59,8 @@ They are all in the WsMsg enum and therefore interchangeable.
 The WebSocket server is coded especially for this game and recognizes 3 types of msg:
 - msg to broadcast to every other player
 - msg to send only to the actual game players
-- msg to the server to act and respond
+## WS reconnect
+TODO: It looks that plain web sockets have often connection problems and they disconnect here and there. Creating a good reconnect is pretty challenging.  
 ## The game flow
 In a few words: Status1 - User action - Status2, Status1 - WsMessage - Status2
 In one moment the game is in a certain Game Status. The user then makes an action.
@@ -84,10 +94,23 @@ There is a constant jumping from thinking in Rust to thinking is JavaScript and 
 JavaScript does not have a good idea of Rust datatypes. All there is is a generic JSValue type.  
 The library `wasm-bindgen` has made a fantastic job of giving Rust the ability to call
 anything JavaScript can call, but the way of doing it is sometimes very hard to understand.  
+## Typed html
+Writing html inside Rust code is much easier with the macro `html!` from the `crate typed-html`  
+https://github.com/bodil/typed-html  
+It has also a macro `dodrio!` created exclusively for the dodrio vdom.  
+Everything is done in compile time, so the runtime is nothing slower.
 ## Browser console
 At least in modern browsers (Firefox and Chrome) we have the developer tools F12 and there is a
 console we can output to. So we can debug what is going on with our Wasm program.
 But not on smartphones that are the only target for this app.  
+## Safari on iOS and FullScreen
+Apple is very restrictive and does not allow fullscreen Safari on iPhones.  
+The workaround is to make a shortcut for the webapp on the homescreen.  
+## mem4 as webapp on HomeScreen
+On both android and iPhone is possible to "Add to homescreen" the webapp.  
+Then it will open in fullscreen and be beautiful.  
+In safari the share icon (a square with arrow up) has "Add to home screen".
+https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html  
 ## Modules
 Rust code is splitted into modules. They are not exactly like classes, but can be similar.  
 Rust has much more freedom to group code in different ways. So that is best suits the problem.  
@@ -102,4 +125,4 @@ I prepared some flows and tasks for Cargo make.
 `cargo make` - lists the possible available/public flows/tasks  
 `cargo make dev` - builds the development version and runs the server and the browser  
 `cargo make release` - builds the release version and runs the server and the browser  
-`cargo make doc` - build the `/target/doc` folder. Copying to the `/docs` folder must be manually performed for now.  
+`cargo make doc` - build the `/target/doc` folder and copy to the `../docs` folder.  

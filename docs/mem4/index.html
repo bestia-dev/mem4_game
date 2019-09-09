@@ -1,5 +1,15 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `mem4` crate."><meta name="keywords" content="rust, rustlang, rust-lang, mem4"><title>mem4 - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../mem4/index.html'><img src='../rust-logo.png' alt='logo' width='100'></a><p class='location'>Crate mem4</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all mem4's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'mem4', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/mem4/lib.rs.html#1-256' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>mem4</a></span></h1><div class='docblock'><p><strong>mem4 - Learning Rust and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication</strong><br />
-mem4 is a simple memory game made primarily for learning the Rust programming language.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `mem4` crate."><meta name="keywords" content="rust, rustlang, rust-lang, mem4"><title>mem4 - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../mem4/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate mem4</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all mem4's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'mem4', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/mem4/lib.rs.html#2-289' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>mem4</a></span></h1><div class='docblock'><p><strong>mem4 is a simple memory game made primarily for learning the Rust programming language and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication</strong></p>
+<p>Look also at the workspace readme on https://github.com/LucianoBestia/mem4_game</p>
+<h1 id="idea" class="section-header"><a href="#idea">Idea</a></h1>
+<p>Playing the memory game alone is boring.<br />
+Playing it with friends is better.<br />
+But if all friends just stare in their smartphones, it is still boring.<br />
+What makes memory games (and other board games) entertaining is the company of friends.<br />
+There must be many friends around the table watching one another and stealing moves and laughing and screaming at each other.<br />
+Today I assume everybody has a decent smartphone. If all friends open the mem4 game and put their smartphones on the center of the table one near the other so that everybody can see them and touch them, this is the closest it gets to a classic board game.<br />
+All the phones will have a small card grid (ex. 3x3). But the combined card grid from all these phones together is not so small anymore. It is now much more interesting to play for the players.<br />
+It can be played with as many friends as there are: 3,4,5,...<br />
+More friends - more fun.</p>
 <h2 id="rust-and-wasmwebassembly" class="section-header"><a href="#rust-and-wasmwebassembly">Rust and Wasm/WebAssembly</a></h2>
 <p>Rust is a pretty new language created by Mozilla for really low level programming.<br />
 It is a step forward from the C language with functionality and features that are best practice today.<br />
@@ -47,25 +57,26 @@ The WebSocket server is coded especially for this game and recognizes 3 types of
 <ul>
 <li>msg to broadcast to every other player</li>
 <li>msg to send only to the actual game players</li>
-<li>msg to the server to act and respond</li>
 </ul>
+<h2 id="ws-reconnect" class="section-header"><a href="#ws-reconnect">WS reconnect</a></h2>
+<p>TODO: It looks that plain web sockets have often connection problems and they disconnect here and there. Creating a good reconnect is pretty challenging.</p>
 <h2 id="the-game-flow" class="section-header"><a href="#the-game-flow">The game flow</a></h2>
 <p>In a few words: Status1 - User action - Status2, Status1 - WsMessage - Status2
 In one moment the game is in a certain Game Status. The user then makes an action.
 This action changes the GameData and the GameStatus.<br />
 Then a message is sent to other players so they can also change their local GameData and GameStatus.<br />
 The rendering is scheduled and it will happen shortly (async).</p>
-<table><thead><tr><th> Game Status1       </th><th> Render                     </th><th> User action                                 </th><th> Condition                            </th><th> GameStatus2 t.p. </th><th> Sends Msg        </th><th> On rcv Msg o.p.            </th><th> GameStatus2 o.p.                 </th></tr></thead><tbody>
-<tr><td> InviteAskBegin     </td><td> div_invite_ask_begin       </td><td> div_invite_ask_begin_on_click               </td><td> -                                    </td><td> InviteAsking     </td><td> Invite           </td><td> on_msg_invite              </td><td> InviteAsked                      </td></tr>
-<tr><td> InviteAsked        </td><td> div_invite_asked, div_play_accepted </td><td> div_invite_asked_on_click          </td><td> -                                    </td><td> PlayAccepted     </td><td> PlayAccept       </td><td> on_msg_play_accept         </td><td> -                                </td></tr>
-<tr><td> InviteAsking       </td><td> div_invite_asking          </td><td> game_data_init                              </td><td> -                                    </td><td> PlayBefore1stCard  </td><td> GameDataInit     </td><td> on_msg_game_data_init      </td><td> PlayBefore1stCard                  </td></tr>
-<tr><td> PlayBefore1stCard    </td><td> div_grid_container         </td><td> div_grid_item_on_click, on_click_1st_card();  </td><td> -                                    </td><td> PlayBefore2ndCard  </td><td> PlayerClick1stCard </td><td> on_msg_player_click_1st_card </td><td> PlayBefore2ndCard                  </td></tr>
-<tr><td> PlayBefore2ndCard    </td><td> div_grid_container         </td><td> div_grid_item_on_click, on_click_2nd_card();  </td><td> If card match and points&lt;all point   </td><td> PlayBefore1stCard  </td><td> PlayerClick2ndCard </td><td> on_msg_player_click_2nd_card </td><td> PlayBefore1stCard                  </td></tr>
-<tr><td> -II-               </td><td> -II-                       </td><td> -II-                                        </td><td> If card match and points=&gt;all points </td><td> PlayAgain        </td><td> PlayAgain        </td><td> on_msg_play_again          </td><td> PlayAgain                        </td></tr>
-<tr><td> -II-               </td><td> -II-                       </td><td> -II-                                        </td><td> else                                 </td><td> TakeTurnBegin    </td><td> TakeTurnBegin    </td><td> on_msg_take_turn           </td><td> TakeTurnBegin                    </td></tr>
-<tr><td> TakeTurnBegin      </td><td> div_take_turn_begin        </td><td> div_take_turn_begin_on_click                </td><td> -                                    </td><td> PlayBefore1stCard  </td><td> TakeTurnEnd      </td><td> on_msg_take_turn_end       </td><td> PlayBefore1stCard, the next player </td></tr>
-<tr><td> PlayAgain          </td><td> div_play_again             </td><td> window.location().reload()                  </td><td> -                                    </td><td> -                </td><td> -                </td><td> -                          </td><td> -                                </td></tr>
-<tr><td>  </td><td>  </td><td>  </td><td>  </td><td>  </td><td>  </td><td>  </td><td>  </td></tr>
+<table><thead><tr><th>Game Status1</th><th>Render</th><th>User action</th><th>Condition</th><th>GameStatus2 t.p.</th><th>Sends Msg</th><th>On rcv Msg o.p.</th><th>GameStatus2 o.p.</th></tr></thead><tbody>
+<tr><td>InviteAskBegin</td><td>div_invite_ask_begin</td><td>div_invite_ask_begin_on_click</td><td>-</td><td>InviteAsking</td><td>Invite</td><td>on_msg_invite</td><td>InviteAsked</td></tr>
+<tr><td>InviteAsked</td><td>div_invite_asked, div_play_accepted</td><td>div_invite_asked_on_click</td><td>-</td><td>PlayAccepted</td><td>PlayAccept</td><td>on_msg_play_accept</td><td>-</td></tr>
+<tr><td>InviteAsking</td><td>div_invite_asking</td><td>game_data_init</td><td>-</td><td>PlayBefore1stCard</td><td>GameDataInit</td><td>on_msg_game_data_init</td><td>PlayBefore1stCard</td></tr>
+<tr><td>PlayBefore1stCard</td><td>div_grid_container</td><td>div_grid_item_on_click, on_click_1st_card();</td><td>-</td><td>PlayBefore2ndCard</td><td>PlayerClick1stCard</td><td>on_msg_player_click_1st_card</td><td>PlayBefore2ndCard</td></tr>
+<tr><td>PlayBefore2ndCard</td><td>div_grid_container</td><td>div_grid_item_on_click, on_click_2nd_card();</td><td>If card match and points&lt;all point</td><td>PlayBefore1stCard</td><td>PlayerClick2ndCard</td><td>on_msg_player_click_2nd_card</td><td>PlayBefore1stCard</td></tr>
+<tr><td>-II-</td><td>-II-</td><td>-II-</td><td>If card match and points=&gt;all points</td><td>PlayAgain</td><td>PlayAgain</td><td>on_msg_play_again</td><td>PlayAgain</td></tr>
+<tr><td>-II-</td><td>-II-</td><td>-II-</td><td>else</td><td>TakeTurnBegin</td><td>TakeTurnBegin</td><td>on_msg_take_turn</td><td>TakeTurnBegin</td></tr>
+<tr><td>TakeTurnBegin</td><td>div_take_turn_begin</td><td>div_take_turn_begin_on_click</td><td>-</td><td>PlayBefore1stCard</td><td>TakeTurnEnd</td><td>on_msg_take_turn_end</td><td>PlayBefore1stCard, the next player</td></tr>
+<tr><td>PlayAgain</td><td>div_play_again</td><td>window.location().reload()</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 </tbody></table>
 <p>t.p. = this player,   o.p. = other players,  rrc = root_rendering_component, rcv = receive</p>
 <ol>
@@ -81,9 +92,23 @@ There is a constant jumping from thinking in Rust to thinking is JavaScript and 
 JavaScript does not have a good idea of Rust datatypes. All there is is a generic JSValue type.<br />
 The library <code>wasm-bindgen</code> has made a fantastic job of giving Rust the ability to call
 anything JavaScript can call, but the way of doing it is sometimes very hard to understand.</p>
+<h2 id="typed-html" class="section-header"><a href="#typed-html">Typed html</a></h2>
+<p>Writing html inside Rust code is much easier with the macro <code>html!</code> from the <code>crate typed-html</code><br />
+https://github.com/bodil/typed-html<br />
+It has also a macro <code>dodrio!</code> created exclusively for the dodrio vdom.<br />
+Everything is done in compile time, so the runtime is nothing slower.</p>
 <h2 id="browser-console" class="section-header"><a href="#browser-console">Browser console</a></h2>
 <p>At least in modern browsers (Firefox and Chrome) we have the developer tools F12 and there is a
-console we can output to. So we can debug what is going on with our Wasm program.</p>
+console we can output to. So we can debug what is going on with our Wasm program.
+But not on smartphones that are the only target for this app.</p>
+<h2 id="safari-on-ios-and-fullscreen" class="section-header"><a href="#safari-on-ios-and-fullscreen">Safari on iOS and FullScreen</a></h2>
+<p>Apple is very restrictive and does not allow fullscreen Safari on iPhones.<br />
+The workaround is to make a shortcut for the webapp on the homescreen.</p>
+<h2 id="mem4-as-webapp-on-homescreen" class="section-header"><a href="#mem4-as-webapp-on-homescreen">mem4 as webapp on HomeScreen</a></h2>
+<p>On both android and iPhone is possible to &quot;Add to homescreen&quot; the webapp.<br />
+Then it will open in fullscreen and be beautiful.<br />
+In safari the share icon (a square with arrow up) has &quot;Add to home screen&quot;.
+https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html</p>
 <h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
 <p>Rust code is splitted into modules. They are not exactly like classes, but can be similar.<br />
 Rust has much more freedom to group code in different ways. So that is best suits the problem.<br />
@@ -98,7 +123,7 @@ Some lints are problematic and they are explicitly allowed here.</p>
 <code>cargo make</code> - lists the possible available/public flows/tasks<br />
 <code>cargo make dev</code> - builds the development version and runs the server and the browser<br />
 <code>cargo make release</code> - builds the release version and runs the server and the browser<br />
-<code>cargo make doc</code> - build the <code>/target/doc</code> folder. Copying to the <code>/docs</code> folder must be manually performed for now.  </p>
+<code>cargo make doc</code> - build the <code>/target/doc</code> folder and copy to the <code>../docs</code> folder.  </p>
 </div><h2 id='modules-1' class='section-header'><a href="#modules-1">Modules</a></h2>
 <table><tr class='module-item'><td><a class="mod" href="divcardmoniker/index.html" title='mem4::divcardmoniker mod'>divcardmoniker</a></td><td class='docblock-short'><p>divcardmoniker.rs - renders the card moniker (card name/title)</p>
 </td></tr><tr class='module-item'><td><a class="mod" href="divfordebugging/index.html" title='mem4::divfordebugging mod'>divfordebugging</a></td><td class='docblock-short'><p>divfordebuggong.rs - information for debugging</p>
@@ -109,7 +134,12 @@ and get a click action from the user</p>
 </td></tr><tr class='module-item'><td><a class="mod" href="divplayersandscores/index.html" title='mem4::divplayersandscores mod'>divplayersandscores</a></td><td class='docblock-short'><p>divplayersandscores.rs - renders the div that shows players and scores</p>
 </td></tr><tr class='module-item'><td><a class="mod" href="divrulesanddescription/index.html" title='mem4::divrulesanddescription mod'>divrulesanddescription</a></td><td class='docblock-short'><p>divrulesanddescription.rs - renders the div that shows rules and descriptions
 All is a static content. Great for implementing dodrio cache.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="fetchgameconfig/index.html" title='mem4::fetchgameconfig mod'>fetchgameconfig</a></td><td class='docblock-short'><p>statusinviteaskbegin.rs - code flow from this status</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="fetchmod/index.html" title='mem4::fetchmod mod'>fetchmod</a></td><td class='docblock-short'><p><strong>fetchmod - isolate/encapsulate fetch api in a module because it is all async</strong></p>
 </td></tr><tr class='module-item'><td><a class="mod" href="gamedata/index.html" title='mem4::gamedata mod'>gamedata</a></td><td class='docblock-short'><p>game data - structs and methods around game data</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="javascriptimportmod/index.html" title='mem4::javascriptimportmod mod'>javascriptimportmod</a></td><td class='docblock-short'><p>jaascriptimport.rs - one single module to import javascript functions and objects
+this are examples how to call a javascript function from rust</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="logmod/index.html" title='mem4::logmod mod'>logmod</a></td><td class='docblock-short'><p>logmod.rs - logging in wasm</p>
 </td></tr><tr class='module-item'><td><a class="mod" href="rootrenderingcomponent/index.html" title='mem4::rootrenderingcomponent mod'>rootrenderingcomponent</a></td><td class='docblock-short'><p>rootrenderingcomponent.rs - renders the web page</p>
 </td></tr><tr class='module-item'><td><a class="mod" href="statusinviteaskbegin/index.html" title='mem4::statusinviteaskbegin mod'>statusinviteaskbegin</a></td><td class='docblock-short'><p>statusinviteaskbegin.rs - code flow from this status</p>
 </td></tr><tr class='module-item'><td><a class="mod" href="statusinviteasked/index.html" title='mem4::statusinviteasked mod'>statusinviteasked</a></td><td class='docblock-short'><p>statusinviteasked.rs - code flow from this status</p>

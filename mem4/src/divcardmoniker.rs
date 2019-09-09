@@ -45,10 +45,14 @@ pub fn div_grid_card_moniker<'a>(
             )
     } else {
         {
+            let version = env!("CARGO_PKG_VERSION");
+
             dodrio!(bump,
             <div class= "grid_container_header" style= "grid-template-columns: auto;">
                 <div class= "grid_item" style= "text-align: center;">
-                    {vec![text(GAME_TITLE)]}
+                    {vec![text(GAME_TITLE),
+                        text(" - "),
+                        text(version)]}
                 </div>
             </div>
             )

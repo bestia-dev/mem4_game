@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["log1_str","simple console write with a string"]]});

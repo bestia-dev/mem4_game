@@ -1,9 +1,13 @@
-Things are changing fast. This is the situation on 2019-09-08. LucianoBestia
+Things are changing fast. This is the situation on 2019-09-09. LucianoBestia
 # mem4_game
 Learning Rust Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication - part four.
 ## Documentation
 Documentation generated from source code:  
-https://lucianobestia.github.io/mem4_game/mem4/index.html
+https://lucianobestia.github.io/mem4_game/mem4/index.html  
+The workspace mem4_game is made of:  
+1. Wasm/WebAssembly  (for browser) frontend - mem4  
+2. web server Warp backend - mem4_server  
+3. common structures - mem4_common  
 ## Info and working game
 Read the `Last project`:  
 https://github.com/LucianoBestia/mem3_game  
@@ -11,43 +15,20 @@ You can play the game here (hosted on google cloud platform):
 http://bestia.shorturl.com/mem4  
 For exercise I made a Docker image/container for mem4 on the google VM:  
 http://bestia.shorturl.com/memdock4  
-# Idea
-Playing the memory game alone is boring.  
-Playing it with one friend is better.  
-But if both friends just stare in their smartphones, it is still boring.  
-What makes memory games (and other board games) entertaining is the company of friends.  
-There must be many friends around the table watching one another and stealing moves and laughing at each other.  
-Today I assume everybody has a decent smartphone. If all friends open the mem4 game and put their smartphones on the table one near the other, everybody can see them and touch them, this is the closest it gets to a classic board game.  
-All the phones will have a small card grid (ex. 3x3). But the combined card grid from all these phones together is not so small anymore. It is now much more interesting to play for the players.  
-It can be played with as many friends as there are: 3,4,5,6,7,8,... More friends - more fun.  
-## Typed html
-Writing html inside Rust code is much easier with the macro `html!` from the `crate typed-html`  
-https://github.com/bodil/typed-html  
-It has also a macro `dodrio!` created exclusively for the dodrio vdom.  
-Everything is done in compile time, so the runtime is nothing slower.
-## WS reconnect
-TODO: It looks that plain web sockets have often connection problems and they disconnect here and there. Creating a good reconnect is pretty challenging. 
-## Cargo make
-I prepared some flows and tasks for Cargo make.  
-`cargo make` - lists the possible available/public flows/tasks  
-`cargo make dev` - builds the development version and runs the server and the browser  
-`cargo make release` - builds the release version and runs the server and the browser  
-`cargo make doc` - build the `/target/docs` folder. Copying to the `/docs` folder must be manually performed for now.  
 ## Shorturl.com
 Google cloud platform does not give any subdomain name for free. Google is also a domain registrar and it looks like they are trying to push me to buy a domain.  
 I didn't like to have the raw IP in the url. People don't like numbers like that.  
 I created a subdomain on shorturl.com. It is not the perfect solution, but it is free or very cheap.  
-## Safari on iOS and FullScreen
-Apple is very restrictive and does not allow fullscreen Safari on iPhones.  
-The workaround is to make a shortcut for the webapp on the homescreen.  
-## mem4 as webapp on HomeScreen
-On both android and iPhone is possible to "Add to homescreen" the webapp.  
-Then it will open in fullscreen and be beautiful.  
-In safari the share icon (a square with arrow up) has "Add to home screen".
-https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html  
+## Cargo make
+I prepared some flows and tasks for Cargo make for the workspace.  
+`cargo make` - lists the possible available/public flows/tasks  
+`cargo make dev` - builds the development version and runs the server and the browser  
+`cargo make release` - builds the release version and runs the server and the browser  
+`cargo make doc` - build the `/target/docs` folder and copy to the `/docs` folder.  
+
 ## TODO:
-- sync data from player1 to others after reconnect.
 - put the version number in the application, increase version on build release
+- sync data from player1 to others after reconnect.
 - different content for English learning: numbers (cardinal, ordinal), food, orientation, alphabet simple spelling, drinks, days/months, questions, colors, transportation, ... 
 - on card click only the active player calculates the new state and send the new info to others in a msg  
 - fullscreen from http://robnyman.github.io/fullscreen/  
@@ -68,5 +49,6 @@ https://developer.apple.com/library/archive/documentation/AppleApplications/Refe
 2019-07-05 refactoring, refactoring,...  
 2019-07-09 request_fullscreen button  
 2019-07-26 full screen, js snippet, external C, logmod,  
-2019-09-09 content filenames in config.json, async fetch game_config.json, separate module for that
-  
+2019-09-08 content filenames in config.json, async fetch game_config.json, separate module for that  
+2019-09-09 version 19.9.9 no need for semver if it is not a public library  
+
