@@ -317,7 +317,7 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
                 Ok(()) => (),
                 Err(_disconnected) => {}
             }
-        }
+        },
         /* obsolete, but keep it as an example how to return a text file over websocket
         WsMessage::RequestGameConfig { filename } => {
             info!("RequestGameConfig: {}", filename);

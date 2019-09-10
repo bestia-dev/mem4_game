@@ -17,8 +17,8 @@ skip_core_tasks = true
     clear=true
     dependencies = [
         "lmake_version_from_date",
-        "build-dev",
-        "post-build",
+        "build_dev",
+        "post_build_dev",
     ]
 
     [tasks.release]
@@ -26,42 +26,48 @@ skip_core_tasks = true
     clear=true
     dependencies = [
         "lmake_version_from_date",
-        "build-release",
-        "post-build",
+        "build_release",
+        "post_build_release",
     ]
 
     [tasks.doc]
     description = "call cargo doc"
     clear=true
     dependencies = [
-        "insert-readme",
-        "cargo-doc",
-        "cargo-docs-copy"
+        "insert_readme",
+        "cargo_doc",
+        "cargo_docs_copy"
     ]
 
 #endregion
 
 #why is task "empty" in the list of public tasks?
 
-[tasks.build-dev]
+[tasks.build_dev]
 clear=true
 private=true
 command = "cargo"
 args = ["build"]
 
-[tasks.build-release]
+[tasks.build_release]
 clear=true
 private=true
 command = "cargo"
 args = ["build","--release"]
 
-[tasks.post-build]
+[tasks.post_build_dev]
 clear=true
 private=true
-linux_alias = "linux_post-build"
-windows_alias = "windows_post-build"
+linux_alias = "linux_post_build_dev"
+windows_alias = "windows_post_build_dev"
 
-[tasks.linux_post-build]
+[tasks.post_build_release]
+clear=true
+private=true
+linux_alias = "linux_post_build_release"
+windows_alias = "windows_post_build_release"
+
+[tasks.linux_post_build_dev]
 clear=true
 private=true
 script = [
@@ -76,7 +82,22 @@ script = [
     "sudo ./mem4_server"
 ]
 
-[tasks.windows_post-build]
+[tasks.linux_post_build_release]
+clear=true
+private=true
+script = [
+    "\\cp ~/rustprojects/mem4_game/target/release/mem4_server -rf -v ~/rustprojects/mem4_game/webfolder",
+    # I cannot script the exact IP here.  
+    # It must be copied from the mem4_server.exe output.
+    "alias chrome=\"/mnt/c/Program\\ Files\\ \\(x86\\)/Google/Chrome/Application/chrome.exe\"",
+    "chrome http://127.0.0.1:8084", 
+    "chrome http://127.0.0.1:8084", 
+    "chrome http://127.0.0.1:8084", 
+    "cd ../webfolder",
+    "sudo ./mem4_server"
+]
+
+[tasks.windows_post_build_dev]
 clear=true
 private=true
 script = [
@@ -90,21 +111,34 @@ script = [
     "mem4_server.exe"
 ]
 
+[tasks.windows_post_build_release]
+clear=true
+private=true
+script = [
+    "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\target\\release\\mem4_server.exe c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\ /y ",
+    # I cannot script the exact IP here.  
+    # It must be copied from the mem4_server.exe output.
+    "start chrome http://127.0.0.1:8084", 
+    "start chrome http://127.0.0.1:8084", 
+    "start chrome http://127.0.0.1:8084", 
+    "cd ..\\webfolder",
+    "mem4_server.exe"
+]
 
-[tasks.insert-readme]
+[tasks.insert_readme]
 clear = true
 private = true
 description = "copy the content of readme.md into *.rs comments (for the docs)"
 script= ["..\\..\\utils\\lmake_readme.exe"]
 
-[tasks.cargo-doc]
+[tasks.cargo_doc]
 clear = true
 private = true
 description = "call cargo doc"
 command="cargo"
 args=["doc","--no-deps","--document-private-items","--open"]
 
-[tasks.cargo-docs-copy]
+[tasks.cargo_docs_copy]
 clear = true
 private = true
 script = [

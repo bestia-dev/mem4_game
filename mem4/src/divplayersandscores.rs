@@ -2,7 +2,7 @@
 
 //region: use
 use crate::gamedata::GameData;
-use crate::logmod;
+//use crate::logmod;
 
 use dodrio::builder::{text};
 use dodrio::bumpalo::{self, Bump};
@@ -38,10 +38,12 @@ impl PlayersAndScores {
     ///copies the data from game data to internal cache
     /// internal fiels are used to render component
     pub fn update_intern_cache(&mut self, game_data: &GameData) -> bool {
+        /*
         logmod::log1_str(&format!(
             "update_intern_cache  my_player_number {}",
             &game_data.my_player_number
         ));
+        */
 
         let mut is_invalidated;
         is_invalidated = false;

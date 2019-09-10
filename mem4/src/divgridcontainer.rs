@@ -111,6 +111,7 @@ pub fn div_grid_items<'a, 'bump>(
             end_index -= 1;
         }
 
+        /*
         logmod::log1_str(&format!(
             "div_grid_items: my_player_number {} start_index {} end_index {} card_grid_data.len {}",
             &root_rendering_component.game_data.my_player_number,
@@ -118,6 +119,7 @@ pub fn div_grid_items<'a, 'bump>(
             end_index,
             game_data.card_grid_data.len()
         ));
+*/
 
         for x in start_index..=end_index {
             let index: usize = x;
@@ -232,6 +234,7 @@ pub fn div_grid_item<'a, 'bump>(
 
 /// on click
 fn div_grid_item_on_click(rrc: &mut RootRenderingComponent, this_click_card_index: usize) {
+    logmod::log1_str("div_grid_item_on_click");
     //region: audio play
     //prepare the audio element with src filename of mp3
     let audio_element = web_sys::HtmlAudioElement::new_with_src(
@@ -317,10 +320,12 @@ pub fn max_grid_size(root_rendering_component: &RootRenderingComponent) -> Size2
         //grid_container width and height
         let mut max_grid_width = grid_width();
         let mut max_grid_height = grid_height();
+        /*
         logmod::log1_str(&format!(
             "inner_width {} inner_height {}",
             max_grid_width, max_grid_height
         ));
+        */
         //default if not choosen
         let mut card_width = 115;
         let mut card_height = 115;
@@ -333,10 +338,12 @@ pub fn max_grid_size(root_rendering_component: &RootRenderingComponent) -> Size2
                     unwrap!(root_rendering_component.game_data.game_config.clone()).card_height;
             }
         }
+        /*
         logmod::log1_str(&format!(
             "card_width {} card_height {}",
             card_width, card_height
         ));
+        */
         //ratio between width and height must stay the same
         let ratio = (unwrap!(card_height.approx_as::<f64>())
             * unwrap!(
@@ -360,10 +367,12 @@ pub fn max_grid_size(root_rendering_component: &RootRenderingComponent) -> Size2
             max_grid_height =
                 unwrap!((unwrap!(max_grid_width.approx_as::<f64>()) * ratio).approx_as::<usize>());
         }
+        /*
         logmod::log1_str(&format!(
             "max_grid_width {} max_grid_height {}",
             max_grid_width, max_grid_height
         ));
+        */
 
         //return
         Size2d {

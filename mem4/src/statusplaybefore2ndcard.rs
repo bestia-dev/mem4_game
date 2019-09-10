@@ -4,6 +4,7 @@
 use crate::gamedata::CardStatusCardFace;
 use crate::rootrenderingcomponent::RootRenderingComponent;
 use crate::websocketcommunication;
+use crate::logmod;
 use mem4_common::{GameStatus, WsMessage};
 
 use dodrio::builder::text;
@@ -44,6 +45,7 @@ where
 
 ///on click
 pub fn on_click_2nd_card(rrc: &mut RootRenderingComponent, this_click_card_index: usize) {
+    logmod::log1_str("on_click_2nd_card");
     rrc.game_data.card_index_of_second_click = this_click_card_index;
     card_click_2nd_card(rrc, "on_click");
 }
@@ -174,6 +176,7 @@ pub fn on_msg_player_click_2nd_card(
     game_status: GameStatus,
     card_index: usize,
 ) {
+    logmod::log1_str("on_msg_player_click_2nd_card");
     rrc.game_data.game_status = game_status;
     if rrc.game_data.game_status.as_ref() == GameStatus::PlayBefore2ndCard.as_ref() {
         rrc.game_data.card_index_of_second_click = card_index;

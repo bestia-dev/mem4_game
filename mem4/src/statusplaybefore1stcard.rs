@@ -4,6 +4,7 @@
 use crate::gamedata::CardStatusCardFace;
 use crate::rootrenderingcomponent::RootRenderingComponent;
 use crate::websocketcommunication;
+use crate::logmod;
 use mem4_common::{GameStatus, WsMessage};
 
 use dodrio::builder::text;
@@ -44,26 +45,29 @@ where
 
 /// on click
 pub fn on_click_1st_card(rrc: &mut RootRenderingComponent, this_click_card_index: usize) {
+    logmod::log1_str("on_click_1st_card");
     rrc.game_data.card_index_of_first_click = this_click_card_index;
+    //change card status and game status
+    card_click_1st_card(rrc);
+    rrc.check_invalidate_for_all_components();
     //region: send WsMessage over WebSocket
     websocketcommunication::ws_send_msg(
         &rrc.game_data.ws,
         &WsMessage::PlayerClick1stCard {
             my_ws_uid: rrc.game_data.my_ws_uid,
-            players: unwrap!(
-                serde_json::to_string(&rrc.game_data.players),
-                "serde_json::to_string(&game_data.players)",
-            ),
-            card_index: rrc.game_data.card_index_of_first_click,
+            players: unwrap!(serde_json::to_string(&rrc.game_data.players)),
+            card_grid_data: unwrap!(serde_json::to_string(&rrc.game_data.card_grid_data)),
             game_status: rrc.game_data.game_status.clone(),
+            card_index_of_first_click: rrc.game_data.card_index_of_first_click,
+            card_index_of_second_click: rrc.game_data.card_index_of_second_click,
         },
     );
     //endregion
-    card_click_1st_card(rrc);
 }
 
 ///on click
 pub fn card_click_1st_card(rrc: &mut RootRenderingComponent) {
+    logmod::log1_str("card_click_1st_card");
     //flip the card up
     unwrap!(
         rrc.game_data
@@ -73,20 +77,20 @@ pub fn card_click_1st_card(rrc: &mut RootRenderingComponent) {
     )
     .status = CardStatusCardFace::UpTemporary;
     rrc.game_data.game_status = GameStatus::PlayBefore2ndCard;
-    rrc.check_invalidate_for_all_components();
 }
 
 ///msg player click
 pub fn on_msg_player_click_1st_card(
     rrc: &mut RootRenderingComponent,
     game_status: GameStatus,
-    card_index: usize,
+    card_grid_data: &str,
+    card_index_of_first_click: usize,
+    card_index_of_second_click: usize,
 ) {
+    logmod::log1_str("on_msg_player_click_1st_card");
     rrc.game_data.game_status = game_status;
-    if rrc.game_data.game_status.as_ref() == GameStatus::PlayBefore1stCard.as_ref() {
-        rrc.game_data.card_index_of_first_click = card_index;
-        card_click_1st_card(rrc);
-    } else {
-        panic!("this else should never be reached");
-    }
+    rrc.game_data.card_grid_data = unwrap!(serde_json::from_str(card_grid_data));
+    rrc.game_data.card_index_of_first_click = card_index_of_first_click;
+    rrc.game_data.card_index_of_second_click = card_index_of_second_click;
+    rrc.check_invalidate_for_all_components();
 }

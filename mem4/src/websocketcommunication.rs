@@ -188,8 +188,10 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                 );
             }
             WsMessage::PlayerClick1stCard {
-                card_index,
+                card_grid_data,
                 game_status,
+                card_index_of_first_click,
+                card_index_of_second_click,
                 ..
             } => {
                 wasm_bindgen_futures::spawn_local(
@@ -203,7 +205,9 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             statusplaybefore1stcard::on_msg_player_click_1st_card(
                                 root_rendering_component,
                                 game_status,
-                                card_index,
+                                card_grid_data.as_str(),
+                                card_index_of_first_click,
+                                card_index_of_second_click,
                             );
                             v2.schedule_render();
                         }

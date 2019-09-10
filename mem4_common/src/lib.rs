@@ -1,16 +1,16 @@
 //region: lmake_readme insert "readme.md"
 //! **mem4_common - commons for mem4 wasm and server**
-//! 
+//!
 //! version: 19.9.9  
 //! Look also at the workspace readme https://github.com/LucianoBestia/mem4_game  
-//! 
+//!
 //! ## mem4_common
 //! Learning to code Rust for a http + WebSocket.  
 //! Here are just the structures, that are in common between frontend and backend.  
-//! 
-//! 
-//! 
-//! 
+//!
+//!
+//!
+//!
 
 //endregion: lmake_readme insert "readme.md"
 
@@ -88,7 +88,7 @@ pub enum WsMessage {
     /// player1 initialize the game data and sends it to all players
     /// I will send json string to not confuse the server with vectors
     GameDataInit {
-        ///act is the action to take on the receiver
+        ///vector of cards status
         card_grid_data: String,
         ///json of game_config
         game_config: String,
@@ -101,10 +101,14 @@ pub enum WsMessage {
         my_ws_uid: usize,
         ///all players
         players: String,
-        ///card index
-        card_index: usize,
+        ///vector of cards status
+        card_grid_data: String,
         ///game status PlayerBefore1stCard or PlayerBefore2ndCard
         game_status: GameStatus,
+        ///have to send all the state of the game
+        card_index_of_first_click: usize,
+        ///have to send all the state of the game
+        card_index_of_second_click: usize,
     },
     ///player click
     PlayerClick2ndCard {
