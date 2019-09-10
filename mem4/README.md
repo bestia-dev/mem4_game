@@ -68,17 +68,17 @@ This action changes the GameData and the GameStatus.
 Then a message is sent to other players so they can also change their local GameData and GameStatus.  
 The rendering is scheduled and it will happen shortly (async).   
  
-| Game Status1       | Render                     | User action                                 | Condition                            | GameStatus2 t.p. | Sends Msg        | On rcv Msg o.p.            | GameStatus2 o.p.                 |
-| ------------------ | -------------------------- | ------------------------------------------- | ------------------------------------ | ---------------- | ---------------- | -------------------------- | -------------------------------- |
-| InviteAskBegin     | div_invite_ask_begin       | div_invite_ask_begin_on_click               | -                                    | InviteAsking     | Invite           | on_msg_invite              | InviteAsked                      |
-| InviteAsked        | div_invite_asked, div_play_accepted | div_invite_asked_on_click          | -                                    | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |
-| InviteAsking       | div_invite_asking          | game_data_init                              | -                                    | PlayBefore1stCard  | GameDataInit     | on_msg_game_data_init      | PlayBefore1stCard                  |
-| PlayBefore1stCard    | div_grid_container         | div_grid_item_on_click, on_click_1st_card();  | -                                    | PlayBefore2ndCard  | PlayerClick1stCard | on_msg_player_click_1st_card | PlayBefore2ndCard                  |
-| PlayBefore2ndCard    | div_grid_container         | div_grid_item_on_click, on_click_2nd_card();  | If card match and points<all point   | PlayBefore1stCard  | PlayerClick2ndCard | on_msg_player_click_2nd_card | PlayBefore1stCard                  |
-| -II-               | -II-                       | -II-                                        | If card match and points=>all points | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |
-| -II-               | -II-                       | -II-                                        | else                                 | TakeTurnBegin    | TakeTurnBegin    | on_msg_take_turn           | TakeTurnBegin                    |
-| TakeTurnBegin      | div_take_turn_begin        | div_take_turn_begin_on_click                | -                                    | PlayBefore1stCard  | TakeTurnEnd      | on_msg_take_turn_end       | PlayBefore1stCard, the next player |
-| PlayAgain          | div_play_again             | window.location().reload()                  | -                                    | -                | -                | -                          | -                                |
+| Game Status1       | Render                     | User action                                 | Condition                            | GameStatus2 t.p.   | Sends Msg          | On rcv Msg o.p.              | GameStatus2 o.p.                   |
+| ------------------ | -------------------------- | ------------------------------------------- | ------------------------------------ | ----------------   | ----------------   | --------------------------   | --------------------------------   |
+| InviteAskBegin     | div_invite_ask_begin       | div_invite_ask_begin_on_click               | -                                    | InviteAsking       | Invite             | on_msg_invite                | InviteAsked                        |
+| InviteAsked        | div_invite_asked, div_play_accepted | div_invite_asked_on_click          | -                                    | PlayAccepted       | PlayAccept         | on_msg_play_accept           | -                                  |
+| InviteAsking       | div_invite_asking          | game_data_init                              | -                                    | PlayBefore1stCard  | GameDataInit       | on_msg_game_data_init        | PlayBefore1stCard                  |
+| PlayBefore1stCard  | div_grid_container         | div_grid_item_on_click, on_click_1st_card();| -                                    | PlayBefore2ndCard  | PlayerClick1stCard | on_msg_player_click_1st_card | PlayBefore2ndCard                  |
+| PlayBefore2ndCard  | div_grid_container         | div_grid_item_on_click, on_click_2nd_card();| If card match and points<all point   | PlayBefore1stCard  | PlayerClick2ndCard | on_msg_player_click_2nd_card | PlayBefore1stCard                  |
+| -II-               | -II-                       | -II-                                        | If card match and points=>all points | GameOverPlayAgainBegin | GameOverPlayAgainBegin  | on_msg_play_again   | GameOverPlayAgainBegin             |
+| -II-               | -II-                       | -II-                                        | else                                 | TakeTurnBegin      | TakeTurnBegin      | on_msg_take_turn             | TakeTurnBegin                      |
+| TakeTurnBegin      | div_take_turn_begin        | div_take_turn_begin_on_click                | -                                    | PlayBefore1stCard  | TakeTurnEnd        | on_msg_take_turn_end         | PlayBefore1stCard, the next player |
+| GameOverPlayAgainBegin | div_play_again         | window.location().reload()                  | -                                    | -                  | -                  | -                            | -                                  |
 |  |  |  |  |  |  |  |  |
  
 t.p. = this player,   o.p. = other players,  rrc = root_rendering_component, rcv = receive

@@ -116,10 +116,14 @@ pub enum WsMessage {
         my_ws_uid: usize,
         ///all players
         players: String,
-        ///card index
-        card_index: usize,
+        ///vector of cards status
+        card_grid_data: String,
         ///game status PlayerBefore1stCard or PlayerBefore2ndCard
         game_status: GameStatus,
+        ///have to send all the state of the game
+        card_index_of_first_click: usize,
+        ///have to send all the state of the game
+        card_index_of_second_click: usize,
     },
     ///take turn begin
     TakeTurnBegin {
@@ -127,17 +131,29 @@ pub enum WsMessage {
         my_ws_uid: usize,
         ///all players
         players: String,
-        ///card index
-        card_index: usize,
+        ///vector of cards status
+        card_grid_data: String,
         ///game status PlayerBefore1stCard or PlayerBefore2ndCard
         game_status: GameStatus,
+        ///have to send all the state of the game
+        card_index_of_first_click: usize,
+        ///have to send all the state of the game
+        card_index_of_second_click: usize,
     },
     ///Play Again
-    PlayAgain {
+    GameOverPlayAgainBegin {
         ///this identifies the smartphone, but not the player-in-turn
         my_ws_uid: usize,
         ///all players
         players: String,
+        ///vector of cards status
+        card_grid_data: String,
+        ///game status PlayerBefore1stCard or PlayerBefore2ndCard
+        game_status: GameStatus,
+        ///have to send all the state of the game
+        card_index_of_first_click: usize,
+        ///have to send all the state of the game
+        card_index_of_second_click: usize,
     },
     ///player change
     TakeTurnEnd {
@@ -169,7 +185,7 @@ pub enum GameStatus {
     ///take turn end
     TakeTurnEnd,
     ///end game
-    PlayAgain,
+    GameOverPlayAgainBegin,
     ///Reconnect after a lost connection
     Reconnect,
 }

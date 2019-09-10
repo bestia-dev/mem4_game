@@ -25,7 +25,7 @@ where
         == root_rendering_component.game_data.player_turn
     {
         dodrio!(bump,
-        <div class="div_clickable">
+        <div >
             <h2 id= "ws_elem" style= "color:orange;">
                 {vec![text(bumpalo::format!(in bump, "Play player{} !", root_rendering_component.game_data.player_turn).into_bump_str())]}
             </h2>
@@ -47,31 +47,15 @@ where
 pub fn on_click_2nd_card(rrc: &mut RootRenderingComponent, this_click_card_index: usize) {
     logmod::log1_str("on_click_2nd_card");
     rrc.game_data.card_index_of_second_click = this_click_card_index;
-    card_click_2nd_card(rrc, "on_click");
+    card_click_2nd_card(rrc);
 }
 
 ///on second click
 ///The on click event passed by JavaScript executes all the logic
 ///and changes only the fields of the Card Grid struct.
 ///That struct is the only permanent data storage for later render the virtual dom.
-pub fn card_click_2nd_card(rrc: &mut RootRenderingComponent, caller: &str) {
-    //region: send WsMessage over WebSocket
-    //don't send if the caller is on_msg
-    if caller == "on_click" {
-        websocketcommunication::ws_send_msg(
-            &rrc.game_data.ws,
-            &WsMessage::PlayerClick2ndCard {
-                my_ws_uid: rrc.game_data.my_ws_uid,
-                players: unwrap!(
-                    serde_json::to_string(&rrc.game_data.players),
-                    "serde_json::to_string(&game_data.players)",
-                ),
-                card_index: rrc.game_data.card_index_of_second_click,
-                game_status: rrc.game_data.game_status.clone(),
-            },
-        );
-    }
-    //endregion
+pub fn card_click_2nd_card(rrc: &mut RootRenderingComponent) {
+    //3 possible outcomes: 1) same player, 2) Next Player 3) end game/play again
     //flip the card up
     unwrap!(
         rrc.game_data
@@ -124,69 +108,104 @@ pub fn card_click_2nd_card(rrc: &mut RootRenderingComponent, caller: &str) {
         for x in &rrc.game_data.players {
             point_sum += x.points;
         }
+        logmod::log1_str(
+            format!(
+                "card_grid len {}  point_sum {}",
+                rrc.game_data.card_grid_data.len(),
+                point_sum
+            )
+            .as_str(),
+        );
         if unwrap!(rrc.game_data.card_grid_data.len().checked_div(2)) == point_sum {
             //The game is over and the question Play again?
-            rrc.game_data.game_status = GameStatus::PlayAgain;
+            rrc.game_data.game_status = GameStatus::GameOverPlayAgainBegin;
             //send message
             unwrap!(
                 rrc.game_data.ws.send_with_str(
-                    &serde_json::to_string(&WsMessage::PlayAgain {
+                    &serde_json::to_string(&WsMessage::GameOverPlayAgainBegin {
                         my_ws_uid: rrc.game_data.my_ws_uid,
-                        players: unwrap!(
-                            serde_json::to_string(&rrc.game_data.players),
-                            "serde_json::to_string(&rrc.game_data.players)"
-                        ),
+                        players: unwrap!(serde_json::to_string(&rrc.game_data.players)),
+                        card_grid_data: unwrap!(serde_json::to_string(
+                            &rrc.game_data.card_grid_data
+                        )),
+                        game_status: rrc.game_data.game_status.clone(),
+                        card_index_of_first_click: rrc.game_data.card_index_of_first_click,
+                        card_index_of_second_click: rrc.game_data.card_index_of_second_click,
                     })
-                    .expect("error sending PlayAgain"),
+                    .expect("error sending GameOverPlayAgainBegin"),
                 ),
-                "Failed to send PlayAgain"
+                "Failed to send GameOverPlayAgainBegin"
             );
         } else {
-            //the same payer continue to play
+            //the same player continues to play
             rrc.game_data.game_status = GameStatus::PlayBefore1stCard;
+            //region: send WsMessage over WebSocket
+            websocketcommunication::ws_send_msg(
+                &rrc.game_data.ws,
+                &WsMessage::PlayerClick2ndCard {
+                    my_ws_uid: rrc.game_data.my_ws_uid,
+                    players: unwrap!(serde_json::to_string(&rrc.game_data.players)),
+                    card_grid_data: unwrap!(serde_json::to_string(&rrc.game_data.card_grid_data)),
+                    game_status: rrc.game_data.game_status.clone(),
+                    card_index_of_first_click: rrc.game_data.card_index_of_first_click,
+                    card_index_of_second_click: rrc.game_data.card_index_of_second_click,
+                },
+            );
+            //endregion
         }
     } else {
         //if cards don't match
         rrc.game_data.game_status = GameStatus::TakeTurnBegin;
         //region: send WsMessage over WebSocket
-        //don't send if it is called from on_msg
-        if caller == "on_click" {
-            websocketcommunication::ws_send_msg(
-                &rrc.game_data.ws,
-                &WsMessage::TakeTurnBegin {
-                    my_ws_uid: rrc.game_data.my_ws_uid,
-                    players: unwrap!(
-                        serde_json::to_string(&rrc.game_data.players),
-                        "serde_json::to_string(&game_data.players)",
-                    ),
-                    card_index: rrc.game_data.card_index_of_first_click,
-                    game_status: rrc.game_data.game_status.clone(),
-                },
-            );
-        }
+        websocketcommunication::ws_send_msg(
+            &rrc.game_data.ws,
+            &WsMessage::TakeTurnBegin {
+                my_ws_uid: rrc.game_data.my_ws_uid,
+                players: unwrap!(serde_json::to_string(&rrc.game_data.players)),
+                card_grid_data: unwrap!(serde_json::to_string(&rrc.game_data.card_grid_data)),
+                game_status: rrc.game_data.game_status.clone(),
+                card_index_of_first_click: rrc.game_data.card_index_of_first_click,
+                card_index_of_second_click: rrc.game_data.card_index_of_second_click,
+            },
+        );
         //endregion
-        //now all the players are calculating the status of the game.
-        //This is not ok. Only the active player should calculate and send a message to all others.
     }
     rrc.check_invalidate_for_all_components();
 }
 ///msg player click
 pub fn on_msg_player_click_2nd_card(
     rrc: &mut RootRenderingComponent,
+    players: &str,
     game_status: GameStatus,
-    card_index: usize,
+    card_grid_data: &str,
+    card_index_of_first_click: usize,
+    card_index_of_second_click: usize,
 ) {
     logmod::log1_str("on_msg_player_click_2nd_card");
+    //player point has changed
+    rrc.game_data.players = unwrap!(serde_json::from_str(players));
     rrc.game_data.game_status = game_status;
-    if rrc.game_data.game_status.as_ref() == GameStatus::PlayBefore2ndCard.as_ref() {
-        rrc.game_data.card_index_of_second_click = card_index;
-        card_click_2nd_card(rrc, "on_msg");
-    } else {
-        panic!("this else must never be reached!");
-    }
+    rrc.game_data.card_grid_data = unwrap!(serde_json::from_str(card_grid_data));
+    rrc.game_data.card_index_of_first_click = card_index_of_first_click;
+    rrc.game_data.card_index_of_second_click = card_index_of_second_click;
+    rrc.check_invalidate_for_all_components();
 }
 
 ///msg player click
-pub fn on_msg_play_again(rrc: &mut RootRenderingComponent) {
-    rrc.game_data.game_status = GameStatus::PlayAgain;
+pub fn on_msg_play_again(
+    rrc: &mut RootRenderingComponent,
+    players: &str,
+    game_status: GameStatus,
+    card_grid_data: &str,
+    card_index_of_first_click: usize,
+    card_index_of_second_click: usize,
+) {
+    logmod::log1_str("on_msg_play_again");
+    //player point has changed
+    rrc.game_data.players = unwrap!(serde_json::from_str(players));
+    rrc.game_data.game_status = game_status;
+    rrc.game_data.card_grid_data = unwrap!(serde_json::from_str(card_grid_data));
+    rrc.game_data.card_index_of_first_click = card_index_of_first_click;
+    rrc.game_data.card_index_of_second_click = card_index_of_second_click;
+    rrc.check_invalidate_for_all_components();
 }

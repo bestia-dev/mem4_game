@@ -107,10 +107,16 @@ pub fn take_turn_end(rrc: &mut RootRenderingComponent) {
 pub fn on_msg_take_turn_begin(
     rrc: &mut RootRenderingComponent,
     game_status: GameStatus,
-    _card_index: usize,
+    card_grid_data: &str,
+    card_index_of_first_click: usize,
+    card_index_of_second_click: usize,
 ) {
-    //TODO: for now nothing concrete, because is all calculated by 2ndCard
+    logmod::log1_str("on_msg_take_turn_begin");
     rrc.game_data.game_status = game_status;
+    rrc.game_data.card_grid_data = unwrap!(serde_json::from_str(card_grid_data));
+    rrc.game_data.card_index_of_first_click = card_index_of_first_click;
+    rrc.game_data.card_index_of_second_click = card_index_of_second_click;
+    rrc.check_invalidate_for_all_components();
 }
 
 ///msg player change

@@ -25,7 +25,7 @@ where
         == root_rendering_component.game_data.player_turn
     {
         dodrio!(bump,
-        <div class="div_clickable">
+        <div >
             <h2 id= "ws_elem" style= "color:orange;">
                 {vec![text(bumpalo::format!(in bump, "Play player{} !", root_rendering_component.game_data.player_turn).into_bump_str())]}
             </h2>

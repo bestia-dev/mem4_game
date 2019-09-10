@@ -46,13 +46,12 @@ where
         statusplaybefore2ndcard::div_click_2nd_card(rrc, bump)
     } else if let GameStatus::TakeTurnBegin = rrc.game_data.game_status {
         statustaketurnbegin::div_take_turn_begin(rrc, bump)
-    } else if let GameStatus::PlayAgain = rrc.game_data.game_status {
+    } else if let GameStatus::GameOverPlayAgainBegin = rrc.game_data.game_status {
         statusplayagain::div_play_again(rrc, bump)
     } else {
         div_unpredicted(rrc, bump)
     }
 }
-
 
 ///render unpredicted
 fn div_unpredicted<'a, 'bump>(

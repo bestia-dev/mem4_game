@@ -358,7 +358,7 @@ fn receive_message(ws_uid_of_message: usize, messg: &Message, users: &Users) {
         | WsMessage::GameDataInit { players, .. }
         | WsMessage::TakeTurnBegin { players, .. }
         | WsMessage::TakeTurnEnd { players, .. }
-        | WsMessage::PlayAgain { players, .. } => {
+        | WsMessage::GameOverPlayAgainBegin { players, .. } => {
             send_to_other_players(users, ws_uid_of_message, &new_msg, &players)
         }
     }

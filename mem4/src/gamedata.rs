@@ -252,7 +252,7 @@ impl GameData {
             | GameStatus::PlayBefore2ndCard
             | GameStatus::TakeTurnBegin
             | GameStatus::TakeTurnEnd
-            | GameStatus::PlayAgain => true,
+            | GameStatus::GameOverPlayAgainBegin => true,
             _ => false,
         }
     }

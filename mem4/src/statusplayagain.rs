@@ -25,13 +25,12 @@ where
                 let window = unwrap!(web_sys::window(), "error: web_sys::window");
                 let x = window.location().reload();
             }}>
-    <h2 class= "m_container" id= "ws_elem" style= "color:green;">
-            {vec![text(
-                //Play again?
-                bumpalo::format!(in bump, "Play again{}?", "").into_bump_str(),
-            )]}
-    </h2>
+        <h2 id= "ws_elem" style= "color:green;">
+                {vec![text(
+                    //Play again?
+                    bumpalo::format!(in bump, "Game Over! Play again{}?", "").into_bump_str(),
+                )]}
+        </h2>
     </div>
     )
 }
-

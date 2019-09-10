@@ -125,7 +125,7 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
 
-                            if let GameStatus::PlayAgain
+                            if let GameStatus::GameOverPlayAgainBegin
                             | GameStatus::InviteAskBegin
                             | GameStatus::InviteAsked =
                                 root_rendering_component.game_data.game_status
@@ -216,8 +216,11 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                 );
             }
             WsMessage::PlayerClick2ndCard {
-                card_index,
+                players,
+                card_grid_data,
                 game_status,
+                card_index_of_first_click,
+                card_index_of_second_click,
                 ..
             } => {
                 wasm_bindgen_futures::spawn_local(
@@ -230,8 +233,11 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             console::log_1(&"players".into());
                             statusplaybefore2ndcard::on_msg_player_click_2nd_card(
                                 root_rendering_component,
+                                players.as_str(),
                                 game_status,
-                                card_index,
+                                card_grid_data.as_str(),
+                                card_index_of_first_click,
+                                card_index_of_second_click,
                             );
                             v2.schedule_render();
                         }
@@ -240,8 +246,10 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                 );
             }
             WsMessage::TakeTurnBegin {
-                card_index,
+                card_grid_data,
                 game_status,
+                card_index_of_first_click,
+                card_index_of_second_click,
                 ..
             } => {
                 wasm_bindgen_futures::spawn_local(
@@ -255,7 +263,9 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             statustaketurnbegin::on_msg_take_turn_begin(
                                 root_rendering_component,
                                 game_status,
-                                card_index,
+                                card_grid_data.as_str(),
+                                card_index_of_first_click,
+                                card_index_of_second_click,
                             );
                             v2.schedule_render();
                         }
@@ -278,7 +288,14 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                     .map_err(|_| ()),
                 );
             }
-            WsMessage::PlayAgain { .. } => {
+            WsMessage::GameOverPlayAgainBegin {
+                players,
+                card_grid_data,
+                game_status,
+                card_index_of_first_click,
+                card_index_of_second_click,
+                ..
+            } => {
                 wasm_bindgen_futures::spawn_local(
                     weak.with_component({
                         let v2 = weak.clone();
@@ -287,7 +304,14 @@ pub fn setup_ws_msg_recv(ws: &WebSocket, weak: dodrio::VdomWeak) {
                             let root_rendering_component =
                                 root.unwrap_mut::<RootRenderingComponent>();
                             console::log_1(&"players".into());
-                            statusplaybefore2ndcard::on_msg_play_again(root_rendering_component);
+                            statusplaybefore2ndcard::on_msg_play_again(
+                                root_rendering_component,
+                                players.as_str(),
+                                game_status,
+                                card_grid_data.as_str(),
+                                card_index_of_first_click,
+                                card_index_of_second_click,
+                            );
                             v2.schedule_render();
                         }
                     })

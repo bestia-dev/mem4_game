@@ -26,9 +26,7 @@ where
     dodrio!(bump,
     <div class="div_clickable" onclick={move |root, vdom, _event| {
                 let rrc = root.unwrap_mut::<RootRenderingComponent>();
-
                 div_invite_asked_on_click(rrc);
-
                 vdom.schedule_render();
             }}>
         <h2 id= "ws_elem" style= "color:green;">
@@ -81,4 +79,3 @@ where
     </h2>
     )
 }
-

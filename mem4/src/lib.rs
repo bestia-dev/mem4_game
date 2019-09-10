@@ -1,9 +1,9 @@
 //region: lmake_readme insert "readme.md"
 //! **mem4 is a simple memory game made primarily for learning the Rust programming language and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication**  
-//! 
+//!
 //! version: 19.9.9  
 //! Look also at the workspace readme on https://github.com/LucianoBestia/mem4_game  
-//! 
+//!
 //! # Idea
 //! Playing the memory game alone is boring.  
 //! Playing it with friends is better.  
@@ -76,10 +76,10 @@
 //! | InviteAsking       | div_invite_asking          | game_data_init                              | -                                    | PlayBefore1stCard  | GameDataInit     | on_msg_game_data_init      | PlayBefore1stCard                  |
 //! | PlayBefore1stCard    | div_grid_container         | div_grid_item_on_click, on_click_1st_card();  | -                                    | PlayBefore2ndCard  | PlayerClick1stCard | on_msg_player_click_1st_card | PlayBefore2ndCard                  |
 //! | PlayBefore2ndCard    | div_grid_container         | div_grid_item_on_click, on_click_2nd_card();  | If card match and points<all point   | PlayBefore1stCard  | PlayerClick2ndCard | on_msg_player_click_2nd_card | PlayBefore1stCard                  |
-//! | -II-               | -II-                       | -II-                                        | If card match and points=>all points | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |
+//! | -II-               | -II-                       | -II-                                        | If card match and points=>all points | GameOverPlayAgainBegin        | GameOverPlayAgainBegin        | on_msg_play_again          | GameOverPlayAgainBegin                        |
 //! | -II-               | -II-                       | -II-                                        | else                                 | TakeTurnBegin    | TakeTurnBegin    | on_msg_take_turn           | TakeTurnBegin                    |
 //! | TakeTurnBegin      | div_take_turn_begin        | div_take_turn_begin_on_click                | -                                    | PlayBefore1stCard  | TakeTurnEnd      | on_msg_take_turn_end       | PlayBefore1stCard, the next player |
-//! | PlayAgain          | div_play_again             | window.location().reload()                  | -                                    | -                | -                | -                          | -                                |
+//! | GameOverPlayAgainBegin          | div_play_again             | window.location().reload()                  | -                                    | -                | -                | -                          | -                                |
 //! |  |  |  |  |  |  |  |  |
 //!  
 //! t.p. = this player,   o.p. = other players,  rrc = root_rendering_component, rcv = receive
