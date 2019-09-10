@@ -67,7 +67,7 @@ pub struct GameData {
     ///game status: InviteAskBegin,InviteAsking,InviteAsked,Player1,Player2
     pub game_status: GameStatus,
     ///vector of cards
-    pub vec_cards: Vec<Card>,
+    pub card_grid_data: Vec<Card>,
     ///card index of first click
     pub card_index_of_first_click: usize,
     ///card index of second click
@@ -160,7 +160,7 @@ impl GameData {
         //endregion
 
         //region: create Cards from random numbers
-        let mut vec_cards = Vec::new();
+        let mut card_grid_data = Vec::new();
 
         //Index 0 is special and reserved for FaceDown. Cards start with base 1
         let new_card = Card {
@@ -168,7 +168,7 @@ impl GameData {
             card_number_and_img_src: 0,
             card_index_and_id: 0,
         };
-        vec_cards.push(new_card);
+        card_grid_data.push(new_card);
 
         //create cards and push to the vector
         for (index, random_number) in vec_of_random_numbers.iter().enumerate() {
@@ -179,20 +179,20 @@ impl GameData {
                 //card base index will be 1. 0 is reserved for FaceDown.
                 card_index_and_id: unwrap!(index.checked_add(1), "usize overflow"),
             };
-            vec_cards.push(new_card);
+            card_grid_data.push(new_card);
         }
         //endregion
-        self.vec_cards = vec_cards;
+        self.card_grid_data = card_grid_data;
         logmod::log1_str(&format!(
-            "vec_of_random_numbers.len {} vec_cards.len {}",
+            "vec_of_random_numbers.len {} card_grid_data.len {}",
             vec_of_random_numbers.len(),
-            self.vec_cards.len()
+            self.card_grid_data.len()
         ));
     }
     ///asociated function: before Accept, there are not random numbers, just default cards.
     pub fn prepare_for_empty() -> Vec<Card> {
         //prepare 32 empty cards. The random is calculated only on PlayAccept.
-        let mut vec_cards = Vec::new();
+        let mut card_grid_data = Vec::new();
         //I must prepare the 0 index, but then I don't use it ever.
         for i in 0..=32 {
             let new_card = Card {
@@ -200,9 +200,9 @@ impl GameData {
                 card_number_and_img_src: 1,
                 card_index_and_id: i,
             };
-            vec_cards.push(new_card);
+            card_grid_data.push(new_card);
         }
-        vec_cards
+        card_grid_data
     }
     ///constructor of game data
     pub fn new(ws: WebSocket, my_ws_uid: usize) -> Self {
@@ -213,7 +213,7 @@ impl GameData {
         });
         //return from constructor
         GameData {
-            vec_cards: Self::prepare_for_empty(),
+            card_grid_data: Self::prepare_for_empty(),
             card_index_of_first_click: 0,
             card_index_of_second_click: 0,
             ws,

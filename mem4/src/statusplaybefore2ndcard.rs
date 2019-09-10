@@ -45,17 +45,17 @@ where
 ///on click
 pub fn on_click_2nd_card(rrc: &mut RootRenderingComponent, this_click_card_index: usize) {
     rrc.game_data.card_index_of_second_click = this_click_card_index;
-    card_click_2nd_card(rrc,"on_click");
+    card_click_2nd_card(rrc, "on_click");
 }
 
 ///on second click
 ///The on click event passed by JavaScript executes all the logic
 ///and changes only the fields of the Card Grid struct.
 ///That struct is the only permanent data storage for later render the virtual dom.
-pub fn card_click_2nd_card(rrc: &mut RootRenderingComponent,caller:&str) {
+pub fn card_click_2nd_card(rrc: &mut RootRenderingComponent, caller: &str) {
     //region: send WsMessage over WebSocket
     //don't send if the caller is on_msg
-    if caller=="on_click"{
+    if caller == "on_click" {
         websocketcommunication::ws_send_msg(
             &rrc.game_data.ws,
             &WsMessage::PlayerClick2ndCard {
@@ -73,7 +73,7 @@ pub fn card_click_2nd_card(rrc: &mut RootRenderingComponent,caller:&str) {
     //flip the card up
     unwrap!(
         rrc.game_data
-            .vec_cards
+            .card_grid_data
             .get_mut(rrc.game_data.card_index_of_second_click),
         "error this_click_card_index"
     )
@@ -82,14 +82,14 @@ pub fn card_click_2nd_card(rrc: &mut RootRenderingComponent,caller:&str) {
     //if the cards match, player get one point and continues another turn
     if unwrap!(
         rrc.game_data
-            .vec_cards
+            .card_grid_data
             .get(rrc.game_data.card_index_of_first_click),
         "error game_data.card_index_of_first_click"
     )
     .card_number_and_img_src
         == unwrap!(
             rrc.game_data
-                .vec_cards
+                .card_grid_data
                 .get(rrc.game_data.card_index_of_second_click),
             "error game_data.card_index_of_second_click"
         )
@@ -108,12 +108,12 @@ pub fn card_click_2nd_card(rrc: &mut RootRenderingComponent,caller:&str) {
         let x1 = rrc.game_data.card_index_of_first_click;
         let x2 = rrc.game_data.card_index_of_second_click;
         unwrap!(
-            rrc.game_data.vec_cards.get_mut(x1),
+            rrc.game_data.card_grid_data.get_mut(x1),
             "error game_data.card_index_of_first_click"
         )
         .status = CardStatusCardFace::UpPermanently;
         unwrap!(
-            rrc.game_data.vec_cards.get_mut(x2),
+            rrc.game_data.card_grid_data.get_mut(x2),
             "error game_data.card_index_of_second_click"
         )
         .status = CardStatusCardFace::UpPermanently;
@@ -122,7 +122,7 @@ pub fn card_click_2nd_card(rrc: &mut RootRenderingComponent,caller:&str) {
         for x in &rrc.game_data.players {
             point_sum += x.points;
         }
-        if unwrap!(rrc.game_data.vec_cards.len().checked_div(2)) == point_sum {
+        if unwrap!(rrc.game_data.card_grid_data.len().checked_div(2)) == point_sum {
             //The game is over and the question Play again?
             rrc.game_data.game_status = GameStatus::PlayAgain;
             //send message
@@ -148,7 +148,7 @@ pub fn card_click_2nd_card(rrc: &mut RootRenderingComponent,caller:&str) {
         rrc.game_data.game_status = GameStatus::TakeTurnBegin;
         //region: send WsMessage over WebSocket
         //don't send if it is called from on_msg
-        if caller == "on_click"{
+        if caller == "on_click" {
             websocketcommunication::ws_send_msg(
                 &rrc.game_data.ws,
                 &WsMessage::TakeTurnBegin {

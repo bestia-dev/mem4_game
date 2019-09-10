@@ -107,28 +107,28 @@ pub fn div_grid_items<'a, 'bump>(
 
         //the count of cards can now be not divisible with 2 for card pairs.
         //so I need to make a different last card that is not clickable.
-        if end_index >= game_data.vec_cards.len() {
+        if end_index >= game_data.card_grid_data.len() {
             end_index -= 1;
         }
 
         logmod::log1_str(&format!(
-            "div_grid_items: my_player_number {} start_index {} end_index {} vec_cards.len {}",
+            "div_grid_items: my_player_number {} start_index {} end_index {} card_grid_data.len {}",
             &root_rendering_component.game_data.my_player_number,
             start_index,
             end_index,
-            game_data.vec_cards.len()
+            game_data.card_grid_data.len()
         ));
 
         for x in start_index..=end_index {
             let index: usize = x;
             //region: prepare variables and closures for inserting into vdom
             let img_src = match unwrap!(
-                game_data.vec_cards.get(index),
-                "match game_data.vec_cards.get(index) {} startindex {} endindex {} vec_card.len {}",
+                game_data.card_grid_data.get(index),
+                "match game_data.card_grid_data.get(index) {} startindex {} endindex {} vec_card.len {}",
                 index,
                 start_index,
                 end_index,
-                game_data.vec_cards.len()
+                game_data.card_grid_data.len()
             )
             .status
             {
@@ -142,7 +142,7 @@ pub fn div_grid_items<'a, 'bump>(
                     unwrap!(
                         unwrap!(game_data.game_config.as_ref())
                         .img_filename.get(
-                            unwrap!(game_data.vec_cards.get(index))
+                            unwrap!(game_data.card_grid_data.get(index))
                             .card_number_and_img_src
                         ))
                     )
@@ -151,7 +151,7 @@ pub fn div_grid_items<'a, 'bump>(
             };
 
             let img_id =
-            bumpalo::format!(in bump, "img{:02}",unwrap!(game_data.vec_cards.get(index),"game_data.vec_cards.get(index)").card_index_and_id)
+            bumpalo::format!(in bump, "img{:02}",unwrap!(game_data.card_grid_data.get(index),"game_data.card_grid_data.get(index)").card_index_and_id)
                 .into_bump_str();
 
             let opacity = if img_src
@@ -214,7 +214,7 @@ pub fn div_grid_item<'a, 'bump>(
             //endregion
             //click is usefull only on facedown cards
             if unwrap!(
-                rrc.game_data.vec_cards.get(this_click_card_index),
+                rrc.game_data.card_grid_data.get(this_click_card_index),
                 "error this_click_card_index"
             ).status.as_ref()==CardStatusCardFace::Down.as_ref(){
 
@@ -242,7 +242,7 @@ fn div_grid_item_on_click(rrc: &mut RootRenderingComponent, this_click_card_inde
                 .sound_filename
                 .get(
                     unwrap!(
-                        rrc.game_data.vec_cards.get(this_click_card_index),
+                        rrc.game_data.card_grid_data.get(this_click_card_index),
                         "error this_click_card_index"
                     )
                     .card_number_and_img_src

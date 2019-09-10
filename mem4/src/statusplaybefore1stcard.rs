@@ -67,7 +67,7 @@ pub fn card_click_1st_card(rrc: &mut RootRenderingComponent) {
     //flip the card up
     unwrap!(
         rrc.game_data
-            .vec_cards
+            .card_grid_data
             .get_mut(rrc.game_data.card_index_of_first_click),
         "error this_click_card_index"
     )

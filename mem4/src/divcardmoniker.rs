@@ -29,7 +29,7 @@ pub fn div_grid_card_moniker<'a>(
                 {vec![text(
                     bumpalo::format!(in bump, "{}",
                     unwrap!(unwrap!(root_rendering_component.game_data.game_config.clone(),"root_rendering_component.game_data.game_config.clone()")
-                    .card_moniker.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_first_click)).card_number_and_img_src)))
+                    .card_moniker.get(unwrap!(game_data.card_grid_data.get(game_data.card_index_of_first_click)).card_number_and_img_src)))
                     .into_bump_str(),
                 )]}
                 </div>
@@ -37,7 +37,7 @@ pub fn div_grid_card_moniker<'a>(
                     {vec![text(
                     bumpalo::format!(in bump, "{}",
                     unwrap!(unwrap!(root_rendering_component.game_data.game_config.clone(),"root_rendering_component.game_data.game_config.clone()")
-                    .card_moniker.get(unwrap!(game_data.vec_cards.get(game_data.card_index_of_second_click)).card_number_and_img_src)))
+                    .card_moniker.get(unwrap!(game_data.card_grid_data.get(game_data.card_index_of_second_click)).card_number_and_img_src)))
                 .into_bump_str(),
                 )]}
                 </div>

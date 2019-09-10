@@ -70,7 +70,7 @@ impl RootRenderingComponent {
     }
     ///reset the data to replay the game
     pub fn reset(&mut self) {
-        self.game_data.vec_cards = GameData::prepare_for_empty();
+        self.game_data.card_grid_data = GameData::prepare_for_empty();
         self.game_data.card_index_of_first_click = 0;
         self.game_data.card_index_of_second_click = 0;
         self.game_data.players.clear();
@@ -104,7 +104,7 @@ impl RootRenderingComponent {
         self.game_data.content_folder_name = self.game_data.asked_folder_name.clone();
         self.game_data.game_status = GameStatus::PlayBefore1stCard;
         self.game_data.player_turn = 1;
-        self.game_data.vec_cards = unwrap!(
+        self.game_data.card_grid_data = unwrap!(
             serde_json::from_str(card_grid_data),
             "error serde_json::from_str(card_grid_data)"
         );

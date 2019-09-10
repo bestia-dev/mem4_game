@@ -15,12 +15,16 @@ skip_core_tasks = true
     [tasks.dev]
     description = "cargo build development"
     clear=true
-    dependencies = ["build-dev"]
+    dependencies = [
+        "lmake_version_from_date",
+        "build-dev"]
 
     [tasks.release]
     description = "cargo build release"
     clear=true
-    dependencies = ["build-release"]
+    dependencies = [
+        "lmake_version_from_date",
+        "build-release"]
 
     [tasks.doc]
     description = "call cargo doc"
@@ -65,4 +69,9 @@ script = [
     "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\target\\doc\\*.* c:\\Users\\Luciano\\rustprojects\\mem4_game\\docs\\ /e /i /y /s ",
 ]
 
+[tasks.lmake_version_from_date]
+clear = true
+private = true
+description = "in cargo.toml change version to today date"
+script= ["..\\..\\utils\\lmake_version_from_date.exe"]
 

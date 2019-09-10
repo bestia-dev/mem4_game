@@ -25,10 +25,7 @@ where
         "my_player_number {}",
         &rrc.game_data.my_player_number
     ));
-    logmod::log1_str(&format!(
-        "player_turn {}",
-        &rrc.game_data.player_turn
-    ));
+    logmod::log1_str(&format!("player_turn {}", &rrc.game_data.player_turn));
     let next_player = if rrc.game_data.player_turn < rrc.game_data.players.len() {
         unwrap!(rrc.game_data.player_turn.checked_add(1))
     } else {
@@ -90,12 +87,12 @@ pub fn take_turn_end(rrc: &mut RootRenderingComponent) {
     let x1 = rrc.game_data.card_index_of_first_click;
     let x2 = rrc.game_data.card_index_of_second_click;
     unwrap!(
-        rrc.game_data.vec_cards.get_mut(x1),
+        rrc.game_data.card_grid_data.get_mut(x1),
         "error game_data.card_index_of_first_click "
     )
     .status = CardStatusCardFace::Down;
     unwrap!(
-        rrc.game_data.vec_cards.get_mut(x2),
+        rrc.game_data.card_grid_data.get_mut(x2),
         "error game_data.card_index_of_second_click"
     )
     .status = CardStatusCardFace::Down;
