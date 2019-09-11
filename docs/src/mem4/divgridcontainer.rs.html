@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `mem4\src\divgridcontainer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>divgridcontainer.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../mem4/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `mem4/src/divgridcontainer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>divgridcontainer.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../mem4/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -372,6 +372,15 @@
 <span id="372">372</span>
 <span id="373">373</span>
 <span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! divgridcontainer.rs - renders the grid container with the images</span>
 <span class="doccomment">//! and most important the on click event</span>
@@ -482,28 +491,30 @@
 
         <span class="comment">//the count of cards can now be not divisible with 2 for card pairs.</span>
         <span class="comment">//so I need to make a different last card that is not clickable.</span>
-        <span class="kw">if</span> <span class="ident">end_index</span> <span class="op">&gt;=</span> <span class="ident">game_data</span>.<span class="ident">vec_cards</span>.<span class="ident">len</span>() {
+        <span class="kw">if</span> <span class="ident">end_index</span> <span class="op">&gt;=</span> <span class="ident">game_data</span>.<span class="ident">card_grid_data</span>.<span class="ident">len</span>() {
             <span class="ident">end_index</span> <span class="op">-=</span> <span class="number">1</span>;
         }
 
-        <span class="ident">logmod</span>::<span class="ident">log1_str</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
-            <span class="string">&quot;div_grid_items: my_player_number {} start_index {} end_index {} vec_cards.len {}&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="ident">root_rendering_component</span>.<span class="ident">game_data</span>.<span class="ident">my_player_number</span>,
-            <span class="ident">start_index</span>,
-            <span class="ident">end_index</span>,
-            <span class="ident">game_data</span>.<span class="ident">vec_cards</span>.<span class="ident">len</span>()
+        <span class="comment">/*
+        logmod::log1_str(&amp;format!(
+            &quot;div_grid_items: my_player_number {} start_index {} end_index {} card_grid_data.len {}&quot;,
+            &amp;root_rendering_component.game_data.my_player_number,
+            start_index,
+            end_index,
+            game_data.card_grid_data.len()
         ));
+*/</span>
 
         <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="ident">start_index</span>..=<span class="ident">end_index</span> {
             <span class="kw">let</span> <span class="ident">index</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">x</span>;
             <span class="comment">//region: prepare variables and closures for inserting into vdom</span>
             <span class="kw">let</span> <span class="ident">img_src</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">unwrap</span><span class="macro">!</span>(
-                <span class="ident">game_data</span>.<span class="ident">vec_cards</span>.<span class="ident">get</span>(<span class="ident">index</span>),
-                <span class="string">&quot;match game_data.vec_cards.get(index) {} startindex {} endindex {} vec_card.len {}&quot;</span>,
+                <span class="ident">game_data</span>.<span class="ident">card_grid_data</span>.<span class="ident">get</span>(<span class="ident">index</span>),
+                <span class="string">&quot;match game_data.card_grid_data.get(index) {} startindex {} endindex {} vec_card.len {}&quot;</span>,
                 <span class="ident">index</span>,
                 <span class="ident">start_index</span>,
                 <span class="ident">end_index</span>,
-                <span class="ident">game_data</span>.<span class="ident">vec_cards</span>.<span class="ident">len</span>()
+                <span class="ident">game_data</span>.<span class="ident">card_grid_data</span>.<span class="ident">len</span>()
             )
             .<span class="ident">status</span>
             {
@@ -517,7 +528,7 @@
                     <span class="macro">unwrap</span><span class="macro">!</span>(
                         <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">game_data</span>.<span class="ident">game_config</span>.<span class="ident">as_ref</span>())
                         .<span class="ident">img_filename</span>.<span class="ident">get</span>(
-                            <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">game_data</span>.<span class="ident">vec_cards</span>.<span class="ident">get</span>(<span class="ident">index</span>))
+                            <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">game_data</span>.<span class="ident">card_grid_data</span>.<span class="ident">get</span>(<span class="ident">index</span>))
                             .<span class="ident">card_number_and_img_src</span>
                         ))
                     )
@@ -526,7 +537,7 @@
             };
 
             <span class="kw">let</span> <span class="ident">img_id</span> <span class="op">=</span>
-            <span class="ident">bumpalo</span>::<span class="macro">format</span><span class="macro">!</span>(<span class="kw">in</span> <span class="ident">bump</span>, <span class="string">&quot;img{:02}&quot;</span>,<span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">game_data</span>.<span class="ident">vec_cards</span>.<span class="ident">get</span>(<span class="ident">index</span>),<span class="string">&quot;game_data.vec_cards.get(index)&quot;</span>).<span class="ident">card_index_and_id</span>)
+            <span class="ident">bumpalo</span>::<span class="macro">format</span><span class="macro">!</span>(<span class="kw">in</span> <span class="ident">bump</span>, <span class="string">&quot;img{:02}&quot;</span>,<span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">game_data</span>.<span class="ident">card_grid_data</span>.<span class="ident">get</span>(<span class="ident">index</span>),<span class="string">&quot;game_data.card_grid_data.get(index)&quot;</span>).<span class="ident">card_index_and_id</span>)
                 .<span class="ident">into_bump_str</span>();
 
             <span class="kw">let</span> <span class="ident">opacity</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">img_src</span>
@@ -589,7 +600,7 @@
             <span class="comment">//endregion</span>
             <span class="comment">//click is usefull only on facedown cards</span>
             <span class="kw">if</span> <span class="macro">unwrap</span><span class="macro">!</span>(
-                <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">vec_cards</span>.<span class="ident">get</span>(<span class="ident">this_click_card_index</span>),
+                <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">card_grid_data</span>.<span class="ident">get</span>(<span class="ident">this_click_card_index</span>),
                 <span class="string">&quot;error this_click_card_index&quot;</span>
             ).<span class="ident">status</span>.<span class="ident">as_ref</span>()<span class="op">==</span><span class="ident">CardStatusCardFace</span>::<span class="ident">Down</span>.<span class="ident">as_ref</span>(){
 
@@ -607,6 +618,7 @@
 
 <span class="doccomment">/// on click</span>
 <span class="kw">fn</span> <span class="ident">div_grid_item_on_click</span>(<span class="ident">rrc</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RootRenderingComponent</span>, <span class="ident">this_click_card_index</span>: <span class="ident">usize</span>) {
+    <span class="ident">logmod</span>::<span class="ident">log1_str</span>(<span class="string">&quot;div_grid_item_on_click&quot;</span>);
     <span class="comment">//region: audio play</span>
     <span class="comment">//prepare the audio element with src filename of mp3</span>
     <span class="kw">let</span> <span class="ident">audio_element</span> <span class="op">=</span> <span class="ident">web_sys</span>::<span class="ident">HtmlAudioElement</span>::<span class="ident">new_with_src</span>(
@@ -617,7 +629,7 @@
                 .<span class="ident">sound_filename</span>
                 .<span class="ident">get</span>(
                     <span class="macro">unwrap</span><span class="macro">!</span>(
-                        <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">vec_cards</span>.<span class="ident">get</span>(<span class="ident">this_click_card_index</span>),
+                        <span class="ident">rrc</span>.<span class="ident">game_data</span>.<span class="ident">card_grid_data</span>.<span class="ident">get</span>(<span class="ident">this_click_card_index</span>),
                         <span class="string">&quot;error this_click_card_index&quot;</span>
                     )
                     .<span class="ident">card_number_and_img_src</span>
@@ -692,10 +704,12 @@
         <span class="comment">//grid_container width and height</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_grid_width</span> <span class="op">=</span> <span class="ident">grid_width</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_grid_height</span> <span class="op">=</span> <span class="ident">grid_height</span>();
-        <span class="ident">logmod</span>::<span class="ident">log1_str</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
-            <span class="string">&quot;inner_width {} inner_height {}&quot;</span>,
-            <span class="ident">max_grid_width</span>, <span class="ident">max_grid_height</span>
+        <span class="comment">/*
+        logmod::log1_str(&amp;format!(
+            &quot;inner_width {} inner_height {}&quot;,
+            max_grid_width, max_grid_height
         ));
+        */</span>
         <span class="comment">//default if not choosen</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">card_width</span> <span class="op">=</span> <span class="number">115</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">card_height</span> <span class="op">=</span> <span class="number">115</span>;
@@ -708,10 +722,12 @@
                     <span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">root_rendering_component</span>.<span class="ident">game_data</span>.<span class="ident">game_config</span>.<span class="ident">clone</span>()).<span class="ident">card_height</span>;
             }
         }
-        <span class="ident">logmod</span>::<span class="ident">log1_str</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
-            <span class="string">&quot;card_width {} card_height {}&quot;</span>,
-            <span class="ident">card_width</span>, <span class="ident">card_height</span>
+        <span class="comment">/*
+        logmod::log1_str(&amp;format!(
+            &quot;card_width {} card_height {}&quot;,
+            card_width, card_height
         ));
+        */</span>
         <span class="comment">//ratio between width and height must stay the same</span>
         <span class="kw">let</span> <span class="ident">ratio</span> <span class="op">=</span> (<span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">card_height</span>.<span class="ident">approx_as</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>())
             <span class="op">*</span> <span class="macro">unwrap</span><span class="macro">!</span>(
@@ -735,10 +751,12 @@
             <span class="ident">max_grid_height</span> <span class="op">=</span>
                 <span class="macro">unwrap</span><span class="macro">!</span>((<span class="macro">unwrap</span><span class="macro">!</span>(<span class="ident">max_grid_width</span>.<span class="ident">approx_as</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>()) <span class="op">*</span> <span class="ident">ratio</span>).<span class="ident">approx_as</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>());
         }
-        <span class="ident">logmod</span>::<span class="ident">log1_str</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
-            <span class="string">&quot;max_grid_width {} max_grid_height {}&quot;</span>,
-            <span class="ident">max_grid_width</span>, <span class="ident">max_grid_height</span>
+        <span class="comment">/*
+        logmod::log1_str(&amp;format!(
+            &quot;max_grid_width {} max_grid_height {}&quot;,
+            max_grid_width, max_grid_height
         ));
+        */</span>
 
         <span class="comment">//return</span>
         <span class="ident">Size2d</span> {

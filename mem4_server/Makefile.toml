@@ -25,7 +25,7 @@ skip_core_tasks = true
     description = "cargo build release"
     clear=true
     dependencies = [
-        # "lmake_version_from_date",
+        "lmake_version_from_date",
         "build_release",
         "post_build_release",
     ]
@@ -58,31 +58,18 @@ args = ["build","--release"]
 [tasks.post_build_dev]
 clear=true
 private=true
-linux_alias = "linux_post_build_dev"
-windows_alias = "windows_post_build_dev"
-
-[tasks.post_build_release]
-clear=true
-private=true
-linux_alias = "linux_post_build_release"
-windows_alias = "windows_post_build_release"
-
-[tasks.linux_post_build_dev]
-clear=true
-private=true
 script = [
-    "\\cp ~/rustprojects/mem4_game/target/debug/mem4_server -rf -v ~/rustprojects/mem4_game/webfolder",
+    "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\target\\debug\\mem4_server.exe c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\ /y ",
     # I cannot script the exact IP here.  
     # It must be copied from the mem4_server.exe output.
-    "alias chrome=\"/mnt/c/Program\\ Files\\ \\(x86\\)/Google/Chrome/Application/chrome.exe\"",
-    "chrome http://127.0.0.1:8084", 
-    "chrome http://127.0.0.1:8084", 
-    "chrome http://127.0.0.1:8084", 
-    "cd ../webfolder",
-    "sudo ./mem4_server"
+    "start chrome http://127.0.0.1:8084", 
+    "start chrome http://127.0.0.1:8084", 
+    "start chrome http://127.0.0.1:8084", 
+    "cd ..\\webfolder",
+    "mem4_server.exe"
 ]
 
-[tasks.linux_post_build_release]
+[tasks.post_build_release]
 clear=true
 private=true
 script = [
@@ -97,57 +84,30 @@ script = [
     "sudo ./mem4_server"
 ]
 
-[tasks.windows_post_build_dev]
-clear=true
-private=true
-script = [
-    "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\target\\debug\\mem4_server.exe c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\ /y ",
-    # I cannot script the exact IP here.  
-    # It must be copied from the mem4_server.exe output.
-    "start chrome http://127.0.0.1:8084", 
-    "start chrome http://127.0.0.1:8084", 
-    "start chrome http://127.0.0.1:8084", 
-    "cd ..\\webfolder",
-    "mem4_server.exe"
-]
-
-[tasks.windows_post_build_release]
-clear=true
-private=true
-script = [
-    "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\target\\release\\mem4_server.exe c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\ /y ",
-    # I cannot script the exact IP here.  
-    # It must be copied from the mem4_server.exe output.
-    "start chrome http://127.0.0.1:8084", 
-    "start chrome http://127.0.0.1:8084", 
-    "start chrome http://127.0.0.1:8084", 
-    "cd ..\\webfolder",
-    "mem4_server.exe"
-]
-
 [tasks.insert_readme]
+description = "copy the content of readme.md into *.rs comments (for the docs)"
 clear = true
 private = true
-description = "copy the content of readme.md into *.rs comments (for the docs)"
-script= ["..\\..\\utils\\lmake_readme.exe"]
+script= ["../../utils_linux/lmake_readme"]
 
 [tasks.cargo_doc]
+description = "call cargo doc"
 clear = true
 private = true
-description = "call cargo doc"
 command="cargo"
 args=["doc","--no-deps","--document-private-items","--open"]
 
 [tasks.cargo_docs_copy]
+description = "copy target doc to docs"
 clear = true
 private = true
 script = [
-    "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\target\\doc\\*.* c:\\Users\\Luciano\\rustprojects\\mem4_game\\docs\\ /e /i /y /s ",
+    "\\cp ~/rustprojects/mem4_game/target/doc -rf -v ~/rustprojects/mem4_game/docs",
 ]
 
 [tasks.lmake_version_from_date]
+description = "in cargo.toml change version to today date"
 clear = true
 private = true
-description = "in cargo.toml change version to today date"
-script= ["..\\..\\utils\\lmake_version_from_date.exe"]
+script= ["../../utils_linux/lmake_version_from_date"]
 

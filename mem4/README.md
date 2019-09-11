@@ -4,6 +4,7 @@
 Look also at the workspace readme on https://github.com/LucianoBestia/mem4_game  
 
 # Idea
+
 Playing the memory game alone is boring.  
 Playing it with friends is better.  
 But if all friends just stare in their smartphones, it is still boring.  
@@ -13,7 +14,9 @@ Today I assume everybody has a decent smartphone. If all friends open the mem4 g
 All the phones will have a small card grid (ex. 3x3). But the combined card grid from all these phones together is not so small anymore. It is now much more interesting to play for the players.  
 It can be played with as many friends as there are: 3,4,5,...  
 More friends - more fun.  
+
 ## Rust and Wasm/WebAssembly
+
 Rust is a pretty new language created by Mozilla for really low level programming.  
 It is a step forward from the C language with functionality and features that are best practice today.  
 It is pretty hard to learn. Some concepts are so different from other languages it makes it

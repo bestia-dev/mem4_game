@@ -1,6 +1,15 @@
 # mem4_game/mem4/Makefile.toml
 # https://github.com/sagiegurari/cargo-make/blob/master/src/lib/Makefile.stable.toml
 
+# Building on windows is just cumbersome. The result is only good for windows.
+# The web server will always be on linux. Wasm/Webassembly is OS agnostic.
+# It has much more sense to build always in Linux. 
+# OS for code editing does not change anything.
+# Building for both OS means I would need to call every utils exe and 
+# every copy command in 2 different ways. So complicated.
+# Not good.
+# Decision: I will always build only for for Linux inside Linux subsystem for Windows !
+
 [config]
 skip_core_tasks = true
 
@@ -17,85 +26,76 @@ skip_core_tasks = true
     clear = true
     dependencies = [
         "lmake_version_from_date",
-        "build-dev",
-        "post-build",
+        "build_dev",
+        "post_build",
     ]
 
     [tasks.release]
     description = "cargo build release"
     clear = true
     dependencies = [
-        # "lmake_version_from_date",
-        "build-release",
-        "post-build",
+        "lmake_version_from_date",
+        "build_release",
+        "post_build",
     ]
 
     [tasks.doc]
     description = "call cargo doc"
     clear=true
     dependencies = [
-        "insert-readme",
-        "cargo-doc",
-        "cargo-docs-copy"
+        "insert_readme",
+        "cargo_doc",
+        "cargo_docs_copy"
     ]
 
 # endregion
 
-[tasks.build-dev]
+[tasks.build_dev]
+description = "build for debug / dev"
 clear = true
 private = true
 command = "wasm-pack"
 args = ["build", "--target", "web","--dev"]
 
-[tasks.build-release]
+[tasks.build_release]
+description = "build for release"
 clear = true
 private = true
 command = "wasm-pack"
 args = ["build","--target", "web","--release"]
 
-[tasks.post-build]
-clear = true
-private = true
-linux_alias = "linux_post-build"
-windows_alias = "windows_post-build"
-
-[tasks.linux_post-build]
+[tasks.post_build]
+description = "copy wasm pkg to webfolder"
 clear = true
 private = true
 script = [
     "\\cp ~/rustprojects/mem4_game/mem4/pkg/* -rf -v ~/rustprojects/mem4_game/webfolder/mem4/pkg",
 ]
 
-[tasks.windows_post-build]
-clear = true
-private = true
-script = [
-    "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\mem4\\pkg\\*.* c:\\Users\\Luciano\\rustprojects\\mem4_game\\webfolder\\mem4\\pkg\\ /e /i /y /s ",
-]
-
-
-[tasks.insert-readme]
-clear = true
-private = true
+[tasks.insert_readme]
 description = "copy the content of readme.md into *.rs comments (for the docs)"
-script= ["..\\..\\utils\\lmake_readme.exe"]
-
-[tasks.cargo-doc]
 clear = true
 private = true
-description = "call cargo doc"
+script= ["../../utils_linux/lmake_readme"]
+
+[tasks.cargo_doc]
+description = "generate docs from source code"
+clear = true
+private = true
 command="cargo"
 args=["doc","--no-deps","--document-private-items","--open"]
 
-[tasks.cargo-docs-copy]
+[tasks.cargo_docs_copy]
+description = "copy target doc to docs (github standard)"
+# TODO: should be better if first delete old content
 clear = true
 private = true
 script = [
-    "xcopy c:\\Users\\Luciano\\rustprojects\\mem4_game\\target\\doc\\*.* c:\\Users\\Luciano\\rustprojects\\mem4_game\\docs\\ /e /i /y /s ",
+    "\\cp ~/rustprojects/mem4_game/target/doc/* -rf -v ~/rustprojects/mem4_game/docs",
 ]
 
 [tasks.lmake_version_from_date]
+description = "in cargo.toml change version to today date"
 clear = true
 private = true
-description = "in cargo.toml change version to today date"
-script= ["..\\..\\utils\\lmake_version_from_date.exe"]
+script= ["../../utils_linux/lmake_version_from_date"]

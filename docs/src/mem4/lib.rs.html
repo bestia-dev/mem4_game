@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `mem4\src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../mem4/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `mem4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../mem4/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -288,14 +288,18 @@
 <span id="288">288</span>
 <span id="289">289</span>
 <span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">//region: lmake_readme insert &quot;readme.md&quot;</span>
 <span class="doccomment">//! **mem4 is a simple memory game made primarily for learning the Rust programming language and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication**  </span>
 <span class="doccomment">//! </span>
-<span class="doccomment">//! version: 19.9.9  </span>
+<span class="doccomment">//! version: 19.9.10  </span>
 <span class="doccomment">//! Look also at the workspace readme on https://github.com/LucianoBestia/mem4_game  </span>
 <span class="doccomment">//! </span>
 <span class="doccomment">//! # Idea</span>
+<span class="doccomment">//! </span>
 <span class="doccomment">//! Playing the memory game alone is boring.  </span>
 <span class="doccomment">//! Playing it with friends is better.  </span>
 <span class="doccomment">//! But if all friends just stare in their smartphones, it is still boring.  </span>
@@ -305,7 +309,9 @@
 <span class="doccomment">//! All the phones will have a small card grid (ex. 3x3). But the combined card grid from all these phones together is not so small anymore. It is now much more interesting to play for the players.  </span>
 <span class="doccomment">//! It can be played with as many friends as there are: 3,4,5,...  </span>
 <span class="doccomment">//! More friends - more fun.  </span>
+<span class="doccomment">//! </span>
 <span class="doccomment">//! ## Rust and Wasm/WebAssembly</span>
+<span class="doccomment">//! </span>
 <span class="doccomment">//! Rust is a pretty new language created by Mozilla for really low level programming.  </span>
 <span class="doccomment">//! It is a step forward from the C language with functionality and features that are best practice today.  </span>
 <span class="doccomment">//! It is pretty hard to learn. Some concepts are so different from other languages it makes it</span>
@@ -360,17 +366,17 @@
 <span class="doccomment">//! Then a message is sent to other players so they can also change their local GameData and GameStatus.  </span>
 <span class="doccomment">//! The rendering is scheduled and it will happen shortly (async).   </span>
 <span class="doccomment">//!  </span>
-<span class="doccomment">//! | Game Status1       | Render                     | User action                                 | Condition                            | GameStatus2 t.p. | Sends Msg        | On rcv Msg o.p.            | GameStatus2 o.p.                 |</span>
-<span class="doccomment">//! | ------------------ | -------------------------- | ------------------------------------------- | ------------------------------------ | ---------------- | ---------------- | -------------------------- | -------------------------------- |</span>
-<span class="doccomment">//! | InviteAskBegin     | div_invite_ask_begin       | div_invite_ask_begin_on_click               | -                                    | InviteAsking     | Invite           | on_msg_invite              | InviteAsked                      |</span>
-<span class="doccomment">//! | InviteAsked        | div_invite_asked, div_play_accepted | div_invite_asked_on_click          | -                                    | PlayAccepted     | PlayAccept       | on_msg_play_accept         | -                                |</span>
-<span class="doccomment">//! | InviteAsking       | div_invite_asking          | game_data_init                              | -                                    | PlayBefore1stCard  | GameDataInit     | on_msg_game_data_init      | PlayBefore1stCard                  |</span>
-<span class="doccomment">//! | PlayBefore1stCard    | div_grid_container         | div_grid_item_on_click, on_click_1st_card();  | -                                    | PlayBefore2ndCard  | PlayerClick1stCard | on_msg_player_click_1st_card | PlayBefore2ndCard                  |</span>
-<span class="doccomment">//! | PlayBefore2ndCard    | div_grid_container         | div_grid_item_on_click, on_click_2nd_card();  | If card match and points&lt;all point   | PlayBefore1stCard  | PlayerClick2ndCard | on_msg_player_click_2nd_card | PlayBefore1stCard                  |</span>
-<span class="doccomment">//! | -II-               | -II-                       | -II-                                        | If card match and points=&gt;all points | PlayAgain        | PlayAgain        | on_msg_play_again          | PlayAgain                        |</span>
-<span class="doccomment">//! | -II-               | -II-                       | -II-                                        | else                                 | TakeTurnBegin    | TakeTurnBegin    | on_msg_take_turn           | TakeTurnBegin                    |</span>
-<span class="doccomment">//! | TakeTurnBegin      | div_take_turn_begin        | div_take_turn_begin_on_click                | -                                    | PlayBefore1stCard  | TakeTurnEnd      | on_msg_take_turn_end       | PlayBefore1stCard, the next player |</span>
-<span class="doccomment">//! | PlayAgain          | div_play_again             | window.location().reload()                  | -                                    | -                | -                | -                          | -                                |</span>
+<span class="doccomment">//! | Game Status1       | Render                     | User action                                 | Condition                            | GameStatus2 t.p.   | Sends Msg          | On rcv Msg o.p.              | GameStatus2 o.p.                   |</span>
+<span class="doccomment">//! | ------------------ | -------------------------- | ------------------------------------------- | ------------------------------------ | ----------------   | ----------------   | --------------------------   | --------------------------------   |</span>
+<span class="doccomment">//! | InviteAskBegin     | div_invite_ask_begin       | div_invite_ask_begin_on_click               | -                                    | InviteAsking       | Invite             | on_msg_invite                | InviteAsked                        |</span>
+<span class="doccomment">//! | InviteAsked        | div_invite_asked, div_play_accepted | div_invite_asked_on_click          | -                                    | PlayAccepted       | PlayAccept         | on_msg_play_accept           | -                                  |</span>
+<span class="doccomment">//! | InviteAsking       | div_invite_asking          | game_data_init                              | -                                    | PlayBefore1stCard  | GameDataInit       | on_msg_game_data_init        | PlayBefore1stCard                  |</span>
+<span class="doccomment">//! | PlayBefore1stCard  | div_grid_container         | div_grid_item_on_click, on_click_1st_card();| -                                    | PlayBefore2ndCard  | PlayerClick1stCard | on_msg_player_click_1st_card | PlayBefore2ndCard                  |</span>
+<span class="doccomment">//! | PlayBefore2ndCard  | div_grid_container         | div_grid_item_on_click, on_click_2nd_card();| If card match and points&lt;all point   | PlayBefore1stCard  | PlayerClick2ndCard | on_msg_player_click_2nd_card | PlayBefore1stCard                  |</span>
+<span class="doccomment">//! | -II-               | -II-                       | -II-                                        | If card match and points=&gt;all points | GameOverPlayAgainBegin | GameOverPlayAgainBegin  | on_msg_play_again   | GameOverPlayAgainBegin             |</span>
+<span class="doccomment">//! | -II-               | -II-                       | -II-                                        | else                                 | TakeTurnBegin      | TakeTurnBegin      | on_msg_take_turn             | TakeTurnBegin                      |</span>
+<span class="doccomment">//! | TakeTurnBegin      | div_take_turn_begin        | div_take_turn_begin_on_click                | -                                    | PlayBefore1stCard  | TakeTurnEnd        | on_msg_take_turn_end         | PlayBefore1stCard, the next player |</span>
+<span class="doccomment">//! | GameOverPlayAgainBegin | div_play_again         | window.location().reload()                  | -                                    | -                  | -                  | -                            | -                                  |</span>
 <span class="doccomment">//! |  |  |  |  |  |  |  |  |</span>
 <span class="doccomment">//!  </span>
 <span class="doccomment">//! t.p. = this player,   o.p. = other players,  rrc = root_rendering_component, rcv = receive</span>
