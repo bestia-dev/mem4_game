@@ -435,9 +435,9 @@ pub fn local_ip_get() -> Option<IpAddr> {
         .output()
         .expect("failed to execute `ifconfig`");
 
-    let stdout = String::from_utf8(output.stdout).unwrap();
+    let stdout = unwrap!(String::from_utf8(output.stdout));
 
-    let re = Regex::new(r#"(?m)^.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*$"#).unwrap();
+    let re = unwrap!(Regex::new(r#"(?m)^.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*$"#));
     for cap in re.captures_iter(&stdout) {
         let host = cap.get(2).map_or("", |m| m.as_str());
         if host != "127.0.0.1" {
@@ -449,7 +449,8 @@ pub fn local_ip_get() -> Option<IpAddr> {
             }
         }
     }
-    return None;
+    //return
+    None
 }
 
 #[cfg(target_family = "windows")]
@@ -495,6 +496,6 @@ pub fn enable_ansi_support() {
 }
 #[cfg(target_family = "unix")]
 ///ansi support
-pub fn enable_ansi_support() {
+pub const fn enable_ansi_support() {
     //do nothing
 }
