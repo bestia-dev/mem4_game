@@ -26,16 +26,6 @@ I prepared some flows and tasks for Cargo make for the workspace.
 `cargo make release` - builds the release version and runs the server and the browser  
 `cargo make doc` - build the `/target/docs` folder and copy to the `/docs` folder.  
 
-## TODO:
-- on card click only the active player calculates the new state and send the new info to others in a msg  
-
-- sync data from player1 to others after reconnect.
-- different content for English learning: numbers (cardinal, ordinal), food, orientation, alphabet simple spelling, drinks, days/months, questions, colors, transportation, ... 
-- fullscreen from http://robnyman.github.io/fullscreen/  
-- onfullscreen vdom schedule render  
-- iPhone/android webapp manifest file  
-- why/how to reset/reload the webapp in "add to homescreen" on iPhone?  
-
 ## Changelog
 2019-05-24 completed a working version  
 2019-06-06 google cloud platform, docker, DockerHub  
@@ -52,4 +42,5 @@ I prepared some flows and tasks for Cargo make for the workspace.
 2019-09-08 content filenames in config.json, async fetch game_config.json, separate module for that  
 2019-09-09 version 19.9.9 no need for semver if it is not a public library, version in docs  
 2019-09-10 increase version automatically on build  
+2019-09-13 end development of mem4, start mem5
 
