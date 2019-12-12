@@ -14,7 +14,7 @@
 //! ## Google vm
 //! One working server is installed on google vm.  
 //! You can play the game here (hosted on google cloud platform):  
-//! http://bestia.shorturl.com/mem4  
+//! http://bestia.dev/mem4  
 //! 
 //! 
 //! 

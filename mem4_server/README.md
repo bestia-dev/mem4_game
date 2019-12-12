@@ -13,7 +13,7 @@ Route `/mem4ws/` broadcast all WebSocket msg to all connected clients except sen
 ## Google vm
 One working server is installed on google vm.  
 You can play the game here (hosted on google cloud platform):  
-http://bestia.shorturl.com/mem4  
+http://bestia.dev/mem4  
 
 
 

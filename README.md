@@ -12,13 +12,13 @@ The workspace mem4_game is made of:
 Read the `Last project`:  
 https://github.com/LucianoBestia/mem3_game  
 You can play the game here (hosted on google cloud platform):  
-http://bestia.shorturl.com/mem4  
+http://bestia.dev/mem4  
 For exercise I made a Docker image/container for mem4 on the google VM:  
-http://bestia.shorturl.com/memdock4  
-## Shorturl.com
-Google cloud platform does not give any subdomain name for free. Google is also a domain registrar and it looks like they are trying to push me to buy a domain.  
-I didn't like to have the raw IP in the url. People don't like numbers like that.  
-I created a subdomain on shorturl.com. It is not the perfect solution, but it is free or very cheap.  
+http://bestia.dev/memdock4  
+## bestia.dev
+Google cloud platform does not give any subdomain name for free.  
+Google is also a domain registrar and it looks like they are trying to push me to buy their domain.   
+I had to buy my own domain name bestia.dev from porkbun.com for 12$ per year.
 ## Cargo make
 I prepared some flows and tasks for Cargo make for the workspace.  
 `cargo make` - lists the possible available/public flows/tasks  

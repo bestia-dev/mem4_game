@@ -1,6 +1,6 @@
 [package]
 name = "mem4"
-version = "19.9.11" #no need for semver if it is not a public library
+version = "19.10.11-14.11" #no need for semver if it is not a public library
 authors = ["Luciano Furlan <Luciano.Bestia@gmail.com>"]
 edition = "2018"
 description = "Learning Rust Wasm/WebAssembly with Virtual Dom Dodrio"
@@ -19,7 +19,7 @@ crate-type = ["cdylib"]
 unwrap = "1.2.1"
 mem4_common = { path = "../mem4_common" }
 dodrio = "0.1.0"
-wasm-bindgen = { version = "0.2.43", features = ["serde-serialize"] }
+wasm-bindgen = { version = "0.2.51", features = ["serde-serialize"] }
 console_error_panic_hook = "0.1.6"
 rand = { version = "0.6", features = ["wasm-bindgen"] }
 js-sys = "0.3"
@@ -35,7 +35,7 @@ typed-html = {version="0.2.0", features = ["dodrio_macro"]}
 conv = "0.3.3"
 
 [dependencies.web-sys]
-version = "0.3.20"
+version = "0.3.28"
 features = [
   "AbortController",
   "console",

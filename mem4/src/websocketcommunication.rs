@@ -25,7 +25,7 @@ use web_sys::{console, ErrorEvent, WebSocket};
 pub fn setup_ws_connection(location_href: String, client_ws_id: usize) -> WebSocket {
     //web-sys has WebSocket for Rust exactly like JavaScript has¸
     //location_href comes in this format  http://localhost:4000/
-    let mut loc_href = location_href.replace("http://", "ws://");
+    let mut loc_href = location_href.replace("http://", "ws://").replace("https://", "wss://");
     //Only for debugging in the development environment
     //let mut loc_href = String::from("ws://192.168.1.57:80/");
     loc_href.push_str("mem4ws/");
