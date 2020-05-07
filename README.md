@@ -26,6 +26,14 @@ I prepared some flows and tasks for Cargo make for the workspace.
 `cargo make release` - builds the release version and runs the server and the browser  
 `cargo make doc` - build the `/target/docs` folder and copy to the `/docs` folder.  
 
+## cargo crev reviews and advisory
+
+It is recommended to always use [cargo-crev](https://github.com/crev-dev/cargo-crev)  
+to verify the trustworthiness of each of your dependencies.  
+Please, spread this info.  
+On the web use this url to read crate reviews. Example:  
+<https://bestia.dev/cargo_crev_web/query/num-traits>  
+
 ## Changelog
 2019-05-24 completed a working version  
 2019-06-06 google cloud platform, docker, DockerHub  

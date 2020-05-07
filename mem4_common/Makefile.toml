@@ -73,5 +73,5 @@ script = [
 clear = true
 private = true
 description = "in cargo.toml change version to today date"
-script= ["..\\..\\utils\\lmake_version_from_date.exe"]
+script= ["lmake_version_from_date"]
 

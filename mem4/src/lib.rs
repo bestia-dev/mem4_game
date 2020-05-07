@@ -1,4 +1,4 @@
-//region: lmake_readme insert "readme.md"
+// region: lmake_readme include "readme.md" //! A
 //! **mem4 is a simple memory game made primarily for learning the Rust programming language and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication**  
 //! 
 //! version: 19.9.10  
@@ -131,7 +131,7 @@
 //! `cargo make release` - builds the release version and runs the server and the browser  
 //! `cargo make doc` - build the `/target/doc` folder and copy to the `../docs` folder.  
 
-//endregion: lmake_readme insert "readme.md"
+// endregion: lmake_readme include "readme.md" //! A
 
 //needed for dodrio! macro (typed-html)
 #![recursion_limit = "512"]

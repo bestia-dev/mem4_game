@@ -1,6 +1,8 @@
 **mem4_server - html and WebSocket server for the mem4 game**
 
-[comment]: # (lmake_readme version)  
+[comment]: # (lmake_readme cargo.toml data start)
+
+[comment]: # (lmake_readme cargo.toml data end)  
 Look also at the workspace readme https://github.com/LucianoBestia/mem4_game  
 
 ## mem4_server
@@ -15,5 +17,12 @@ One working server is installed on google vm.
 You can play the game here (hosted on google cloud platform):  
 http://bestia.dev/mem4  
 
+## cargo crev reviews and advisory
+
+It is recommended to always use [cargo-crev](https://github.com/crev-dev/cargo-crev)  
+to verify the trustworthiness of each of your dependencies.  
+Please, spread this info.  
+On the web use this url to read crate reviews. Example:  
+<https://bestia.dev/cargo_crev_web/query/num-traits>  
 
 

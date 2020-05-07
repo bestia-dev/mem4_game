@@ -1,6 +1,8 @@
 **mem4 is a simple memory game made primarily for learning the Rust programming language and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication**  
 
-[comment]: # (lmake_readme version)  
+[comment]: # (lmake_readme cargo.toml data start)
+
+[comment]: # (lmake_readme cargo.toml data end)  
 Look also at the workspace readme on https://github.com/LucianoBestia/mem4_game  
 
 # Idea
@@ -129,3 +131,11 @@ I prepared some flows and tasks for Cargo make.
 `cargo make dev` - builds the development version and runs the server and the browser  
 `cargo make release` - builds the release version and runs the server and the browser  
 `cargo make doc` - build the `/target/doc` folder and copy to the `../docs` folder.  
+
+## cargo crev reviews and advisory
+
+It is recommended to always use [cargo-crev](https://github.com/crev-dev/cargo-crev)  
+to verify the trustworthiness of each of your dependencies.  
+Please, spread this info.  
+On the web use this url to read crate reviews. Example:  
+<https://bestia.dev/cargo_crev_web/query/num-traits>  

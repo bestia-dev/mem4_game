@@ -1,4 +1,4 @@
-//region: lmake_readme insert "readme.md"
+// region: lmake_readme include "readme.md" //! A
 //! **mem4_server - html and WebSocket server for the mem4 game**
 //! 
 //! version: 19.9.9  
@@ -19,7 +19,7 @@
 //! 
 //! 
 
-//endregion: lmake_readme insert "readme.md"
+// endregion: lmake_readme include "readme.md" //! A
 
 //region: Clippy
 #![warn(

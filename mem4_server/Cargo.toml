@@ -8,6 +8,7 @@ readme = "README.md"
 repository = "https://github.com/lucianobestia/mem4_game"
 categories = ["web-programming::http-server"]
 keywords = ["warp", "server", "http", "websocket"]
+publish = false
 
 [dependencies]
 mem4_common = { path = "../mem4_common" }
