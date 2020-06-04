@@ -69,7 +69,7 @@ description = "copy wasm pkg to webfolder"
 clear = true
 private = true
 script = [
-    "\\cp ~/rustprojects/mem4_game/mem4/pkg/* -rf -v ~/rustprojects/mem4_game/webfolder/mem4/pkg",
+    "\\cp /mnt/c/Users/Luciano/rustprojects/mem4_game/mem4/pkg/* -rf -v /mnt/c/Users/Luciano/rustprojects/mem4_game/webfolder/mem4/pkg",
 ]
 
 [tasks.insert_readme]
@@ -91,7 +91,7 @@ description = "copy target doc to docs (github standard)"
 clear = true
 private = true
 script = [
-    "\\cp ~/rustprojects/mem4_game/target/doc/* -rf -v ~/rustprojects/mem4_game/docs",
+    "\\cp /mnt/c/Users/Luciano/rustprojects/mem4_game/target/doc/* -rf -v /mnt/c/Users/Luciano/rustprojects/mem4_game/docs",
 ]
 
 [tasks.lmake_version_from_date]

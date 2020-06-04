@@ -73,7 +73,7 @@ script = [
 clear=true
 private=true
 script = [
-    "\\cp ~/rustprojects/mem4_game/target/release/mem4_server -rf -v ~/rustprojects/mem4_game/webfolder",
+    "\\cp /mnt/c/Users/Luciano/rustprojects/mem4_game/target/release/mem4_server -rf -v /mnt/c/Users/Luciano/rustprojects/mem4_game/webfolder",
     # I cannot script the exact IP here.  
     # It must be copied from the mem4_server.exe output.
     "alias chrome=\"/mnt/c/Program\\ Files\\ \\(x86\\)/Google/Chrome/Application/chrome.exe\"",
@@ -102,7 +102,7 @@ description = "copy target doc to docs"
 clear = true
 private = true
 script = [
-    "\\cp ~/rustprojects/mem4_game/target/doc -rf -v ~/rustprojects/mem4_game/docs",
+    "\\cp /mnt/c/Users/Luciano/rustprojects/mem4_game/target/doc -rf -v /mnt/c/Users/Luciano/rustprojects/mem4_game/docs",
 ]
 
 [tasks.lmake_version_from_date]
