@@ -3,7 +3,7 @@
 [comment]: # (lmake_readme cargo.toml data start)
 
 [comment]: # (lmake_readme cargo.toml data end)  
-Look also at the workspace readme https://github.com/LucianoBestia/mem4_game  
+Look also at the workspace readme https://github.com/bestia-dev/mem4_game  
 
 ## mem4_server
 Primarily made for learning to code Rust for a http + WebSocket server on the same port  

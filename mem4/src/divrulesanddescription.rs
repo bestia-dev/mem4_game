@@ -60,8 +60,8 @@ impl Render for RulesAndDescription {
             </h4>
             <h6>
                 {vec![text(bumpalo::format!(in bump, "Learning Rust programming: {}", "").into_bump_str(),)]}
-                <a href= "https://github.com/LucianoBestia/mem4_game" target="_blank">
-                    {vec![text(bumpalo::format!(in bump, "https://github.com/LucianoBestia/mem4_game{}", "").into_bump_str(),)]}
+                <a href= "https://github.com/bestia-dev/mem4_game" target="_blank">
+                    {vec![text(bumpalo::format!(in bump, "https://github.com/bestia-dev/mem4_game{}", "").into_bump_str(),)]}
                 </a>
             </h6>
         </div>

@@ -1,12 +1,12 @@
 # mem4_game
 
 **Learning Rust Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication - part four.**  
-***version: 4.0  date: 2019-09-09 author: [Dev_Bestia](https://bestia.dev) repository: [GitHub](https://github.com/LucianoBestia/mem4_game)***  
+***version: 4.0  date: 2019-09-09 author: [bestia.dev](https://bestia.dev) repository: [GitHub](https://github.com/bestia-dev/mem4_game)***  
 
 ## Documentation
 
 Documentation generated from source code:  
-<https://lucianobestia.github.io/mem4_game/mem4/index.html>  
+<https://bestia-dev.github.io/mem4_game/mem4/index.html>  
 The workspace mem4_game is made of:  
 
 1. Wasm/WebAssembly  (for browser) frontend - mem4  
@@ -16,7 +16,7 @@ The workspace mem4_game is made of:
 ## Info and working game
 
 Read the `Last project`:  
-<https://github.com/LucianoBestia/mem3_game>  
+<https://github.com/bestia-dev/mem3_game>  
 You can play the game here (hosted on google cloud platform):  
 <http://bestia.dev/mem4>  
 For exercise I made a Docker image/container for mem4 on the google VM:  

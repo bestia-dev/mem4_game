@@ -2,7 +2,7 @@
 //! **mem4_common - commons for mem4 wasm and server**
 //!
 //! version: 19.9.9  
-//! Look also at the workspace readme https://github.com/LucianoBestia/mem4_game  
+//! Look also at the workspace readme https://github.com/bestia-dev/mem4_game  
 //!
 //! ## mem4_common
 //! Learning to code Rust for a http + WebSocket.  

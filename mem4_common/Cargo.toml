@@ -2,10 +2,10 @@
 name = "mem4_common"
 version = "19.9.9" #no need for semver if it is not a library
 description = "commons for mem4 wasm and server"
-authors = ["Luciano Bestia"]
+authors = ["bestia.dev"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/lucianobestia/mem4_game"
+repository = "https://github.com/bestia-dev/mem4_game"
 categories = ["web-programming::http-server"]
 keywords = ["warp", "server", "http", "websocket"]
 publish = false

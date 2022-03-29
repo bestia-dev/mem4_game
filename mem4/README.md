@@ -3,7 +3,7 @@
 [comment]: # (lmake_readme cargo.toml data start)
 
 [comment]: # (lmake_readme cargo.toml data end)  
-Look also at the workspace readme on https://github.com/LucianoBestia/mem4_game  
+Look also at the workspace readme on https://github.com/bestia-dev/mem4_game  
 
 # Idea
 
@@ -44,7 +44,7 @@ When GameData change and we know it will affect the DOM, then rendering must be 
 The main component of the Dodrio Virtual Dom is the root rendering component.  
 It is the component that renders the complete user interface (HTML).  
 The root rendering component is easily splitted  into sub-components.  
-![](https://github.com/LucianoBestia/mem4_game/raw/master/docs/img/subcomponents.png)  
+![](https://github.com/bestia-dev/mem4_game/raw/master/docs/img/subcomponents.png)  
 Some subcomponents don't need any extra data and can be coded as simple functions.  
 The subcomponent "players and scores" has its own data. This data is cached from the GameData.  
 When this data does not match, invalidation is called to cache them.

@@ -2,7 +2,7 @@
 //! **mem4_server - html and WebSocket server for the mem4 game**
 //! 
 //! version: 19.9.9  
-//! Look also at the workspace readme https://github.com/LucianoBestia/mem4_game  
+//! Look also at the workspace readme https://github.com/bestia-dev/mem4_game  
 //! 
 //! ## mem4_server
 //! Primarily made for learning to code Rust for a http + WebSocket server on the same port  
@@ -123,7 +123,7 @@ fn main() {
     //region: cmdline parameters
     let matches = App::new("mem4_server")
         .version("1.0.0")
-        .author("Luciano Bestia")
+        .author("bestia.dev")
         .about("server http and WebSocket for mem4 game")
         .arg(
             Arg::with_name("prm_ip")

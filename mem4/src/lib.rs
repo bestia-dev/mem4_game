@@ -2,7 +2,7 @@
 //! **mem4 is a simple memory game made primarily for learning the Rust programming language and Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication**  
 //! 
 //! version: 19.9.10  
-//! Look also at the workspace readme on https://github.com/LucianoBestia/mem4_game  
+//! Look also at the workspace readme on https://github.com/bestia-dev/mem4_game  
 //! 
 //! # Idea
 //! 
@@ -43,7 +43,7 @@
 //! The main component of the Dodrio Virtual Dom is the root rendering component.  
 //! It is the component that renders the complete user interface (HTML).  
 //! The root rendering component is easily splitted  into sub-components.  
-//! ![](https://github.com/LucianoBestia/mem4_game/raw/master/docs/img/subcomponents.png)  
+//! ![](https://github.com/bestia-dev/mem4_game/raw/master/docs/img/subcomponents.png)  
 //! Some subcomponents don't need any extra data and can be coded as simple functions.  
 //! The subcomponent "players and scores" has its own data. This data is cached from the GameData.  
 //! When this data does not match, invalidation is called to cache them.
