@@ -2,6 +2,7 @@
 name = "mem4"
 version = "19.10.11-14.11" #no need for semver if it is not a public library
 authors = ["bestia.dev"]
+homepage = "https://bestia.dev"
 edition = "2018"
 description = "Learning Rust Wasm/WebAssembly with Virtual Dom Dodrio"
 repository = "https://github.com/bestia-dev/mem4_game"
