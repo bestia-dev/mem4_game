@@ -3,7 +3,7 @@
 **Learning Rust Wasm/WebAssembly with Virtual Dom Dodrio and WebSocket communication - part four.**  
 ***version: 4.0  date: 2019-09-09 author: [bestia.dev](https://bestia.dev) repository: [GitHub](https://github.com/bestia-dev/mem4_game)***  
 
-![Hits](https://bestia.dev/webpage_hit_counter/get_svg_image/877407106)
+![Hits](https://bestia.dev/webpage_hit_counter/get_svg_image/877407106.svg)
 
 Hashtags: #rustlang #game #tutorial  
 My projects on Github are more like a tutorial than a finished product: [bestia-dev tutorials](https://github.com/bestia-dev/tutorials_rust_wasm).
